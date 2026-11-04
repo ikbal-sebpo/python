@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+{% block title %}Upload gross salary · Orbis{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <h1 class="text-xl font-semibold">Upload gross salary</h1>
+    <p class="text-sm text-text-soft dark:text-white/60 mt-1">
+        Restricted to Finance. Sets each employee's current gross monthly salary.
+    </p>
+</div>
+
+<div class="card mb-4">
+    <h2 class="text-sm font-semibold mb-3">1. Download a template</h2>
+    <div class="flex flex-wrap items-center gap-2">
+        <a href="{% url 'payroll_salary_upload_template' %}" class="btn-secondary">
+            <i data-lucide="file-spreadsheet" class="w-4 h-4"></i><span>Excel template</span>
+        </a>
+        <span class="text-xs text-text-mute ml-2">
+            Prefilled with every active employee's ID, name and current gross salary for reference, plus a
+            dropdown on the Reason column. Delete the rows you don't need to touch this cycle before uploading —
+            an unedited row fails to parse.
+        </span>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <h2 class="text-sm font-semibold mb-2">2. File format</h2>
+    <p class="text-sm text-text-soft dark:text-white/70 mb-2">
+        One row per employee, four columns, header on row 1:
+    </p>
+    <table class="table-simple text-sm mb-2">
+        <thead><tr><th>Employee ID</th><th>Gross monthly salary</th><th>Effective from</th><th>Reason</th></tr></thead>
+        <tbody>
+            <tr><td>1042</td><td>85000</td><td>2026-03-01</td><td>Annual increment</td></tr>
+        </tbody>
+    </table>
+    <ul class="text-sm text-text-soft dark:text-white/70 list-disc pl-5 space-y-1">
+        <li>Effective from is per employee — use the date their current gross salary actually took effect,
+            not the upload date. Payroll runs pick a salary by this date, so getting it right matters for
+            any period run or re-run before today.</li>
+        <li>Reason accepts either the code or the label below, case-insensitively:
+            {% for value, label in reason_choices %}<span class="font-medium">{{ label }}</span>{% if not forloop.last %}, {% endif %}{% endfor %}.
+        </li>
+        <li>Re-uploading the same employee <span class="font-medium">supersedes</span> their current gross
+            salary — the earlier figure is kept as a closed-out history row, not overwritten.</li>
+        <li>There is no approval gate — your upload is final.</li>
+    </ul>
+</div>
+
+<div class="card mb-4">
+    <h2 class="text-sm font-semibold mb-3">3. Upload your filled file</h2>
+    <form id="salary-upload-form"
+          method="post"
+          enctype="multipart/form-data"
+          hx-post="{% url 'payroll_salary_upload' %}"
+          hx-encoding="multipart/form-data"
+          hx-target="#upload-result"
+          hx-swap="innerHTML"
+          hx-indicator="#upload-spinner"
+          class="flex flex-wrap items-end gap-3">
+        {% csrf_token %}
+        <div>
+            <label class="block text-xs font-medium text-text-soft dark:text-white/70 mb-1" for="{{ form.note.id_for_label }}">
+                Note (optional)
+            </label>
+            {{ form.note }}
+        </div>
+        <input type="file" name="file" accept=".xlsx,.csv" required class="form-input w-auto max-w-xs">
+        <button type="submit" name="action" value="preview" class="btn-secondary">
+            <i data-lucide="eye" class="w-4 h-4"></i><span>Preview only</span>
+        </button>
+        <button type="submit" name="action" value="apply" class="btn-primary">
+            <i data-lucide="upload-cloud" class="w-4 h-4"></i><span>Apply upload</span>
+        </button>
+        <span id="upload-spinner" class="htmx-indicator inline-flex items-center gap-1 text-xs text-text-mute">
+            <i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i>Working…
+        </span>
+    </form>
+    <p class="text-xs text-text-mute mt-2">
+        Tip: click <span class="font-medium">Preview only</span> first to see what will change without writing,
+        then click <span class="font-medium">Apply upload</span> — the file stays attached, no need to re-upload.
+        A malformed row (bad ID, amount, date or reason) rejects the whole upload before anything is written; a
+        row that fails only when applied (e.g. an effective date that doesn't come after that employee's current
+        record) is skipped and reported without affecting the rest of the file.
+    </p>
+</div>
+
+<div id="upload-result">
+    {% if report or inline_error %}
+        {% include "payroll/_salary_upload_report.html" with report=report parsed_preview=parsed_preview preview=preview aborted=aborted inline_error=inline_error %}
+    {% endif %}
+</div>
+
+<script>
+    document.body.addEventListener('htmx:afterSwap', function (evt) {
+        if (window.lucide && typeof window.lucide.createIcons === 'function') {
+            window.lucide.createIcons();
+        }
+    });
+</script>
+{% endblock %}

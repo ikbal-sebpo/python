@@ -1,0 +1,73 @@
+{% if dedicated_night_shifts or can_request_dedicated_night_shift %}
+<div class="card" id="section-card-dedicated-night-shifts">
+    <div class="flex items-start justify-between gap-3 mb-3">
+        <div class="flex items-center gap-2">
+            <i data-lucide="moon" class="w-4 h-4 text-brand-accent"></i>
+            <h3 class="text-sm font-semibold uppercase tracking-wider text-text-mute">Dedicated night shift</h3>
+        </div>
+        <div class="flex items-center gap-2">
+            {% if can_request_dedicated_night_shift %}
+                <button type="button"
+                        class="text-xs text-brand hover:underline dark:text-brand-accent inline-flex items-center gap-1"
+                        hx-get="{% url 'dedicated_night_shift_request' %}?for={{ employee.pk }}"
+                        hx-target="#drawer-body"
+                        hx-swap="innerHTML"
+                        @click="open('Request dedicated night shift — {{ employee.display_name|escapejs }}')">
+                    <i data-lucide="plus" class="w-3.5 h-3.5"></i>Request
+                </button>
+            {% endif %}
+            <a href="{% url 'dedicated_night_shift_list' %}"
+               class="text-xs text-brand hover:underline dark:text-brand-accent">View all</a>
+        </div>
+    </div>
+    {% if dedicated_night_shifts %}
+        <ul class="space-y-2 text-sm">
+            {% for a in dedicated_night_shifts %}
+                <li class="flex items-start justify-between gap-3">
+                    <div class="min-w-0">
+                        <div class="font-medium text-text-main dark:text-white">
+                            {{ a.start_date|date:"Y-m-d" }} → {{ a.end_date|date:"Y-m-d" }}
+                        </div>
+                        {% if a.note %}
+                            <div class="text-xs text-text-soft dark:text-white/60 truncate" title="{{ a.note }}">{{ a.note }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="shrink-0 flex items-center gap-1.5">
+                        {% if a.status == 'PENDING' %}
+                            <span class="badge badge-info text-[10px]">Pending</span>
+                        {% elif a.status == 'APPROVED' %}
+                            <span class="badge badge-success text-[10px]">Approved</span>
+                        {% elif a.status == 'DECLINED' %}
+                            <span class="badge text-[10px]" style="background:rgba(239,68,68,.15); color:#dc2626;">Declined</span>
+                        {% else %}
+                            <span class="badge badge-muted text-[10px]">Cancelled</span>
+                        {% endif %}
+                        <button type="button"
+                                class="p-1 rounded text-text-mute hover:text-brand hover:bg-bg-soft dark:hover:bg-white/5"
+                                title="History"
+                                hx-get="{% url 'dedicated_night_shift_history' a.pk %}"
+                                hx-target="#drawer-body"
+                                hx-swap="innerHTML"
+                                @click="open('History — {{ employee.display_name|escapejs }}')">
+                            <i data-lucide="history" class="w-3 h-3"></i>
+                        </button>
+                        {% if a.can_edit %}
+                            <button type="button"
+                                    class="p-1 rounded text-text-mute hover:text-brand hover:bg-bg-soft dark:hover:bg-white/5"
+                                    title="Edit"
+                                    hx-get="{% url 'dedicated_night_shift_edit' a.pk %}"
+                                    hx-target="#drawer-body"
+                                    hx-swap="innerHTML"
+                                    @click="open('Edit dedicated night shift — {{ employee.display_name|escapejs }}')">
+                                <i data-lucide="pencil" class="w-3 h-3"></i>
+                            </button>
+                        {% endif %}
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p class="text-sm text-text-mute dark:text-white/40 italic">No dedicated night shift assignments yet.</p>
+    {% endif %}
+</div>
+{% endif %}

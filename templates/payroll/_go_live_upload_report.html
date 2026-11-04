@@ -1,0 +1,203 @@
+{# Result fragment for /payroll/go-live/upload/ — swapped in by HTMX. #}
+<div class="card mb-4">
+    <h2 class="text-sm font-semibold mb-3">Result</h2>
+
+    {% if inline_error %}
+        <div class="mb-3 px-3 py-2 rounded border border-red-300 bg-red-50 text-red-800
+                    dark:border-red-700/50 dark:bg-red-900/20 dark:text-red-200 text-sm">
+            {{ inline_error }}
+        </div>
+    {% endif %}
+
+    {% if report %}
+        {% if aborted %}
+            <div class="mb-3 px-3 py-2 rounded border border-red-300 bg-red-50 text-red-800
+                        dark:border-red-700/50 dark:bg-red-900/20 dark:text-red-200 text-sm">
+                Upload aborted. Nothing was written. Fix the errors below and re-upload.
+            </div>
+        {% elif preview %}
+            <div class="mb-3 px-3 py-2 rounded border border-blue-300 bg-blue-50 text-blue-800
+                        dark:border-blue-700/50 dark:bg-blue-900/20 dark:text-blue-200 text-sm">
+                Preview only — nothing was written. Package amounts are resolved on apply.
+            </div>
+        {% else %}
+            <div class="mb-3 px-3 py-2 rounded border border-emerald-300 bg-emerald-50 text-emerald-800
+                        dark:border-emerald-700/50 dark:bg-emerald-900/20 dark:text-emerald-200 text-sm">
+                <span class="font-medium">{{ report.total_applied }}</span> processed
+                {% if report.total_skipped %}· <span class="font-medium">{{ report.total_skipped }}</span> skipped{% endif %}
+            </div>
+        {% endif %}
+
+        {% if report.parse_errors %}
+            <h3 class="text-xs font-semibold uppercase tracking-wide text-red-700 dark:text-red-300 mt-4 mb-2">
+                Errors ({{ report.parse_errors|length }})
+            </h3>
+            <div class="overflow-x-auto">
+                <table class="table-simple text-sm">
+                    <thead><tr><th class="w-12">Row</th><th>Employee ID</th><th>Team</th><th>Go-live Date</th><th>Reason</th></tr></thead>
+                    <tbody>
+                        {% for err in report.parse_errors %}
+                            <tr class="text-red-700 dark:text-red-300">
+                                <td>{{ err.line_no }}</td>
+                                <td>{{ err.raw.Employee_ID|default:"—" }}</td>
+                                <td>{{ err.raw.Team|default:"—" }}</td>
+                                <td>{{ err.raw.Go_live_Date|default:"—" }}</td>
+                                <td>{{ err.message }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endif %}
+
+        {% if report.duplicates %}
+            <h3 class="text-xs font-semibold uppercase tracking-wide text-red-700 dark:text-red-300 mt-4 mb-2">
+                Duplicates within file ({{ report.duplicates|length }})
+            </h3>
+            <div class="overflow-x-auto">
+                <table class="table-simple text-sm">
+                    <thead><tr><th class="w-12">Row</th><th>Employee ID</th><th>Team</th><th>Go-live Date</th><th>Reason</th></tr></thead>
+                    <tbody>
+                        {% for err in report.duplicates %}
+                            <tr class="text-red-700 dark:text-red-300">
+                                <td>{{ err.line_no }}</td>
+                                <td>{{ err.raw.Employee_ID|default:"—" }}</td>
+                                <td>{{ err.raw.Team|default:"—" }}</td>
+                                <td>{{ err.raw.Go_live_Date|default:"—" }}</td>
+                                <td>{{ err.message }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endif %}
+
+        {% if report.skipped_scope %}
+            <h3 class="text-xs font-semibold uppercase tracking-wide text-amber-700 dark:text-amber-300 mt-4 mb-2">
+                Outside your scope ({{ report.skipped_scope|length }})
+            </h3>
+            <div class="overflow-x-auto">
+                <table class="table-simple text-sm">
+                    <thead><tr><th class="w-12">Row</th><th>Employee ID</th><th>Team</th><th>Go-live Date</th><th>Reason</th></tr></thead>
+                    <tbody>
+                        {% for err in report.skipped_scope %}
+                            <tr class="text-amber-700 dark:text-amber-300">
+                                <td>{{ err.line_no }}</td>
+                                <td>{{ err.raw.Employee_ID|default:"—" }}</td>
+                                <td>{{ err.raw.Team|default:"—" }}</td>
+                                <td>{{ err.raw.Go_live_Date|default:"—" }}</td>
+                                <td>{{ err.message }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endif %}
+
+        {% if report.skipped_not_trainee %}
+            <h3 class="text-xs font-semibold uppercase tracking-wide text-amber-700 dark:text-amber-300 mt-4 mb-2">
+                Not currently a trainee ({{ report.skipped_not_trainee|length }})
+            </h3>
+            <p class="text-xs text-text-mute mb-2">Already live, on bench, or never a trainee. Use the employee's profile for a correction.</p>
+            <div class="overflow-x-auto">
+                <table class="table-simple text-sm">
+                    <thead><tr><th class="w-12">Row</th><th>Employee ID</th><th>Team</th><th>Go-live Date</th><th>Reason</th></tr></thead>
+                    <tbody>
+                        {% for err in report.skipped_not_trainee %}
+                            <tr class="text-amber-700 dark:text-amber-300">
+                                <td>{{ err.line_no }}</td>
+                                <td>{{ err.raw.Employee_ID|default:"—" }}</td>
+                                <td>{{ err.raw.Team|default:"—" }}</td>
+                                <td>{{ err.raw.Go_live_Date|default:"—" }}</td>
+                                <td>{{ err.message }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endif %}
+
+        {% if report.skipped_no_package %}
+            <h3 class="text-xs font-semibold uppercase tracking-wide text-amber-700 dark:text-amber-300 mt-4 mb-2">
+                No salary package configured ({{ report.skipped_no_package|length }})
+            </h3>
+            <p class="text-xs text-text-mute mb-2">Nothing was written for these. Ask Finance to add a package for the team, then re-upload.</p>
+            <div class="overflow-x-auto">
+                <table class="table-simple text-sm">
+                    <thead><tr><th class="w-12">Row</th><th>Employee ID</th><th>Team</th><th>Go-live Date</th><th>Reason</th></tr></thead>
+                    <tbody>
+                        {% for err in report.skipped_no_package %}
+                            <tr class="text-amber-700 dark:text-amber-300">
+                                <td>{{ err.line_no }}</td>
+                                <td>{{ err.raw.Employee_ID|default:"—" }}</td>
+                                <td>{{ err.raw.Team|default:"—" }}</td>
+                                <td>{{ err.raw.Go_live_Date|default:"—" }}</td>
+                                <td>{{ err.message }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endif %}
+
+        {% if preview and parsed_preview %}
+            <details class="mt-4" open>
+                <summary class="cursor-pointer text-xs font-semibold uppercase tracking-wide text-text-soft dark:text-white/70">
+                    Rows that would be processed ({{ parsed_preview|length }})
+                </summary>
+                <div class="overflow-x-auto mt-2">
+                    <table class="table-simple text-sm">
+                        <thead><tr><th class="w-12">Row</th><th>Employee ID</th><th>Team</th><th>Go-live Date</th></tr></thead>
+                        <tbody>
+                            {% for row in parsed_preview %}
+                                <tr>
+                                    <td>{{ row.line_no }}</td>
+                                    <td>{{ row.employee_id }}</td>
+                                    <td>{{ row.new_team.name }}</td>
+                                    <td>{{ row.go_live_date|date:"Y-m-d" }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </details>
+        {% endif %}
+
+        {% if not preview and not aborted %}
+            {% if report.applied %}
+                <details class="mt-4" open>
+                    <summary class="cursor-pointer text-xs font-semibold uppercase tracking-wide text-emerald-700 dark:text-emerald-300">
+                        Processed ({{ report.total_applied }})
+                    </summary>
+                    <div class="overflow-x-auto mt-2">
+                        <table class="table-simple text-sm">
+                            <thead>
+                                <tr><th class="w-12">Row</th><th>Employee ID</th><th>Team</th>
+                                    <th>Go-live Date</th><th class="text-right">Package</th>
+                                    <th>Salary proposal</th></tr>
+                            </thead>
+                            <tbody>
+                                {% for row in report.applied %}
+                                    <tr class="text-emerald-700 dark:text-emerald-300">
+                                        <td>{{ row.line_no }}</td>
+                                        <td>{{ row.employee_id }}</td>
+                                        <td>{{ row.new_team.name }}</td>
+                                        <td>{{ row.go_live_date|date:"Y-m-d" }}</td>
+                                        <td class="text-right tabular-nums">{{ row.package_amount|taka  }}</td>
+                                        <td>
+                                            {% if row.proposal_created %}
+                                                <span class="badge badge-info">Pending Finance approval</span>
+                                            {% else %}
+                                                <span class="badge badge-warning">No salary on file — none proposed</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </details>
+            {% endif %}
+        {% endif %}
+    {% endif %}
+</div>

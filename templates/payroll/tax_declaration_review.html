@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}{{ page_title }} · Orbis{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl">
+    <div class="card space-y-4">
+        <h1 class="text-base font-semibold">{{ page_title }}</h1>
+        {% include "payroll/_tax_declaration_review_body.html" with form_id="tax-declaration-review-form" %}
+        <div class="pt-4 border-t border-bg-soft dark:border-white/10 flex items-center gap-3">
+            <button type="submit" form="tax-declaration-review-form" class="btn-primary">
+                <i data-lucide="lock" class="w-4 h-4"></i><span>Confirm &amp; lock</span>
+            </button>
+            <a href="{% url 'employee_detail' target_employee.pk %}" class="btn-secondary">Cancel</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

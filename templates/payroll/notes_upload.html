@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+{% block title %}Upload notes · Orbis{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <h1 class="text-xl font-semibold">Upload notes</h1>
+    <p class="text-sm text-text-soft dark:text-white/60 mt-1">
+        Bulk-file {{ role_label|default:"" }} notes for {{ run.period }}. A blank Note cell is left unchanged,
+        never cleared; use the per-employee drawer on the Support Info tab to clear one.
+    </p>
+    <a href="{% url 'payroll_run_detail' run.pk %}?tab=support_info" class="text-sm text-brand hover:underline dark:text-brand-accent">
+        &larr; Back to Support Info &amp; Notes
+    </a>
+</div>
+
+{% if not role %}
+    <div class="card mb-4">
+        <p class="text-sm text-red-700 dark:text-red-300">
+            You don't have write access to any note type on this run.
+        </p>
+    </div>
+{% else %}
+
+{% if run_locked %}
+    <div class="card mb-4 border-l-4 border-amber-500">
+        <div class="flex items-start gap-2 text-sm">
+            <i data-lucide="lock" class="w-4 h-4 mt-0.5 text-amber-500 shrink-0"></i>
+            <div>
+                <span class="font-medium">This run's inputs are {{ run.get_status_display|lower }}.</span>
+                Notes are commentary, not a payroll input, so you can still upload them — but nothing
+                you write here changes anyone's pay. If a note describes money that should actually be
+                paid, file it as overtime or variable pay instead; the run flags a note naming an
+                amount nothing structured accounts for.
+            </div>
+        </div>
+    </div>
+{% endif %}
+
+<div class="card mb-4">
+    <h2 class="text-sm font-semibold mb-3">Note type</h2>
+    <p class="text-sm">
+        <span class="font-medium">{{ role_label }} note</span> — determined by your access, not a choice on this
+        page, so a supervisor can never accidentally bulk-file into HR or Finance notes (or the other way around).
+        Need a different note type? Use the per-employee drawer on the Support Info tab instead.
+    </p>
+</div>
+
+<div class="card mb-4">
+    <h2 class="text-sm font-semibold mb-3">1. Download a template</h2>
+    <div class="flex flex-wrap items-center gap-2">
+        <a href="{% url 'payroll_run_notes_upload_template' run.pk %}" class="btn-secondary">
+            <i data-lucide="file-spreadsheet" class="w-4 h-4"></i><span>Excel template</span>
+        </a>
+        <span class="text-xs text-text-mute ml-2">
+            One row per employee you can currently write this note type for, ID and name prefilled — leave the
+            Note column blank for anyone you don't need to touch.
+        </span>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <h2 class="text-sm font-semibold mb-2">2. File format</h2>
+    <p class="text-sm text-text-soft dark:text-white/70 mb-2">
+        Two columns, header on row 1:
+    </p>
+    <table class="table-simple text-sm mb-2">
+        <thead><tr><th>Employee ID</th><th>Note</th></tr></thead>
+        <tbody>
+            <tr><td>1042</td><td>Consistently arriving late this period.</td></tr>
+        </tbody>
+    </table>
+    <ul class="text-sm text-text-soft dark:text-white/70 list-disc pl-5 space-y-1">
+        <li>Re-uploading the same employee <span class="font-medium">corrects</span> that employee's existing note
+            for this note type, rather than adding a second one.</li>
+        <li>A blank Note cell is skipped — it does not clear an existing note.</li>
+        <li>You can only upload for employees you're allowed to write this note type for; others are rejected
+            per-row.</li>
+    </ul>
+</div>
+
+<div class="card mb-4">
+    <h2 class="text-sm font-semibold mb-3">3. Upload your filled file</h2>
+    <form id="notes-upload-form"
+          method="post"
+          enctype="multipart/form-data"
+          hx-post="{% url 'payroll_run_notes_upload' run.pk %}"
+          hx-encoding="multipart/form-data"
+          hx-target="#upload-result"
+          hx-swap="innerHTML"
+          hx-indicator="#upload-spinner"
+          class="flex flex-wrap items-center gap-3">
+        {% csrf_token %}
+        <input type="file" name="file" accept=".xlsx,.csv" required class="form-input w-auto max-w-xs">
+        <button type="submit" name="action" value="preview" class="btn-secondary">
+            <i data-lucide="eye" class="w-4 h-4"></i><span>Preview only</span>
+        </button>
+        <button type="submit" name="action" value="apply" class="btn-primary">
+            <i data-lucide="upload-cloud" class="w-4 h-4"></i><span>Apply upload</span>
+        </button>
+        <span id="upload-spinner" class="htmx-indicator inline-flex items-center gap-1 text-xs text-text-mute">
+            <i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i>Working…
+        </span>
+    </form>
+    <p class="text-xs text-text-mute mt-2">
+        Tip: click <span class="font-medium">Preview only</span> first to see what will change without writing,
+        then click <span class="font-medium">Apply upload</span> — the file stays attached, no need to re-upload.
+        Any errors reject the whole upload.
+    </p>
+</div>
+{% endif %}
+
+<div id="upload-result">
+    {% if report or inline_error %}
+        {% include "payroll/_notes_upload_report.html" with report=report parsed_preview=parsed_preview preview=preview aborted=aborted inline_error=inline_error %}
+    {% endif %}
+</div>
+
+<script>
+    document.body.addEventListener('htmx:afterSwap', function (evt) {
+        if (window.lucide && typeof window.lucide.createIcons === 'function') {
+            window.lucide.createIcons();
+        }
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,17 @@
+{% load static tailwind_tags %}<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Document verification · Orbis{% endblock %}</title>
+  <link rel="icon" type="image/png" href="{% static 'SEBPO-Favicon-2023-150x150.png' %}">
+  <link rel="preconnect" href="https://fonts.bunny.net" crossorigin>
+  <link rel="stylesheet" href="https://fonts.bunny.net/css?family=figtree:400,500,600|roboto:400,500&display=swap">
+  {% tailwind_css %}
+</head>
+<body class="min-h-screen bg-bg-main text-text-main">
+  <div class="max-w-2xl mx-auto py-12 px-6">
+    {% block content %}{% endblock %}
+  </div>
+</body>
+</html>

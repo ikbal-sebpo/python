@@ -1,0 +1,67 @@
+{% load static %}<aside id="sidebar"
+       class="sidebar hidden md:flex flex-col shrink-0 bg-bg-card dark:bg-brand-navy
+              border-r border-bg-soft dark:border-white/10 overflow-hidden">
+    <div class="h-16 flex items-center justify-center border-b border-bg-soft dark:border-white/10">
+        <a href="{% url 'home' %}" aria-label="Orbis home"
+           class="rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent">
+            {# Theme-swapped on the <html> .dark class; files named for their background. #}
+            <img src="{% static 'brand/orbis-mark-on-light.svg' %}" alt=""
+                 class="w-8 h-8 shrink-0 object-contain dark:hidden">
+            <img src="{% static 'brand/orbis-mark-on-dark.svg' %}" alt=""
+                 class="w-8 h-8 shrink-0 object-contain hidden dark:block">
+        </a>
+    </div>
+
+    <nav class="flex-1 py-3 overflow-y-auto">
+        {# Dashboard — always present, flyout shows just the title. #}
+        <div class="sidebar-group">
+            <a href="{% url 'home' %}"
+               class="nav-item {% if request.resolver_match.url_name == 'home' %}active{% endif %}">
+                <i data-lucide="layout-dashboard" class="w-4 h-4 shrink-0"></i>
+                <span class="sr-only">Dashboard</span>
+            </a>
+            <div class="sidebar-flyout" role="menu" aria-label="Dashboard">
+                <div class="sidebar-flyout-header">Dashboard</div>
+            </div>
+        </div>
+
+        {% if user.is_authenticated and dynamic_main_menus %}
+            {% for main in dynamic_main_menus %}
+                <div class="sidebar-group">
+                    {% if main.url %}
+                        {# Direct-link MainMenu — flyout shows just the title. #}
+                        <a href="{% url main.url %}"
+                           class="nav-item {% if request.resolver_match.view_name == main.url %}active{% endif %}">
+                            <i data-lucide="{{ main.icon_class|default:'circle' }}" class="w-4 h-4 shrink-0"></i>
+                            <span class="sr-only">{{ main.title }}</span>
+                        </a>
+                        <div class="sidebar-flyout" role="menu" aria-label="{{ main.title }}">
+                            <div class="sidebar-flyout-header">{{ main.title }}</div>
+                        </div>
+                    {% else %}
+                        {# Section-header MainMenu — flyout shows title + submenus. #}
+                        <div class="nav-item" tabindex="0">
+                            <i data-lucide="{{ main.icon_class|default:'folder' }}" class="w-4 h-4 shrink-0"></i>
+                            <span class="sr-only">{{ main.title }}</span>
+                        </div>
+                        <div class="sidebar-flyout" role="menu" aria-label="{{ main.title }}">
+                            <div class="sidebar-flyout-header">{{ main.title }}</div>
+                            {% for sub in main.submenus.all %}
+                                {% if sub in dynamic_sub_menus %}
+                                    <a href="{% url sub.url %}" role="menuitem"
+                                       class="sidebar-flyout-item {% if request.resolver_match.view_name == sub.url %}active{% endif %}">
+                                        {{ sub.title }}
+                                    </a>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        {% elif user.is_authenticated %}
+            <div class="px-2 pt-6 text-[10px] text-center text-text-mute dark:text-white/40">
+                No role
+            </div>
+        {% endif %}
+    </nav>
+</aside>

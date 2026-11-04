@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+{% block title %}Upload SLA achievement · Orbis{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <h1 class="text-xl font-semibold">Upload SLA achievement</h1>
+    <p class="text-sm text-text-soft dark:text-white/60 mt-1">
+        List who met their SLA target — only add the SLA month for the people you're crediting. The amount
+        is <span class="font-medium">not</span> yours to enter — it's resolved from the configured rate for
+        each employee's department when the file is applied.
+        {% if period %}
+            Rows are paid in the <span class="font-medium">{{ period }}</span> period.
+        {% endif %}
+    </p>
+    <a href="{% url 'payroll_variable_pay_list' %}" class="text-sm text-brand hover:underline dark:text-brand-accent">
+        &larr; Back to variable pay
+    </a>
+</div>
+
+{% if not period %}
+    <div class="card mb-4 border border-red-300 dark:border-red-700/50">
+        <p class="text-sm text-red-800 dark:text-red-200">
+            No payroll period exists yet — one has to be created before SLA achievement can be uploaded.
+        </p>
+    </div>
+{% elif not component %}
+    <div class="card mb-4 border border-red-300 dark:border-red-700/50">
+        <p class="text-sm text-red-800 dark:text-red-200">
+            The <span class="font-mono">SLA_INCENTIVE</span> pay component is missing. Run
+            <span class="font-mono">manage.py seed_payroll_components</span> before uploading.
+        </p>
+    </div>
+{% endif %}
+
+<div class="card mb-4">
+    <h2 class="text-sm font-semibold mb-3">1. Download a template</h2>
+    <div class="flex flex-wrap items-center gap-2">
+        <a href="{% url 'payroll_sla_upload_template' %}" class="btn-secondary">
+            <i data-lucide="file-spreadsheet" class="w-4 h-4"></i><span>Excel template</span>
+        </a>
+        <span class="text-xs text-text-mute ml-2">
+            One row per employee in your managed scope, names and IDs filled in — the SLA month is left
+            blank for you to add only for the people who achieved it.
+        </span>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <h2 class="text-sm font-semibold mb-2">2. File format</h2>
+    <p class="text-sm text-text-soft dark:text-white/70 mb-2">
+        Two columns, header on row 1. Any further columns (employee name, team) are ignored.
+    </p>
+    <table class="table-simple text-sm mb-2">
+        <thead><tr><th>Employee ID</th><th>SLA month</th></tr></thead>
+        <tbody>
+            <tr><td>2737</td><td>2026-08</td></tr>
+        </tbody>
+    </table>
+    <ul class="text-sm text-text-soft dark:text-white/70 list-disc pl-5 space-y-1">
+        <li><span class="font-medium">There is no amount column, and no Met SLA column.</span> Only list the
+            people who achieved it — a blank SLA month is an untouched row and is ignored, so it's not
+            possible to accidentally credit someone by leaving their row alone. The amount is priced from the
+            configured rate; if none is configured for someone's department, the row is skipped and listed —
+            never written as zero.</li>
+        <li><span class="font-medium">SLA month is the month the target was met</span>, not the month it's
+            paid in. August's SLA is paid in the period that's currently open.</li>
+        <li>A <span class="font-medium">missed earlier month</span> can be claimed alongside the current one —
+            add a second row with the earlier SLA month. The two are tracked separately, so a retro claim is
+            never mistaken for a double payment.</li>
+        <li>Re-uploading the same employee and SLA month <span class="font-medium">corrects</span> the earlier
+            row rather than duplicating it — unless it has already been approved or rejected, in which case
+            it's left alone and listed.</li>
+        <li>You can only upload for employees in your managed scope; others are rejected per-row.</li>
+        <li>Every row lands as <span class="font-medium">Pending</span>. The department head approves it, and
+            the payroll run must then be recalculated, before it is paid.</li>
+    </ul>
+</div>
+
+<div class="card mb-4">
+    <h2 class="text-sm font-semibold mb-3">3. Upload your filled file</h2>
+    <form id="sla-upload-form"
+          method="post"
+          enctype="multipart/form-data"
+          hx-post="{% url 'payroll_sla_upload' %}"
+          hx-encoding="multipart/form-data"
+          hx-target="#upload-result"
+          hx-swap="innerHTML"
+          hx-indicator="#upload-spinner"
+          class="flex flex-wrap items-center gap-3">
+        {% csrf_token %}
+        <input type="file" name="file" accept=".xlsx,.csv" required class="form-input w-auto max-w-xs">
+        <button type="submit" name="action" value="preview" class="btn-secondary">
+            <i data-lucide="eye" class="w-4 h-4"></i><span>Preview only</span>
+        </button>
+        <button type="submit" name="action" value="apply" class="btn-primary">
+            <i data-lucide="upload-cloud" class="w-4 h-4"></i><span>Apply upload</span>
+        </button>
+        <span id="upload-spinner" class="htmx-indicator inline-flex items-center gap-1 text-xs text-text-mute">
+            <i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i>Working…
+        </span>
+    </form>
+    <p class="text-xs text-text-mute mt-2">
+        Tip: click <span class="font-medium">Preview only</span> first to see what will change without writing,
+        then click <span class="font-medium">Apply upload</span> — the file stays attached, no need to re-upload.
+        Any errors reject the whole upload.
+    </p>
+</div>
+
+<div id="upload-result">
+    {% if report or inline_error %}
+        {% include "payroll/_sla_upload_report.html" with report=report parsed_preview=parsed_preview preview=preview aborted=aborted inline_error=inline_error %}
+    {% endif %}
+</div>
+
+<script>
+    document.body.addEventListener('htmx:afterSwap', function (evt) {
+        if (window.lucide && typeof window.lucide.createIcons === 'function') {
+            window.lucide.createIcons();
+        }
+    });
+</script>
+{% endblock %}

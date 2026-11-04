@@ -1,0 +1,10 @@
+{% if object %}
+    <dl class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2 text-sm">
+        <div><dt class="text-text-mute text-xs">Marital status</dt><dd>{{ object.get_marital_status_display|default:"—" }}</dd></div>
+        <div><dt class="text-text-mute text-xs">Spouse</dt><dd>{{ object.spouse_name|default:"—" }}</dd></div>
+        <div><dt class="text-text-mute text-xs">Marriage date</dt><dd>{{ object.marriage_date|default:"—" }}</dd></div>
+        <div><dt class="text-text-mute text-xs">Children</dt><dd>{{ object.total_number_of_children }}</dd></div>
+    </dl>
+{% else %}
+    {% include "employees/sections/_empty.html" %}
+{% endif %}

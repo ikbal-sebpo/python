@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}Profile self-service · Orbis{% endblock %}
+
+{% block content %}
+<div class="page-fill">
+    <div class="card shrink-0 flex flex-wrap items-center gap-3">
+        <form method="get" class="flex flex-wrap items-center gap-2 flex-1 min-w-[240px]">
+            {% include "partials/_employee_filter_controls.html" %}
+            <button type="submit" class="btn-secondary">Search</button>
+        </form>
+    </div>
+
+    {% include "partials/_result_count.html" with count_noun="employees" %}
+
+    <div class="card p-0 table-scroll">
+        <table class="table-simple table-sticky min-w-full text-sm">
+            <thead>
+                <tr>
+                    <th class="text-left">Employee</th>
+                    <th class="text-left">Department / Team</th>
+                    <th class="text-left">Enabled by</th>
+                    <th class="text-left">Enabled at</th>
+                    <th class="text-left">Note</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for employee in rows %}
+                    <tr>
+                        <td class="whitespace-nowrap">
+                            <a href="{% url 'employee_detail' employee.pk %}" class="font-medium hover:underline">
+                                {{ employee.display_name }}
+                            </a>
+                            {% if employee.employee_id %}
+                                <span class="ml-1.5 text-xs text-text-mute">· {{ employee.employee_id }}</span>
+                            {% endif %}
+                        </td>
+                        <td class="whitespace-nowrap text-xs text-text-soft dark:text-white/60">
+                            {{ employee.department|default:"—" }}{% if employee.team %} · {{ employee.team }}{% endif %}
+                        </td>
+                        <td class="whitespace-nowrap text-xs text-text-soft dark:text-white/60">
+                            {{ employee.last_event.actor.display_name|default:"—" }}
+                        </td>
+                        <td class="whitespace-nowrap text-xs text-text-soft dark:text-white/60 tabular-nums">
+                            {{ employee.last_event.occurred_at|date:"Y-m-d H:i"|default:"—" }}
+                        </td>
+                        <td class="text-xs text-text-soft dark:text-white/60 max-w-xs truncate" title="{{ employee.last_event.note }}">
+                            {{ employee.last_event.note|default:"—" }}
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="5" class="text-center italic text-text-mute py-4">
+                            No employees currently have profile self-service turned on.
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% include "partials/_pagination.html" %}
+</div>
+{% endblock %}

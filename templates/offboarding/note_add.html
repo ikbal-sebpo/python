@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% block title %}Add note · Orbis{% endblock %}
+{% block content %}
+<div class="max-w-xl space-y-6">
+  <h1 class="text-2xl font-semibold text-text-main dark:text-white">Add HR note</h1>
+  {% include "offboarding/_page_form_body.html" with submit_label="Add note" %}
+</div>
+{% endblock %}

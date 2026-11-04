@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% block title %}{{ page_title }} · Orbis{% endblock %}
+
+{% block content %}
+<div x-data="{
+        drawer: false,
+        drawerTitle: '',
+        open(title) { this.drawerTitle = title || ''; this.drawer = true; },
+        close() {
+            this.drawer = false;
+            this.drawerTitle = '';
+            const body = document.getElementById('drawer-body');
+            if (body) body.innerHTML = '';
+        },
+     }"
+     x-on:orbis:drawer-close.window="close()"
+     x-on:keydown.escape.window="close()">
+<div class="mb-6 flex items-start justify-between gap-3">
+    <div>
+        <h1 class="text-xl font-semibold">{{ employee.display_name }}</h1>
+        <p class="text-sm text-text-soft dark:text-white/60 mt-1">
+            {{ employee.employee_id|default:"—" }} · {{ employee.department|default:"No department" }}{% if employee.team %} · {{ employee.team }}{% endif %}
+        </p>
+    </div>
+    <div class="flex items-center gap-2 shrink-0">
+        <button type="button" class="btn-primary"
+                hx-get="{% url 'payroll_salary_revise' employee.pk %}"
+                hx-target="#drawer-body"
+                hx-swap="innerHTML"
+                @click="open('Revise salary — {{ employee.display_name|escapejs }}')">
+            <i data-lucide="pencil" class="w-4 h-4"></i><span>Revise salary</span>
+        </button>
+        {% if can_open_list %}
+            <a href="{% url 'payroll_salary_list' %}" class="btn-secondary">
+                <i data-lucide="arrow-left" class="w-4 h-4"></i><span>Back to list</span>
+            </a>
+        {% else %}
+            <a href="{% url 'employee_detail' employee.pk %}" class="btn-secondary">
+                <i data-lucide="arrow-left" class="w-4 h-4"></i><span>Back to profile</span>
+            </a>
+        {% endif %}
+    </div>
+</div>
+
+{% if current %}
+<div class="card mb-6">
+    <div class="text-xs text-text-mute uppercase tracking-wider mb-1">Current gross salary</div>
+    <div class="flex flex-wrap items-baseline gap-x-6 gap-y-2">
+        <div class="text-3xl font-semibold tabular-nums">{{ current.gross_monthly|taka }}</div>
+        <span class="badge badge-success">{{ current.get_status_display }}</span>
+    </div>
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-4 text-sm">
+        <div>
+            <div class="text-xs text-text-mute uppercase tracking-wider">Effective from</div>
+            <div>{{ current.effective_from|date:"Y-m-d" }}</div>
+        </div>
+        <div>
+            <div class="text-xs text-text-mute uppercase tracking-wider">Reason</div>
+            <div>{{ current.get_reason_display }}</div>
+        </div>
+        <div>
+            <div class="text-xs text-text-mute uppercase tracking-wider">Revision</div>
+            <div>#{{ current.revision_no }}</div>
+        </div>
+        <div>
+            <div class="text-xs text-text-mute uppercase tracking-wider">Processed by</div>
+            <div>{{ current.processed_by.display_name|default:"—" }}</div>
+        </div>
+    </div>
+    {% if current.note %}
+        <div class="text-sm text-text-soft dark:text-white/60 mt-3">{{ current.note }}</div>
+    {% endif %}
+</div>
+{% else %}
+<div class="card mb-6 text-center text-text-mute">No current approved salary structure.</div>
+{% endif %}
+
+<div class="card p-0">
+    <div class="px-4 pt-4 pb-2 text-sm font-medium text-text-main dark:text-white">History</div>
+    <table class="table-simple min-w-full text-sm">
+        <thead>
+            <tr>
+                <th class="text-left">Rev</th>
+                <th class="text-right">Gross monthly</th>
+                <th class="text-left">Effective from</th>
+                <th class="text-left">Effective to</th>
+                <th class="text-left">Reason</th>
+                <th class="text-left">Status</th>
+                <th class="text-left">Processed by</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for s in history %}
+                <tr>
+                    <td class="tabular-nums">#{{ s.revision_no }}</td>
+                    <td class="text-right tabular-nums">{{ s.gross_monthly|taka }}</td>
+                    <td class="whitespace-nowrap">{{ s.effective_from|date:"Y-m-d" }}</td>
+                    <td class="whitespace-nowrap">{{ s.effective_to|date:"Y-m-d"|default:"—" }}</td>
+                    <td class="whitespace-nowrap">{{ s.get_reason_display }}</td>
+                    <td><span class="badge badge-muted">{{ s.get_status_display }}</span></td>
+                    <td class="whitespace-nowrap">{{ s.processed_by.display_name|default:"—" }}</td>
+                </tr>
+            {% empty %}
+                <tr><td colspan="7" class="text-center italic text-text-mute py-4">No prior history.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% include "partials/_drawer_shell.html" %}
+</div>
+{% endblock %}

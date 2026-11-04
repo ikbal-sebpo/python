@@ -1,0 +1,13 @@
+{% autoescape off %}{{ intro_text }}
+
+{{ title }}
+{% if poc %}Team Manager/POC: {{ poc.display_name }} <{{ poc.email }}>
+{% endif %}{% for line in legend %}{{ line }}
+{% endfor %}
+{% for r in rows %}{{ r.sl }}. {{ r.name }} ({{ r.role }}){% if r.highlight %}  <- you{% endif %}
+{% for c in r.cells %}   {% with d=body_days|slice:forloop.counter|last %}{{ d|date:"D j-M" }}: {{ c }}{% endwith %}
+{% endfor %}{% if merge_weekend %}   Sat/Sun: Weekend
+{% endif %}
+{% endfor %}--
+{{ signature }}
+{% endautoescape %}

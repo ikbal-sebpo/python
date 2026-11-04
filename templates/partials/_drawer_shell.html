@@ -1,0 +1,34 @@
+{% comment %}
+    Teleported right-hand drawer shell. The enclosing page must provide the
+    Alpine x-data (drawer / drawerTitle / open / close) — see
+    policies/policy_list.html for the canonical block. htmx GETs load a
+    fragment into #drawer-body.
+
+    Shared by policies, payroll and leave; the .drawer-* classes are defined
+    globally in theme/static_src/src/styles.css.
+{% endcomment %}
+<template x-teleport="body">
+    <div x-show="drawer" x-cloak>
+        <div class="drawer-backdrop"
+             x-show="drawer"
+             x-transition.opacity
+             @click="close()"></div>
+        <div class="drawer-panel"
+             x-show="drawer"
+             x-transition:enter="transition ease-out duration-200"
+             x-transition:enter-start="translate-x-full"
+             x-transition:enter-end="translate-x-0"
+             x-transition:leave="transition ease-in duration-150"
+             x-transition:leave-start="translate-x-0"
+             x-transition:leave-end="translate-x-full">
+            <div class="drawer-header">
+                <h2 class="text-base font-semibold text-text-main dark:text-white truncate" x-text="drawerTitle">&nbsp;</h2>
+                <button type="button" @click="close()"
+                        class="p-1.5 rounded hover:bg-bg-soft dark:hover:bg-white/5 text-text-soft dark:text-white/60">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+            </div>
+            <div id="drawer-body" class="contents"></div>
+        </div>
+    </div>
+</template>

@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Dedicated night shift history · Orbis{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl">
+
+    <div class="card mb-4 border-l-4 border-brand-accent">
+        <div class="text-sm">
+            History for
+            <strong>{{ target_employee.display_name }}</strong>
+            <span class="text-text-mute">({{ target_employee.email }})</span>
+        </div>
+        <div class="mt-1 text-xs tabular-nums text-text-soft dark:text-white/60">
+            Current window: {{ assignment.start_date|date:"Y-m-d" }} → {{ assignment.end_date|date:"Y-m-d" }}
+            · {{ assignment.get_status_display }}
+        </div>
+    </div>
+
+    <div class="card">
+        {% include "employees/_dedicated_night_shift_timeline.html" %}
+    </div>
+
+    <div class="mt-4">
+        <a href="{% url 'employee_detail' target_employee.pk %}" class="btn-secondary">Back to profile</a>
+    </div>
+</div>
+{% endblock %}

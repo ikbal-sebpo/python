@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}Submit resignation · Orbis{% endblock %}
+{% block content %}
+<div class="max-w-2xl space-y-6">
+  <h1 class="text-2xl font-semibold text-text-main dark:text-white">Submit resignation</h1>
+  <p class="text-sm text-text-soft">
+    HR is notified once you submit. You can withdraw the resignation any time before
+    it is accepted.
+  </p>
+  {% include "offboarding/_page_form_body.html" with submit_label="Submit resignation" cancel_url='/offboarding/my/' %}
+</div>
+{% endblock %}

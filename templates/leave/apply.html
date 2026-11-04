@@ -1,0 +1,177 @@
+{% extends "base.html" %}
+{% block title %}{% if editing %}Edit leave request{% else %}Apply for leave{% endif %} · Orbis{% endblock %}
+
+{% block content %}
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 max-w-5xl">
+
+    <div class="lg:col-span-2">
+        {% if editing %}
+            <div class="card mb-4 border-l-4 border-brand-accent">
+                <div class="text-sm">
+                    Editing a pending request for
+                    <strong>{{ target_employee.display_name }}</strong>
+                    <span class="text-text-mute">({{ target_employee.email }})</span>
+                    — you can revise it until a manager acts on it.
+                </div>
+            </div>
+        {% elif applying_for_other %}
+            <div class="card mb-4 border-l-4 border-brand-accent">
+                <div class="text-sm">
+                    Applying on behalf of
+                    <strong>{{ target_employee.display_name }}</strong>
+                    <span class="text-text-mute">({{ target_employee.email }})</span>
+                </div>
+            </div>
+        {% endif %}
+
+        {% if form.non_field_errors %}
+            <div class="mb-4 rounded border border-red-200 bg-red-50 text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-300 px-3 py-2 text-sm">
+                {{ form.non_field_errors|striptags }}
+            </div>
+        {% endif %}
+
+        <form id="leave-apply-form"
+              method="post"
+              enctype="multipart/form-data"
+              class="card space-y-4"
+              data-preview-url="{% url 'leave_preview' %}"
+              {% if applying_for_other %}data-for="{{ target_employee.pk }}"{% endif %}>
+            {% csrf_token %}
+            {% if applying_for_other and not editing %}
+                <input type="hidden" name="for" value="{{ target_employee.pk }}">
+            {% endif %}
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {% include "accounts/_field.html" with field=form.leave_type %}
+
+                <div class="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {% include "accounts/_field.html" with field=form.start_date %}
+                    {% include "accounts/_field.html" with field=form.end_date %}
+                </div>
+
+                <div class="md:col-span-2 flex items-center gap-3">
+                    <label class="inline-flex items-center gap-2 text-sm">
+                        <input type="checkbox"
+                               name="{{ form.is_half_day.name }}"
+                               id="{{ form.is_half_day.id_for_label }}"
+                               class="form-checkbox"
+                               {% if form.is_half_day.value %}checked{% endif %}>
+                        <span>Half-day leave</span>
+                    </label>
+                    <div id="half-day-period-wrap" class="{% if not form.is_half_day.value %}hidden{% endif %}">
+                        {% include "accounts/_field.html" with field=form.half_day_period %}
+                    </div>
+                </div>
+
+                <div class="md:col-span-2">
+                    {% include "accounts/_field.html" with field=form.note %}
+                </div>
+                <div class="md:col-span-2">
+                    {% include "accounts/_field.html" with field=form.attachment %}
+                </div>
+            </div>
+
+            <div class="pt-4 border-t border-bg-soft dark:border-white/10 flex items-center gap-3">
+                {% if editing %}
+                    <button type="submit" class="btn-primary">
+                        <i data-lucide="save" class="w-4 h-4"></i><span>Save changes</span>
+                    </button>
+                    <a href="{% url 'leave_detail' application.pk %}" class="btn-secondary">Cancel</a>
+                {% else %}
+                    <button type="submit" class="btn-primary">
+                        <i data-lucide="send" class="w-4 h-4"></i><span>Submit request</span>
+                    </button>
+                    <a href="{% url 'leave_list' %}" class="btn-secondary">Cancel</a>
+                {% endif %}
+            </div>
+        </form>
+    </div>
+
+    {# --- Live preview --- #}
+    <div class="lg:col-span-1">
+        <div class="card sticky top-4">
+            <h2 class="text-sm font-semibold uppercase tracking-wider text-text-mute mb-3">Preview</h2>
+            <div id="leave-preview" class="text-sm space-y-3">
+                <p class="text-text-mute italic">Pick a leave type and dates to see the cost breakdown.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+(function () {
+    const form = document.getElementById("leave-apply-form");
+    if (!form) return;
+    const previewUrl = form.dataset.previewUrl;
+    const target = form.querySelector('[name="leave_type"]');
+    const start = form.querySelector('[name="start_date"]');
+    const end = form.querySelector('[name="end_date"]');
+    const halfDay = form.querySelector('[name="is_half_day"]');
+    const halfWrap = document.getElementById("half-day-period-wrap");
+    const out = document.getElementById("leave-preview");
+
+    function fmt(n) {
+        const v = parseFloat(n || "0");
+        return Number.isInteger(v) ? v.toFixed(0) : v.toFixed(2);
+    }
+
+    function refresh() {
+        if (halfDay) {
+            halfWrap.classList.toggle("hidden", !halfDay.checked);
+        }
+        if (!target.value || !start.value || !end.value) {
+            out.innerHTML = '<p class="text-text-mute italic">Pick a leave type and dates to see the cost breakdown.</p>';
+            return;
+        }
+        const fd = new FormData();
+        fd.append("leave_type", target.value);
+        fd.append("start_date", start.value);
+        fd.append("end_date", end.value);
+        if (halfDay && halfDay.checked) fd.append("is_half_day", "true");
+        const forPk = form.dataset.for;
+        if (forPk) fd.append("for", forPk);
+        const csrf = form.querySelector('[name=csrfmiddlewaretoken]').value;
+        fetch(previewUrl, {
+            method: "POST",
+            headers: { "X-CSRFToken": csrf },
+            body: fd,
+        }).then(r => r.json()).then(data => {
+            if (data.error) {
+                out.innerHTML = '<p class="text-red-600 dark:text-red-300 text-sm">' + data.error + '</p>';
+                return;
+            }
+            const certNotice = data.cert_required
+                ? `<div class="mt-3 text-xs px-2 py-1.5 rounded bg-amber-50 text-amber-800 border border-amber-200 dark:bg-amber-500/10 dark:text-amber-200 dark:border-amber-500/30">Attachment (e.g., doctor's note) required for ${data.leave_type_name} of ${data.cert_required_min_days}+ days.</div>`
+                : "";
+            const balanceNotice = data.is_paid
+                ? `<div class="mt-3 text-xs text-text-mute">Available balance: <strong>${fmt(data.available)}</strong> day(s) (${data.year}).</div>`
+                : `<div class="mt-3 text-xs text-text-mute">Unpaid leave — no balance impact.</div>`;
+            const advanceNotice = data.is_advance
+                ? `<div class="mt-3 text-xs px-2 py-1.5 rounded bg-amber-50 text-amber-800 border border-amber-200 dark:bg-amber-500/10 dark:text-amber-200 dark:border-amber-500/30">${data.advance_message}</div>`
+                : "";
+            out.innerHTML = `
+                <dl class="space-y-2">
+                    <div class="flex justify-between"><dt class="text-text-mute">Working days</dt><dd>${fmt(data.working)}</dd></div>
+                    <div class="flex justify-between"><dt class="text-text-mute">Sandwich days</dt><dd>${fmt(data.sandwich)}</dd></div>
+                    <div class="flex justify-between border-t border-bg-soft dark:border-white/10 pt-2 font-semibold">
+                        <dt>Billed</dt><dd>${fmt(data.total)}</dd>
+                    </div>
+                </dl>
+                ${certNotice}
+                ${balanceNotice}
+                ${advanceNotice}
+            `;
+        }).catch(() => {
+            out.innerHTML = '<p class="text-text-mute italic">Could not compute preview.</p>';
+        });
+    }
+
+    [target, start, end, halfDay].forEach(el => {
+        if (!el) return;
+        el.addEventListener("change", refresh);
+        el.addEventListener("input", refresh);
+    });
+    refresh();
+})();
+</script>
+{% endblock %}

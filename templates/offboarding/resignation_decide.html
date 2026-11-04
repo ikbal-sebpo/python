@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}Decide resignation · Orbis{% endblock %}
+{% block content %}
+<div class="max-w-2xl space-y-6">
+  <div>
+    <h1 class="text-2xl font-semibold text-text-main dark:text-white">Decide resignation</h1>
+    <p class="text-sm text-text-soft">{{ resignation.employee.display_name }} · LWD {{ resignation.last_working_date }}</p>
+  </div>
+  {% include "offboarding/_page_form_body.html" with submit_label="Submit decision" %}
+</div>
+{% endblock %}

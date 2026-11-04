@@ -1,0 +1,29 @@
+{% comment %}
+Full-page form shape — htmx fallback for the drawer flows.
+{% endcomment %}
+<form method="post" action="{{ action_url }}" class="card space-y-4" enctype="multipart/form-data">
+  {% csrf_token %}
+  {% if form.non_field_errors %}
+    <div class="rounded border border-red-200 bg-red-50 text-red-700 px-3 py-2 text-sm">
+      {{ form.non_field_errors|striptags }}
+    </div>
+  {% endif %}
+  {% for field in form %}
+    <div>
+      <label class="text-sm font-medium block mb-1">{{ field.label }}</label>
+      {{ field }}
+      {% if field.help_text %}
+        <p class="text-xs text-text-soft dark:text-white/60 mt-1">{{ field.help_text }}</p>
+      {% endif %}
+      {% if field.errors %}
+        <p class="text-xs text-red-600 mt-1">{{ field.errors|join:" " }}</p>
+      {% endif %}
+    </div>
+  {% endfor %}
+  <div class="flex justify-end gap-2 pt-2">
+    <a href="{{ cancel_url|default:'javascript:history.back()' }}" class="btn-secondary">Cancel</a>
+    <button type="submit" class="btn-primary">
+      <i data-lucide="check" class="w-4 h-4"></i><span>{{ submit_label|default:"Save" }}</span>
+    </button>
+  </div>
+</form>

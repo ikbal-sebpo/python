@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Sign {{ policy.key }} · Orbis{% endblock %}
+
+{% comment %}
+    Focused policy-reading layout (modelled on the TeamMate sign view): a compact
+    metadata header, a large near-full-width PDF that opens fit-to-width, and an
+    accept bar pinned to the bottom of the viewport.
+{% endcomment %}
+
+{# main_class drops <main>'s bottom padding (base.html) — position:sticky      #}
+{# bottom-0 (the accept bar below) sticks to <main>'s padding edge, so that    #}
+{# padding would otherwise be dead space the bar can never cover. The bar      #}
+{# supplies its own small bottom buffer (pb-2) instead.                       #}
+{% block main_class %}px-6 pt-0 md:px-8{% endblock %}
+
+{% block content %}
+{# oncontextmenu blocks right-click "Save As"/"Save image as" on the page      #}
+{# chrome around the PDF. The PDF itself is rendered client-side onto         #}
+{# <canvas> pages (policy-pdf-viewer.js) rather than embedded via the         #}
+{# browser's native PDF plugin — a native plugin is a separate rendering      #}
+{# surface no page JS can reach, so its own right-click "Save As" can't be    #}
+{# suppressed. Canvas is ordinary DOM, so contextmenu blocking on it works.   #}
+{# Still a deterrent, not real prevention: the bytes have to reach the        #}
+{# browser to render, so devtools/screenshots always work.                   #}
+<div class="flex flex-col gap-1.5" oncontextmenu="return false">
+
+  {# --- Large PDF reader: fills nearly the whole viewport, leaving just enough #}
+  {# room below for the (now minimal) accept bar. --- #}
+  {% if current_version %}
+    <div id="policy-pdf-viewer"
+         data-policy-pdf-viewer
+         data-pdf-url="{% url 'policies:pdf' policy.pk %}"
+         data-pdfjs-url="{% static 'vendor/pdfjs-6.2.108.min.js' %}"
+         data-pdfjs-worker-url="{% static 'vendor/pdfjs-6.2.108.worker.min.js' %}"
+         data-watermark="{{ watermark }}"
+         class="rounded-lg border border-bg-soft dark:border-white/10 bg-bg-soft dark:bg-black/20 overflow-y-auto h-[calc(100vh_-_7.25rem)] min-h-[24rem]"
+         aria-label="Policy document — {{ policy.title }}"></div>
+    <script type="module" src="{% static 'js/policy-pdf-viewer.js' %}"></script>
+    <noscript><p class="text-sm">Your browser needs JavaScript to display the PDF.
+      <a href="{% url 'policies:pdf' policy.pk %}" class="text-brand-accent underline">Open it here</a>.</p></noscript>
+  {% else %}
+    <div class="card"><p class="text-sm text-amber-600 dark:text-amber-400">No document is available for this policy yet.</p></div>
+  {% endif %}
+
+  {# --- Accept bar, pinned to the bottom of the viewport --- #}
+  {% if acknowledgement.is_signed %}
+    <div class="sticky bottom-0 z-10 pt-1 pb-2 border-t border-emerald-200 dark:border-emerald-500/30 bg-emerald-50 dark:bg-emerald-500/10">
+      <p class="text-sm text-emerald-700 dark:text-emerald-300 flex items-center gap-2">
+        <i data-lucide="check-circle" class="w-4 h-4"></i>
+        You acknowledged this policy{% if acknowledgement.version %} (v{{ acknowledgement.version.version }}){% endif %}
+        on {{ acknowledgement.signed_at|date:"Y-m-d H:i" }}.
+      </p>
+    </div>
+  {% elif acknowledgement and policy.is_active and current_version %}
+    <form method="post" action="{% url 'policies:sign' policy.pk %}"
+          class="sticky bottom-0 z-10 pt-1 pb-2 border-t border-bg-soft dark:border-white/10 bg-bg-card dark:bg-brand-navy">
+      {% csrf_token %}
+      {# `accept` is checked by default and hidden — clicking Accept below   #}
+      {# is the affirmative act; see policies/forms.py::SignForm.           #}
+      {{ form.accept }}
+      {% if acknowledgement.status == 'SUPERSEDED' %}
+        <p class="text-xs text-blue-600 dark:text-blue-300 mb-1">
+          <i data-lucide="info" class="w-4 h-4 inline align-[-0.15rem]"></i>
+          A new version was published since you last signed — please review and re-acknowledge.
+        </p>
+      {% endif %}
+      <div class="flex items-center justify-end">
+        <button type="submit" class="btn-primary shrink-0 py-1.5 px-3">
+          <i data-lucide="check" class="w-4 h-4"></i><span>Accept</span>
+        </button>
+      </div>
+      {% if form.accept.errors %}<p class="text-xs text-red-600 dark:text-red-400 mt-1">{{ form.accept.errors|striptags }}</p>{% endif %}
+    </form>
+  {% elif is_manager and not acknowledgement %}
+    <div class="sticky bottom-0 z-10 pt-1 pb-2 border-t border-bg-soft dark:border-white/10 bg-bg-card dark:bg-brand-navy">
+      <p class="text-sm text-text-soft dark:text-white/60">You're viewing this as a policy manager — it isn't assigned to you, so there's nothing to sign.</p>
+    </div>
+  {% else %}
+    <div class="sticky bottom-0 z-10 pt-1 pb-2 border-t border-bg-soft dark:border-white/10 bg-bg-card dark:bg-brand-navy">
+      <p class="text-sm text-text-soft dark:text-white/60">This policy isn’t open for signing right now.</p>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

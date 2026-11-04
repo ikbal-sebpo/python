@@ -1,0 +1,24 @@
+{% load static tailwind_tags %}<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Access ended · Orbis</title>
+{% include "partials/_favicon.html" %}
+<link rel="preconnect" href="https://fonts.bunny.net" crossorigin>
+<link rel="stylesheet" href="https://fonts.bunny.net/css?family=figtree:400,500,600|roboto:400,500&display=swap">
+{% tailwind_css %}
+</head><body class="min-h-screen bg-bg-main">
+<div class="max-w-md mx-auto py-16 px-6 text-center">
+  <div class="bg-white rounded-lg shadow p-8 border border-bg-soft">
+    <div class="w-12 h-12 rounded-full bg-bg-soft flex items-center justify-center text-2xl mx-auto mb-4">⏳</div>
+    <h1 class="text-xl font-semibold mb-2">Your Orbis access has ended.</h1>
+    <p class="text-text-soft text-sm">
+      Your last working day at SEBPO has passed. The account is now deactivated.
+    </p>
+    <p class="text-text-soft text-sm mt-4">
+      For payslips, letters, or any post-separation enquiries please contact HR at
+      <a href="mailto:hr@sebpo.com" class="text-brand-accent hover:underline">hr@sebpo.com</a>.
+    </p>
+  </div>
+</div>
+</body></html>

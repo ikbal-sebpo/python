@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+{% block title %}Org Chart · Orbis{% endblock %}
+
+{% block content %}
+<div class="page-fill">
+<div class="card shrink-0 flex flex-wrap items-center gap-3">
+    <div class="flex flex-wrap items-center gap-1.5" aria-label="Start from">
+        {% for r in tree.roots %}
+            <a href="?root={{ r.pk }}&levels={{ levels }}"
+               class="org-chip{% if mode == 'tree' and root and root.pk == r.pk %} org-chip--on{% endif %}"
+               title="{{ r.user.display_name }}">
+                {{ r.user.designation|default:r.user.display_name }}<small class="tabular-nums">{{ r.team_size|add:1 }}</small>
+            </a>
+        {% endfor %}
+        {% if tree.unlinked %}
+            <a href="?root=unlinked" class="org-chip{% if mode == 'unlinked' %} org-chip--on{% endif %}"
+               title="No manager recorded and nobody reporting to them">
+                Unlinked<small class="tabular-nums">{{ tree.unlinked|length }}</small>
+            </a>
+        {% endif %}
+    </div>
+
+    <form method="get" class="flex items-center gap-2 flex-1 min-w-[220px]" role="search">
+        <input type="search" name="q" value="{{ q }}" class="form-input flex-1" autocomplete="off"
+               placeholder="Find a person, title or employee ID" aria-label="Find a person">
+        <button type="submit" class="btn-secondary">Search</button>
+    </form>
+
+    <div class="flex items-center gap-1.5 text-xs text-text-mute" aria-label="Levels shown">
+        <span>Show</span>
+        {% for lv in level_choices %}
+            <a href="?{% if root %}root={{ root.pk }}&{% endif %}levels={{ lv }}"
+               class="org-chip{% if mode == 'tree' and not focus and levels == lv %} org-chip--on{% endif %}">
+                {% if lv == 99 %}All{% else %}{{ lv }} level{{ lv|pluralize }}{% endif %}
+            </a>
+        {% endfor %}
+    </div>
+
+    {% if me %}
+        <a href="?focus={{ me.pk }}" class="btn-secondary">
+            <i data-lucide="locate" class="w-4 h-4"></i><span>Show my chain</span>
+        </a>
+    {% endif %}
+</div>
+
+{% if q and not focus %}
+    <div class="card shrink-0 py-3">
+        {% if results %}
+            <div class="text-xs text-text-mute mb-2">{{ results|length }} match{{ results|length|pluralize:"es" }} for “{{ q }}” — pick one to open their place in the chart.</div>
+            <div class="flex flex-wrap gap-2">
+                {% for n in results %}
+                    <a href="?focus={{ n.pk }}" class="org-chip">
+                        {{ n.user.display_name }}
+                        <small>{{ n.user.designation|default:"—" }} · {{ n.user.department|default:"—" }}</small>
+                    </a>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="text-sm text-text-mute">No active employee matches “{{ q }}”.</div>
+        {% endif %}
+    </div>
+{% endif %}
+
+<div class="shrink-0 flex flex-wrap items-center gap-x-5 gap-y-1 text-xs text-text-mute px-1">
+    <span class="tabular-nums"><b class="font-semibold text-text-main dark:text-white">{{ stats.active }}</b> active</span>
+    <span class="tabular-nums"><b class="font-semibold text-text-main dark:text-white">{{ stats.linked }}</b> with a manager recorded</span>
+    <span class="tabular-nums"><b class="font-semibold text-text-main dark:text-white">{{ stats.roots }}</b> top-level leader{{ stats.roots|pluralize }}</span>
+    <span class="tabular-nums"><b class="font-semibold text-text-main dark:text-white">{{ stats.depth }}</b> levels deep</span>
+    <span class="org-legend"><i class="org-legend-swatch org-legend-swatch--root"></i>Top of this tree</span>
+    <span class="org-legend"><i class="org-legend-swatch org-legend-swatch--me"></i>You</span>
+    <span class="org-legend"><i class="org-legend-swatch org-legend-swatch--warn"></i>Reports to someone who has left</span>
+    {% if focus %}
+        <a href="?root={{ root.pk|default:'unlinked' }}&levels={{ levels }}" class="text-brand hover:underline">Clear focus</a>
+    {% endif %}
+</div>
+
+{% if quality %}
+<details class="card shrink-0 py-2.5">
+    <summary class="cursor-pointer text-sm select-none">
+        <span class="font-medium">Data quality (HR)</span>
+        <span class="text-text-mute tabular-nums">
+            · {{ quality.unlinked|length }} unlinked
+            · {{ quality.manager_inactive|length }} reporting to someone inactive
+            · {{ quality.missing_job_info|length }} without job info
+            · {{ quality.wide_spans|length }} manager{{ quality.wide_spans|length|pluralize }} with 20+ direct reports
+        </span>
+    </summary>
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 mt-3 text-sm">
+        <div>
+            <div class="text-xs text-text-mute mb-1">No manager, no reports</div>
+            <ul class="space-y-0.5 max-h-48 overflow-y-auto">
+                {% for n in quality.unlinked %}<li><a href="{% url 'employee_detail' n.pk %}" class="hover:underline">{{ n.user.display_name }}</a> <span class="text-text-mute">· {{ n.user.department|default:"—" }}</span></li>{% empty %}<li class="text-text-mute">None</li>{% endfor %}
+            </ul>
+        </div>
+        <div>
+            <div class="text-xs text-text-mute mb-1">Reports to someone who has left</div>
+            <ul class="space-y-0.5 max-h-48 overflow-y-auto">
+                {% for n in quality.manager_inactive %}<li><a href="{% url 'employee_detail' n.pk %}" class="hover:underline">{{ n.user.display_name }}</a> <span class="text-text-mute">· {{ n.user.department|default:"—" }}</span></li>{% empty %}<li class="text-text-mute">None</li>{% endfor %}
+            </ul>
+        </div>
+        <div>
+            <div class="text-xs text-text-mute mb-1">No job info row at all</div>
+            <ul class="space-y-0.5 max-h-48 overflow-y-auto">
+                {% for n in quality.missing_job_info %}<li><a href="{% url 'employee_detail' n.pk %}" class="hover:underline">{{ n.user.display_name }}</a> <span class="text-text-mute">· {{ n.user.department|default:"—" }}</span></li>{% empty %}<li class="text-text-mute">None</li>{% endfor %}
+            </ul>
+        </div>
+        <div>
+            <div class="text-xs text-text-mute mb-1">20 or more direct reports</div>
+            <ul class="space-y-0.5 max-h-48 overflow-y-auto">
+                {% for n in quality.wide_spans %}<li><a href="?focus={{ n.pk }}" class="hover:underline">{{ n.user.display_name }}</a> <span class="text-text-mute tabular-nums">· {{ n.direct_count }} direct</span></li>{% empty %}<li class="text-text-mute">None</li>{% endfor %}
+            </ul>
+        </div>
+    </div>
+</details>
+{% endif %}
+
+<div class="card p-0 table-scroll org-canvas">
+    {% if mode == "unlinked" %}
+        <div class="p-4">
+            <p class="text-sm text-text-mute mb-3">These people have no manager recorded and nobody reports to them, so they sit outside every tree. Set their “Reports to” in the Job Info section of the profile to place them.</p>
+            <div class="org-tree org-unlinked">
+                {% for n in tree.unlinked %}{% include "employees/_org_card.html" with node=n is_root=False %}{% endfor %}
+            </div>
+        </div>
+    {% elif root %}
+        <div class="org-tree">
+            {% include "employees/_org_node.html" with node=root is_root=True %}
+        </div>
+    {% else %}
+        <div class="p-8 text-sm text-text-mute">No reporting lines are recorded yet. Set “Reports to” on employees' Job Info to build the chart.</div>
+    {% endif %}
+</div>
+</div>
+
+{% if focus or root %}
+<script>
+    // A wide tree starts scrolled to its left edge, which may be nowhere
+    // near the root: centre the focused person (or the root) on first paint.
+    document.addEventListener('DOMContentLoaded', function () {
+        var el = document.getElementById('org-card-{% if focus %}{{ focus.pk }}{% else %}{{ root.pk }}{% endif %}');
+        if (el) el.scrollIntoView({ block: {% if focus %}'center'{% else %}'nearest'{% endif %}, inline: 'center' });
+    });
+</script>
+{% endif %}
+{% endblock %}

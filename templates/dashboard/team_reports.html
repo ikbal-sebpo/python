@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block title %}Direct reports · Orbis{% endblock %}
+
+{% block content %}
+<div class="card mb-4">
+    <div>
+        <a href="{% url 'home' %}?tab=team" class="text-xs text-text-mute hover:text-brand-accent inline-flex items-center gap-1">
+            <i data-lucide="chevron-left" class="w-3.5 h-3.5"></i>
+            <span>Back to dashboard</span>
+        </a>
+    </div>
+
+    {# Breadcrumb: Me / … / current target #}
+    <nav class="flex items-center flex-wrap gap-1 text-sm mt-2">
+        <a href="{% url 'team_reports' %}"
+           class="{% if is_self %}font-semibold text-text-main dark:text-white{% else %}text-text-mute hover:text-brand-accent{% endif %}">
+            Me
+        </a>
+        {% for crumb in crumbs %}
+            <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-text-mute shrink-0"></i>
+            {% if forloop.last %}
+                <span class="font-semibold text-text-main dark:text-white">{{ crumb.display_name }}</span>
+            {% else %}
+                <a href="{% url 'team_reports' %}?root={{ crumb.pk }}"
+                   class="text-text-mute hover:text-brand-accent">{{ crumb.display_name }}</a>
+            {% endif %}
+        {% endfor %}
+    </nav>
+
+    <h1 class="text-lg font-semibold text-text-main dark:text-white mt-1">
+        {% if is_self %}My direct reports{% else %}Direct reports of {{ target.display_name }}{% endif %}
+    </h1>
+    <div class="text-xs text-text-mute mt-0.5">
+        {{ rows|length }} direct report{{ rows|length|pluralize }}
+    </div>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+    {% for row in rows %}
+        {% if row.team_size %}
+            <a href="{% url 'team_reports' %}?root={{ row.user.pk }}"
+               class="card hover:ring-1 hover:ring-brand-accent/40 transition flex items-center justify-between gap-3">
+        {% else %}
+            <div class="card flex items-center justify-between gap-3">
+        {% endif %}
+                <div class="min-w-0">
+                    <div class="font-medium truncate">{{ row.user.display_name }}</div>
+                    <div class="text-xs text-text-mute truncate">
+                        {{ row.user.designation.name|default:"—" }}{% if row.user.department %} · {{ row.user.department.name }}{% endif %}
+                    </div>
+                    {% if row.user.confirmation_date and row.user.confirmation_date > today %}
+                        <span class="inline-block mt-1 text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded bg-brand-gold/20 text-brand-gold">
+                            On probation
+                        </span>
+                    {% endif %}
+                </div>
+                {% if row.team_size %}
+                    <span class="badge bg-brand-blue text-white shrink-0 inline-flex items-center gap-1"
+                          title="{{ row.user.display_name }}'s full team">
+                        <i data-lucide="users" class="w-3 h-3"></i>{{ row.team_size }}
+                    </span>
+                {% else %}
+                    <span class="text-xs text-text-mute tabular-nums shrink-0">—</span>
+                {% endif %}
+        {% if row.team_size %}
+            </a>
+        {% else %}
+            </div>
+        {% endif %}
+    {% empty %}
+        <div class="card md:col-span-2 lg:col-span-3 text-sm text-text-mute italic py-6 text-center">
+            No direct reports.
+        </div>
+    {% endfor %}
+</div>
+{% endblock %}

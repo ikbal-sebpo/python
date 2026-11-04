@@ -1,0 +1,84 @@
+{% comment %}
+    Context:
+      row                 LeaveApplication
+      current_user_pk     UUID — to decide whether to show self-cancel vs approve
+      oob                 True on out-of-band replace after htmx action
+      show_actions        whether to render the inline approve/decline form
+      user_can_edit_all   True if viewer is HR / Admins / superuser —
+                          when True, inline approve appears even on the viewer's own rows.
+                          Managers get this only for their downline.
+
+    The balance button needs the host page to provide the drawer Alpine
+    x-data (drawer / drawerTitle / open / close) and to include
+    partials/_drawer_shell.html — leave/list.html does both.
+{% endcomment %}
+<tr id="leave-row-{{ row.pk }}"
+    {% if oob %}hx-swap-oob="true"{% endif %}>
+    <td class="whitespace-nowrap">
+        {% comment %}
+            Name + employee ID on one line, rather than name over email. The ID
+            is what disambiguates same-named employees (there are some), it's
+            the identifier HR uses, and the email was derivable from the name
+            anyway. Search still matches name, email or ID, so nothing became
+            harder to find — and the single line drops the row from 65px to 53.
+            Same "Name · ID" shape as CustomUser.search_label.
+        {% endcomment %}
+        <a href="{% url 'leave_detail' row.pk %}" class="font-medium text-brand hover:underline dark:text-brand-accent">
+            {{ row.employee.display_name }}
+        </a>
+        {% if row.employee.employee_id %}
+            <span class="ml-1.5 text-xs text-text-mute" title="Employee ID">· {{ row.employee.employee_id }}</span>
+        {% endif %}
+    </td>
+    <td class="text-center">
+        {% comment %} Balance drawer: the same view the balance page uses, plus the
+           requested-vs-available arithmetic for this application, so a
+           manager can decide without leaving the list. {% endcomment %}
+        <button type="button"
+                class="p-1.5 rounded text-text-mute hover:bg-bg-soft hover:text-brand dark:hover:bg-white/5 dark:hover:text-brand-accent"
+                title="Leave balance for {{ row.employee.display_name }}"
+                aria-label="Leave balance for {{ row.employee.display_name }}"
+                hx-get="{% url 'leave_balance' %}?for={{ row.employee_id }}&application={{ row.pk }}"
+                hx-target="#drawer-body"
+                hx-swap="innerHTML"
+                @click="open('Leave balance — {{ row.employee.display_name|escapejs }}')">
+            <i data-lucide="wallet" class="w-4 h-4"></i>
+        </button>
+    </td>
+    <td class="whitespace-nowrap">{{ row.employee.team|default:"—" }}</td>
+    <td>{{ row.leave_type.name }}</td>
+    <td>{{ row.start_date|date:"Y-m-d" }} → {{ row.end_date|date:"Y-m-d" }}</td>
+    <td class="text-center">{{ row.day_count }}</td>
+    <td>
+        {% if row.status == 'PENDING' %}
+            <span class="badge badge-info"><i data-lucide="clock" class="w-3 h-3"></i>Pending</span>
+        {% elif row.status == 'APPROVED' %}
+            <span class="badge badge-success"><i data-lucide="check" class="w-3 h-3"></i>Approved</span>
+        {% elif row.status == 'DECLINED' %}
+            <span class="badge" style="background:rgba(239,68,68,.15); color:#dc2626;"><i data-lucide="x" class="w-3 h-3"></i>Declined</span>
+        {% else %}
+            <span class="badge badge-muted"><i data-lucide="slash" class="w-3 h-3"></i>Cancelled</span>
+        {% endif %}
+        {% if row.approved_over_balance %}
+            <span class="badge badge-warning" title="Approved as an advance against future entitlement — exceeded balance by {{ row.balance_shortfall_days }} day(s) at approval time.">⚠ Advance</span>
+        {% endif %}
+    </td>
+    <td class="text-xs text-text-soft dark:text-white/60">{{ row.applied_at|date:"Y-m-d H:i" }}</td>
+    <td class="text-right">
+        {% if show_actions and row.status == 'PENDING' and row.employee_id != current_user_pk %}
+            {% include "leave/_row_actions.html" with row=row %}
+        {% elif show_actions and row.status == 'PENDING' and user_can_edit_all %}
+            {# Admin can approve anyone, including themselves. #}
+            {% include "leave/_row_actions.html" with row=row %}
+        {% else %}
+            {% if row.status == 'PENDING' and row.employee_id == current_user_pk %}
+                {# Own pending request — always editable (accounts.permissions.can_edit_leave). #}
+                <a href="{% url 'leave_edit' row.pk %}" class="inline-flex align-middle mr-2 text-text-mute hover:text-brand dark:hover:text-brand-accent"
+                   title="Edit request" aria-label="Edit request">
+                    <i data-lucide="pencil" class="w-3.5 h-3.5"></i>
+                </a>
+            {% endif %}
+            <a href="{% url 'leave_detail' row.pk %}" class="text-xs text-brand hover:underline dark:text-brand-accent">Details</a>
+        {% endif %}
+    </td>
+</tr>

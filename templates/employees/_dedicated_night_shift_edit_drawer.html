@@ -1,0 +1,67 @@
+{% comment %}
+    Drawer body for revising an existing Dedicated Night Shift assignment's
+    window/note. GET loads this fragment into #drawer-body; POST re-renders
+    it with errors, or (on success) a bare 204 + HX-Refresh so the profile
+    card picks up the new dates.
+{% endcomment %}
+<div class="drawer-body space-y-4">
+    <div class="rounded border-l-4 border-brand-accent bg-bg-soft/40 dark:bg-white/5 px-3 py-2 text-sm">
+        For <strong>{{ target_employee.display_name }}</strong>
+        <span class="text-text-mute">({{ target_employee.email }})</span>
+        <span class="ml-2">
+            {% if assignment.status == 'PENDING' %}
+                <span class="badge badge-info text-[10px]">Pending</span>
+            {% elif assignment.status == 'APPROVED' %}
+                <span class="badge badge-success text-[10px]">Approved</span>
+            {% endif %}
+        </span>
+    </div>
+
+    {% if form.non_field_errors %}
+        <div class="rounded border border-red-200 bg-red-50 text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-300 px-3 py-2 text-sm">
+            {{ form.non_field_errors|striptags }}
+        </div>
+    {% endif %}
+
+    {% if demotes_on_save %}
+        <div class="rounded border-l-4 border-amber-400 bg-amber-50 text-amber-800 dark:border-amber-500/40 dark:bg-amber-500/10 dark:text-amber-200 px-3 py-2 text-sm">
+            <div class="flex items-start gap-2">
+                <i data-lucide="alert-triangle" class="w-4 h-4 shrink-0 mt-0.5"></i>
+                <div>
+                    Saving a change here <strong>sends this assignment back for approval</strong>.
+                    The Dedicated Night Shift allowance stops applying until an APM or
+                    above approves the new window.
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <p class="text-xs text-text-mute dark:text-white/50">
+            {% if assignment.status == 'APPROVED' %}
+                This assignment is already approved — every night shift worked
+                during the window earns the Dedicated Night Shift allowance, so
+                changing the dates changes what gets paid.
+            {% else %}
+                Still awaiting APM-or-above approval — you can revise the window
+                or note before it's decided.
+            {% endif %}
+        </p>
+    {% endif %}
+
+    <form method="post" id="dedicated-night-shift-edit-form" action="{{ action_url }}"
+          hx-post="{{ action_url }}"
+          hx-target="#drawer-body"
+          hx-swap="innerHTML"
+          class="grid grid-cols-1 gap-4">
+        {% csrf_token %}
+        {% include "accounts/_field.html" with field=form.start_date %}
+        {% include "accounts/_field.html" with field=form.end_date %}
+        {% include "accounts/_field.html" with field=form.note %}
+    </form>
+</div>
+
+<div class="drawer-footer justify-end">
+    <button type="button" class="btn-secondary" @click="close()">Cancel</button>
+    <button type="submit" form="dedicated-night-shift-edit-form" class="btn-primary">
+        <i data-lucide="check" class="w-4 h-4"></i><span>Save changes</span>
+    </button>
+</div>

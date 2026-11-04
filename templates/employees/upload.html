@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+{% block title %}Bulk update employees · Orbis{% endblock %}
+
+{% block content %}
+<div class="mb-4 flex items-center justify-between gap-3">
+    <div>
+        <h1 class="text-xl font-semibold">Bulk update employee data</h1>
+        <p class="text-sm text-text-soft dark:text-white/60 mt-1">
+            Update team, reporting line, resource status, and billing status for many employees from an Excel or CSV file.
+        </p>
+    </div>
+    <a href="{% url 'employee_list' %}" class="btn-secondary">
+        <i data-lucide="arrow-left" class="w-4 h-4"></i><span>Back to employees</span>
+    </a>
+</div>
+
+<div class="card mb-4">
+    <h2 class="text-sm font-semibold mb-2">How it works</h2>
+    <ul class="text-sm text-text-soft dark:text-white/70 list-disc pl-5 space-y-1">
+        <li>One row per employee. <span class="font-medium">Employee ID</span> is required and is how each row is matched.</li>
+        <li>A blank cell in any optional column leaves that field unchanged — it never clears an existing value.</li>
+        <li><span class="font-medium">Team</span>, <span class="font-medium">Job Location</span>, and
+            <span class="font-medium">Work Location</span> are matched by name (case-insensitive).
+            <span class="font-medium">Reports To</span> is matched by the manager's Employee ID.
+            <span class="font-medium">Resource Status</span>/<span class="font-medium">Billing Status</span>
+            accept either the code or the label.</li>
+        {% if can_edit_all %}
+            <li><span class="font-medium">Department</span>, <span class="font-medium">Joining Date</span>,
+                <span class="font-medium">Gender</span>, <span class="font-medium">Employee Register Serial No.</span>,
+                and <span class="font-medium">Last Working Date</span>
+                are HR-managed fields, included in your template because you have org-wide write access.
+                <span class="font-medium">Department</span> is matched by name; <span class="font-medium">Joining Date</span>
+                and <span class="font-medium">Last Working Date</span>
+                accept most common date formats (e.g. 2024-01-31, 31/01/2024, Jan 31, 2024);
+                <span class="font-medium">Gender</span> accepts Male/Female or M/F;
+                <span class="font-medium">Employee Register Serial No.</span> must be unique per employee.</li>
+            <li>Setting <span class="font-medium">Last Working Date</span> deactivates the employee's access the day
+                after that date (same as the HR edit form) and purges any roster shifts scheduled after it — no
+                clearance case is created automatically; use
+                <a href="{% url 'offboarding:hr_create_resignation' %}" class="underline">Start offboarding</a> for that.
+                A blank cell never clears an already-set date.</li>
+        {% endif %}
+        <li>The template is prefilled with each employee's current values, so you only need to edit the cells that changed.</li>
+        <li>Any error in the file aborts the whole upload — nothing is written until every row is valid.</li>
+        <li>You can only upload rows for employees in your managed scope; others are rejected per-row.</li>
+    </ul>
+</div>
+
+<div class="card mb-4">
+    <h2 class="text-sm font-semibold mb-3">1. Download a template</h2>
+    <div class="flex flex-wrap items-center gap-2">
+        <a href="{% url 'employee_bulk_upload_template' 'xlsx' %}" class="btn-secondary">
+            <i data-lucide="file-spreadsheet" class="w-4 h-4"></i><span>Excel template</span>
+        </a>
+        <a href="{% url 'employee_bulk_upload_template' 'csv' %}" class="btn-secondary">
+            <i data-lucide="file-text" class="w-4 h-4"></i><span>CSV template</span>
+        </a>
+        <span class="text-xs text-text-mute ml-2">
+            Prefilled with your visible employees' current team, reports to, resource status, billing status,
+            job location, and work location.
+        </span>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <h2 class="text-sm font-semibold mb-3">2. Upload your filled file</h2>
+    <form id="employee-upload-form"
+          method="post"
+          enctype="multipart/form-data"
+          hx-post="{% url 'employee_bulk_upload' %}"
+          hx-encoding="multipart/form-data"
+          hx-target="#upload-result"
+          hx-swap="innerHTML"
+          hx-indicator="#upload-spinner"
+          class="flex flex-wrap items-center gap-3">
+        {% csrf_token %}
+        <input type="file" name="file" accept=".xlsx,.csv" required
+               class="form-input w-auto max-w-xs">
+        <button type="submit" name="action" value="preview" class="btn-secondary">
+            <i data-lucide="eye" class="w-4 h-4"></i><span>Preview only</span>
+        </button>
+        <button type="submit" name="action" value="apply" class="btn-primary">
+            <i data-lucide="upload-cloud" class="w-4 h-4"></i><span>Apply upload</span>
+        </button>
+        <span id="upload-spinner" class="htmx-indicator inline-flex items-center gap-1 text-xs text-text-mute">
+            <i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i>Working…
+        </span>
+    </form>
+    <p class="text-xs text-text-mute mt-2">
+        Tip: click <span class="font-medium">Preview only</span> first to see what will change without writing,
+        then click <span class="font-medium">Apply upload</span> — the file stays attached, no need to re-upload.
+        Any errors will reject the whole upload.
+    </p>
+</div>
+
+<div id="upload-result">
+    {% if report or inline_error %}
+        {% include "employees/_upload_report.html" with report=report parsed_preview=parsed_preview preview=preview aborted=aborted inline_error=inline_error %}
+    {% endif %}
+</div>
+
+<script>
+    document.body.addEventListener('htmx:afterSwap', function (evt) {
+        if (window.lucide && typeof window.lucide.createIcons === 'function') {
+            window.lucide.createIcons();
+        }
+    });
+</script>
+{% endblock %}

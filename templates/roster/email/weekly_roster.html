@@ -1,0 +1,64 @@
+{% comment %}
+    Weekly team roster email (roster/emails.py::build_context). Inline styles
+    only — Gmail/Outlook strip <style> blocks and ignore classes.
+{% endcomment %}{% with b="border:1px solid #444444;" hd="#20618A" gray="#EFEFEF" %}<!DOCTYPE html>
+<html>
+<body style="margin:0;padding:0;font-family:Arial,Helvetica,sans-serif;font-size:14px;color:#222222;">
+<div style="padding:8px 0;">
+<p style="margin:0 0 16px 0;line-height:1.5;">{{ intro_html|safe }}</p>
+
+<table cellpadding="0" cellspacing="0" style="border-collapse:collapse;font-family:'Times New Roman',Times,serif;font-size:14px;">
+    {# Title block (left) + one legend line per shift (right). #}
+    <tr>
+        <td colspan="3" rowspan="{{ legend|length|default:1 }}"
+            style="{{ b }}background:{{ gray }};text-align:center;font-weight:bold;font-size:15px;padding:4px 8px;line-height:1.5;">
+            {{ title_team }}<br>{{ title_week }}<br>
+            {% if poc %}Team Manager/POC: {{ poc.display_name }}<br>
+            Email: <a href="mailto:{{ poc.email }}" style="color:#1155CC;">{{ poc.email }}</a>{% endif %}
+        </td>
+        <td colspan="7" style="{{ b }}font-weight:bold;padding:6px 8px;white-space:nowrap;">{{ legend.0|default:"" }}</td>
+    </tr>
+    {% for line in legend|slice:"1:" %}
+    <tr><td colspan="7" style="{{ b }}font-weight:bold;padding:6px 8px;white-space:nowrap;">{{ line }}</td></tr>
+    {% endfor %}
+
+    {# Header: dates on a blue band, weekday names on grey below. #}
+    <tr>
+        <td rowspan="2" style="{{ b }}background:{{ hd }};color:#FFFFFF;font-weight:bold;text-align:center;vertical-align:bottom;padding:4px 6px;">SL</td>
+        <td rowspan="2" style="{{ b }}background:{{ hd }};color:#FFFFFF;font-weight:bold;text-align:center;vertical-align:bottom;padding:4px 8px;">Name</td>
+        <td style="{{ b }}background:{{ hd }};padding:4px 8px;"></td>
+        {% for h in day_headers %}
+        <td style="{{ b }}background:{{ hd }};color:#FFFFFF;font-weight:bold;text-align:center;padding:4px 8px;white-space:nowrap;">{{ h.date|date:"j-M" }}</td>
+        {% endfor %}
+    </tr>
+    <tr>
+        <td style="{{ b }}background:{{ gray }};font-weight:bold;text-align:center;padding:4px 8px;">Role</td>
+        {% for h in day_headers %}
+        <td style="{{ b }}background:{{ gray }};font-weight:bold;text-align:center;padding:4px 8px;">
+            {{ h.date|date:"l" }}{% if h.holiday %}<br><span style="font-weight:normal;font-size:12px;color:#B00020;">{{ h.holiday.name }}</span>{% endif %}
+        </td>
+        {% endfor %}
+    </tr>
+
+    {% for r in rows %}
+    <tr>
+        <td style="{{ b }}background:{{ r.tint }};{% if r.highlight %}font-weight:bold;{% endif %}text-align:center;padding:4px 8px;">{{ r.sl }}</td>
+        <td style="{{ b }}background:{{ r.tint }};{% if r.highlight %}font-weight:bold;{% endif %}padding:4px 8px;white-space:nowrap;">{{ r.name }}</td>
+        <td style="{{ b }}background:{{ r.tint }};{% if r.highlight %}font-weight:bold;{% endif %}text-align:center;padding:4px 8px;white-space:nowrap;">{{ r.role }}</td>
+        {% for c in r.cells %}
+        <td style="{{ b }}background:{{ r.tint }};{% if r.highlight %}font-weight:bold;{% endif %}text-align:center;padding:4px 8px;white-space:nowrap;">{{ c }}</td>
+        {% endfor %}
+        {% if merge_weekend and forloop.first %}
+        <td rowspan="{{ rows|length }}" colspan="{{ weekend_colspan }}"
+            style="{{ b }}background:#FFFFFF;text-align:center;vertical-align:middle;font-weight:bold;">Weekend</td>
+        {% endif %}
+    </tr>
+    {% empty %}
+    <tr><td colspan="10" style="{{ b }}text-align:center;padding:12px;color:#666666;">No active team members this week.</td></tr>
+    {% endfor %}
+</table>
+
+<p style="margin:24px 0 0 0;line-height:1.5;">--<br>{{ signature_html|safe }}</p>
+</div>
+</body>
+</html>{% endwith %}

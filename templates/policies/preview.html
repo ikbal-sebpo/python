@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}{{ policy.key }} — v{{ version.version }} · Orbis{% endblock %}
+
+{% comment %}
+    Manager-facing PDF preview — the "View PDF" / "Open" counterpart of the
+    sign page for policy_detail.html. Same canvas-rendered, no-native-viewer
+    approach as sign.html (see policy-pdf-viewer.js) instead of linking
+    straight to the raw PDF, which would open the browser's native,
+    right-click-savable PDF viewer in a new tab.
+{% endcomment %}
+
+{% block main_class %}px-6 pt-0 md:px-8{% endblock %}
+
+{% block content %}
+{# oncontextmenu blocks right-click "Save As"/"Save image as" on the page  #}
+{# chrome around the PDF — see sign.html for why the PDF itself needs to    #}
+{# be canvas-rendered rather than embedded for this to actually matter.    #}
+<div class="flex flex-col gap-1.5" oncontextmenu="return false">
+  <div class="flex items-center gap-2 py-1 text-sm text-text-soft dark:text-white/60">
+    <a href="{% url 'policies:detail' policy.pk %}" class="hover:underline">{{ policy.key }}</a>
+    <span>/</span>
+    <span class="text-text-main dark:text-white font-medium">v{{ version.version }}{% if version.is_current %} (current){% endif %}</span>
+  </div>
+
+  <div id="policy-pdf-viewer"
+       data-policy-pdf-viewer
+       data-pdf-url="{% url 'policies:pdf' policy.pk %}?v={{ version.version }}"
+       data-pdfjs-url="{% static 'vendor/pdfjs-6.2.108.min.js' %}"
+       data-pdfjs-worker-url="{% static 'vendor/pdfjs-6.2.108.worker.min.js' %}"
+       data-watermark="{{ watermark }}"
+       class="rounded-lg border border-bg-soft dark:border-white/10 bg-bg-soft dark:bg-black/20 overflow-y-auto h-[calc(100vh_-_9rem)] min-h-[24rem]"
+       aria-label="Policy document — {{ policy.title }}"></div>
+  <script type="module" src="{% static 'js/policy-pdf-viewer.js' %}"></script>
+  <noscript><p class="text-sm">Your browser needs JavaScript to display the PDF.</p></noscript>
+</div>
+{% endblock %}

@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+{% block title %}Bulk create new joiners · Orbis{% endblock %}
+
+{% block content %}
+<div class="mb-4 flex items-center justify-between gap-3">
+    <div>
+        <h1 class="text-xl font-semibold">Bulk create new joiners</h1>
+        <p class="text-sm text-text-soft dark:text-white/60 mt-1">
+            Create a batch of new employees from a spreadsheet — Employee ID and login Email
+            are auto-assigned when left blank, and each new employee gets a one-time password
+            so they can sign in and fill in their own profile on day one.
+        </p>
+    </div>
+    <a href="{% url 'user_list' %}" class="btn-secondary">
+        <i data-lucide="arrow-left" class="w-4 h-4"></i><span>Back to users</span>
+    </a>
+</div>
+
+<div class="card mb-4">
+    <h2 class="text-sm font-semibold mb-3">1. Download a template</h2>
+    <div class="flex flex-wrap items-center gap-2">
+        <a href="{% url 'user_bulk_create_template' %}" class="btn-secondary">
+            <i data-lucide="file-spreadsheet" class="w-4 h-4"></i><span>Excel template</span>
+        </a>
+        <span class="text-xs text-text-mute ml-2">
+            Department/Designation/Team/Job Location/Work Location/Employment Type/Resource
+            Status/Billing Status/Reason are dropdowns sourced from live reference data — a
+            hidden "Existing employees" sheet lists Employee ID + Name for filling in Reports To.
+        </span>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <h2 class="text-sm font-semibold mb-2">2. File format</h2>
+    <p class="text-sm text-text-soft dark:text-white/70 mb-2">
+        One row per new joiner. Only <span class="font-medium">Full Name</span> and
+        <span class="font-medium">Department</span> are required — everything else can be
+        left blank and filled in on the profile later.
+    </p>
+    <ul class="text-sm text-text-soft dark:text-white/70 list-disc pl-5 space-y-1">
+        <li><span class="font-medium">Employee ID</span> — blank auto-assigns the next number
+            after the current highest.</li>
+        <li><span class="font-medium">Email</span> — blank auto-generates a unique
+            first.last@sebpo.com-style address (Data Solutions uses initials); fill it in
+            yourself to override.</li>
+        <li>A random <span class="font-medium">password</span> is generated for every new
+            employee — it isn't a template column, it only appears once, on the results
+            workbook after you apply the upload. There's no separate "change your password
+            on first login" step yet, so treat it as something the new joiner should change
+            themselves once they're in.</li>
+        <li><span class="font-medium">Gross Monthly Salary</span> needs an
+            <span class="font-medium">Effective From</span> date alongside it — leave both
+            blank to skip starting pay for now (Finance can add it later via the existing
+            gross-salary upload).</li>
+        <li>Grade, Cost Center, and Sub Project aren't part of this sheet — set those on the
+            profile once decided.</li>
+    </ul>
+</div>
+
+<div class="card mb-4">
+    <h2 class="text-sm font-semibold mb-3">3. Upload your filled file</h2>
+    <form id="onboard-upload-form"
+          method="post"
+          enctype="multipart/form-data"
+          hx-post="{% url 'user_bulk_create' %}"
+          hx-encoding="multipart/form-data"
+          hx-target="#upload-result"
+          hx-swap="innerHTML"
+          hx-indicator="#upload-spinner"
+          class="flex flex-wrap items-end gap-3">
+        {% csrf_token %}
+        <input type="file" name="file" accept=".xlsx,.csv" required class="form-input w-auto max-w-xs">
+        <button type="submit" name="action" value="preview" class="btn-secondary">
+            <i data-lucide="eye" class="w-4 h-4"></i><span>Preview only</span>
+        </button>
+        <button type="submit" name="action" value="apply" class="btn-primary">
+            <i data-lucide="upload-cloud" class="w-4 h-4"></i><span>Create employees</span>
+        </button>
+        <span id="upload-spinner" class="htmx-indicator inline-flex items-center gap-1 text-xs text-text-mute">
+            <i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i>Working…
+        </span>
+    </form>
+    <p class="text-xs text-text-mute mt-2">
+        Tip: click <span class="font-medium">Preview only</span> first to see the assigned
+        Employee IDs and Emails before anything is written. A malformed or duplicate row
+        rejects the whole upload before anything is created — fix it and re-upload.
+    </p>
+</div>
+
+<div id="upload-result">
+    {% if report or inline_error %}
+        {% include "accounts/_onboard_upload_report.html" with report=report parsed_preview=parsed_preview preview=preview aborted=aborted inline_error=inline_error %}
+    {% endif %}
+</div>
+
+<script>
+    document.body.addEventListener('htmx:afterSwap', function (evt) {
+        if (window.lucide && typeof window.lucide.createIcons === 'function') {
+            window.lucide.createIcons();
+        }
+    });
+</script>
+{% endblock %}

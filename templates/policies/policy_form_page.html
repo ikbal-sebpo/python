@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}{{ drawer_title|default:"Policy" }} · Orbis{% endblock %}
+
+{% comment %}
+    Non-htmx fallback for the create/edit/version drawers. Rendered when the
+    form view is reached with a normal (non-htmx) request.
+{% endcomment %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto space-y-6">
+  <h1 class="text-2xl font-semibold text-text-main dark:text-white">{{ drawer_title|default:"Policy" }}</h1>
+
+  <form method="post" action="{{ action_url }}" enctype="multipart/form-data" class="card space-y-4">
+    {% csrf_token %}
+    {% if form.non_field_errors %}
+      <div class="rounded border border-red-200 bg-red-50 text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-300 px-3 py-2 text-sm">
+        {{ form.non_field_errors|striptags }}
+      </div>
+    {% endif %}
+    {% for field in form %}
+      {% include "accounts/_field.html" with field=field %}
+    {% endfor %}
+    <div class="flex justify-end gap-2 pt-2">
+      <a href="{% url 'policies:list' %}" class="btn-secondary">Cancel</a>
+      <button type="submit" class="btn-primary">
+        <i data-lucide="save" class="w-4 h-4"></i><span>Save</span>
+      </button>
+    </div>
+  </form>
+</div>
+{% endblock %}

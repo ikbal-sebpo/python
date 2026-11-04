@@ -1,0 +1,161 @@
+{% comment %}
+    Drawer body for the weekly roster email (RosterEmailView). Every button
+    posts the same form with a different `action`; the view re-renders this
+    fragment with a notice/error, or a confirm prompt when the week was
+    already sent.
+{% endcomment %}
+<div class="drawer-body space-y-4">
+    <div class="flex flex-wrap items-center justify-between gap-2">
+        <div class="text-sm">
+            <div class="font-semibold text-text-main dark:text-white">{{ team.name }}</div>
+            <div class="text-xs text-text-mute">{{ subject }}</div>
+        </div>
+        <div class="inline-flex items-center gap-1">
+            <button type="button" class="btn-secondary !px-2" title="Previous week"
+                    hx-get="{{ action_url }}?team={{ team.pk }}&week={{ prev_week|date:'Y-m-d' }}"
+                    hx-target="#drawer-body" hx-swap="innerHTML">
+                <i data-lucide="chevron-left" class="w-4 h-4"></i>
+            </button>
+            <span class="px-2 text-sm font-medium whitespace-nowrap">{{ week_label }}</span>
+            <button type="button" class="btn-secondary !px-2" title="Next week"
+                    hx-get="{{ action_url }}?team={{ team.pk }}&week={{ next_week|date:'Y-m-d' }}"
+                    hx-target="#drawer-body" hx-swap="innerHTML">
+                <i data-lucide="chevron-right" class="w-4 h-4"></i>
+            </button>
+        </div>
+    </div>
+
+    {% if notice %}
+        <div class="rounded border border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-500/30 dark:bg-emerald-500/10 dark:text-emerald-300 px-3 py-2 text-sm">{{ notice }}</div>
+    {% endif %}
+    {% if error %}
+        <div class="rounded border border-red-200 bg-red-50 text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-300 px-3 py-2 text-sm">{{ error }}</div>
+    {% endif %}
+    {% if already_sent %}
+        <div class="rounded border-l-4 border-brand-accent bg-bg-soft/40 dark:bg-white/5 px-3 py-2 text-sm">
+            {{ week_label }} was already sent
+            {% if already_sent.sent_by %}by <strong>{{ already_sent.sent_by.display_name }}</strong>{% else %}by the Friday schedule{% endif %}
+            on {{ already_sent.created_at|date:"Y-m-d H:i" }}
+            ({{ already_sent.get_status_display|lower }}). The scheduled job will skip this week.
+        </div>
+    {% endif %}
+    {% if needs_confirm %}
+        <div class="rounded border border-amber-300 bg-amber-50 text-amber-800 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-200 px-3 py-2 text-sm">
+            This week has already gone out. Send it again to everyone on the list?
+            <button type="submit" form="roster-email-form" 
+                    onclick="document.getElementById('roster-email-action').value='send';document.getElementById('roster-email-confirm').value='1'"
+                    class="btn-primary !h-8 ml-2">Yes, send again</button>
+        </div>
+    {% endif %}
+
+    <form method="post" id="roster-email-form" action="{{ action_url }}"
+          hx-post="{{ action_url }}" hx-target="#drawer-body" hx-swap="innerHTML"
+          class="grid grid-cols-1 gap-4">
+        {% csrf_token %}
+        <input type="hidden" name="team" value="{{ team.pk }}">
+        <input type="hidden" name="week" value="{{ week|date:'Y-m-d' }}">
+        <input type="hidden" name="confirm" id="roster-email-confirm" value="0">
+        <input type="hidden" name="action" id="roster-email-action" value="save">
+
+        {% if form.non_field_errors %}
+            <div class="text-sm text-red-600">{{ form.non_field_errors|striptags }}</div>
+        {% endif %}
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {% include "accounts/_field.html" with field=form.to_emails %}
+            {% include "accounts/_field.html" with field=form.cc_emails %}
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {% include "accounts/_field.html" with field=form.poc %}
+            {% include "accounts/_field.html" with field=form.sender %}
+        </div>
+
+        <details class="rounded border border-bg-soft dark:border-white/10 px-3 py-2" {% if form.errors or excluded %}open{% endif %}>
+            <summary class="cursor-pointer text-sm font-medium">People &amp; roles <span class="text-text-mute font-normal">— blank role uses the designation</span></summary>
+            <div class="mt-3 space-y-2">
+                {% for p in form.person_rows %}
+                <div class="flex items-center gap-3">
+                    <div class="w-56 shrink-0 text-sm min-w-0">
+                        <div class="truncate">{{ p.employee.display_name }}</div>
+                        {% if p.note %}<div class="text-xs text-text-mute">{{ p.note }}</div>{% endif %}
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        {{ p.role }}
+                        {% if p.role.errors %}<p class="mt-1 text-xs text-red-600">{{ p.role.errors|striptags }}</p>{% endif %}
+                    </div>
+                    <label class="inline-flex shrink-0 items-center gap-1 text-xs w-20"{% if not p.include %} style="visibility:hidden"{% endif %}>
+                        {% if p.include %}{{ p.include }} Include{% endif %}
+                    </label>
+                </div>
+                {% empty %}
+                    <p class="text-sm text-text-mute">No active members this week.</p>
+                {% endfor %}
+                {% if excluded %}
+                <p class="text-xs text-text-mute">
+                    Not on the email: {% for e in excluded %}{{ e.display_name }}{% if not forloop.last %}, {% endif %}{% endfor %}
+                    (trainee{{ excluded|length|pluralize }}, not live yet). Tick Include to list anyway.
+                </p>
+                {% endif %}
+                <div class="pt-2">
+                    {% include "accounts/_field.html" with field=form.add_person %}
+                </div>
+            </div>
+        </details>
+
+        <details class="rounded border border-bg-soft dark:border-white/10 px-3 py-2" {% if form.intro_text.errors or form.signature.errors %}open{% endif %}>
+            <summary class="cursor-pointer text-sm font-medium">Wording</summary>
+            <div class="grid grid-cols-1 gap-3 mt-3">
+                {% include "accounts/_field.html" with field=form.intro_text %}
+                {% include "accounts/_field.html" with field=form.signature %}
+            </div>
+        </details>
+
+        <label class="inline-flex items-start gap-2 text-sm">
+            {{ form.send_team_copy }}
+            <span>{{ form.send_team_copy.label }}<span class="block text-xs text-text-mute">{{ form.send_team_copy.help_text }}</span></span>
+        </label>
+        <label class="inline-flex items-start gap-2 text-sm">
+            {{ form.is_active }}
+            <span>{{ form.is_active.label }}<span class="block text-xs text-text-mute">{{ form.is_active.help_text }}</span></span>
+        </label>
+    </form>
+
+    <div>
+        <div class="text-xs font-semibold uppercase tracking-wide text-text-mute mb-1">Preview</div>
+        <iframe srcdoc="{{ preview_html }}" title="Email preview"
+                class="w-full rounded border border-bg-soft bg-white dark:border-white/10"
+                style="height: 30rem;"></iframe>
+        <p class="mt-1 text-xs text-text-mute">
+            Preview uses the saved settings. From: {{ from_header.0 }}{% if from_header.1 %} · Reply-To: {{ from_header.1 }}{% endif %}{% if sender.email %} · {{ sender.display_name }} is CC'd on sends{% endif %}.
+        </p>
+    </div>
+
+    {% if recent_logs %}
+    <div>
+        <div class="text-xs font-semibold uppercase tracking-wide text-text-mute mb-1">History for this week</div>
+        <ul class="text-xs space-y-1">
+            {% for log in recent_logs %}
+            <li>
+                <span class="badge {% if log.status == 'FAILED' %}badge-danger{% elif log.status == 'SENT' %}badge-success{% else %}badge-warning{% endif %}">{{ log.get_status_display }}</span>
+                {% if log.kind == 'TEAM_COPY' %}Team copy{% else %}{{ log.get_trigger_display }}{% endif %} · {{ log.created_at|date:"Y-m-d H:i" }}
+                · {% if log.sent_by %}{{ log.sent_by.display_name }}{% else %}schedule{% endif %}
+                · <span class="text-text-mute">{{ log.to_emails|truncatechars:60 }}</span>
+                {% if log.error %}<div class="text-red-600">{{ log.error|truncatechars:160 }}</div>{% endif %}
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+</div>
+
+<div class="drawer-footer justify-end flex-wrap">
+    <button type="button" class="btn-secondary" @click="close()">Close</button>
+    <button type="submit" form="roster-email-form" onclick="document.getElementById('roster-email-action').value='save'" class="btn-secondary">
+        <i data-lucide="save" class="w-4 h-4"></i><span>Save</span>
+    </button>
+    <button type="submit" form="roster-email-form" onclick="document.getElementById('roster-email-action').value='test'" class="btn-secondary">
+        <i data-lucide="flask-conical" class="w-4 h-4"></i><span>Send test to me</span>
+    </button>
+    <button type="submit" form="roster-email-form" onclick="document.getElementById('roster-email-action').value='send'" class="btn-primary">
+        <i data-lucide="send" class="w-4 h-4"></i><span>Send to recipients</span>
+    </button>
+</div>

@@ -1,0 +1,64 @@
+{% comment %}
+    Policy create/edit drawer body. Returned by htmx GET, and re-returned on a
+    failing POST (status 400) so errors render in place. A successful POST
+    returns 204 + HX-Redirect, so htmx navigates to the detail page.
+{% endcomment %}
+<form method="post" action="{{ action_url }}"
+      hx-post="{{ action_url }}"
+      hx-target="#drawer-body"
+      hx-swap="innerHTML"
+      class="flex flex-col flex-1 min-h-0">
+    {% csrf_token %}
+
+    <div class="drawer-body space-y-4">
+        {% if form.non_field_errors %}
+            <div class="rounded border border-red-200 bg-red-50 text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-300 px-3 py-2 text-sm">
+                {{ form.non_field_errors|striptags }}
+            </div>
+        {% endif %}
+
+        {% include "accounts/_field.html" with field=form.title %}
+        {% include "accounts/_field.html" with field=form.category %}
+        {% include "accounts/_field.html" with field=form.description %}
+        {% include "accounts/_field.html" with field=form.department %}
+        {% include "accounts/_field.html" with field=form.owner %}
+        <p class="text-xs text-text-soft dark:text-white/50 -mt-3">Owner options follow the selected department.</p>
+        {% include "accounts/_field.html" with field=form.due_days %}
+
+        <div class="border-t border-bg-soft dark:border-white/10 pt-4">
+            <p class="text-xs uppercase tracking-wide text-text-soft dark:text-white/50 mb-3">Who must sign</p>
+            <label class="form-label">{{ form.target_groups.label }}</label>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-1">
+                {% for checkbox in form.target_groups %}
+                    <label class="flex items-center gap-2 text-sm text-text-soft dark:text-white/70">
+                        {{ checkbox.tag }}
+                        <span>{{ checkbox.choice_label }}</span>
+                    </label>
+                {% endfor %}
+            </div>
+            {% if form.target_groups.errors %}
+                <p class="mt-1 text-xs text-red-600 dark:text-red-400">{{ form.target_groups.errors|striptags }}</p>
+            {% endif %}
+            <p class="text-xs text-text-soft dark:text-white/50 mt-1 mb-3">
+                New policies start with <strong>All Employees</strong> ticked. Untick it to narrow to
+                specific groups, or untick every group to target only the people named below.
+            </p>
+            <label class="form-label">{{ form.custom_adherents.label }}</label>
+            {% include "policies/_adherent_picker.html" %}
+            {% if form.custom_adherents.errors %}
+                <p class="mt-1 text-xs text-red-600 dark:text-red-400">{{ form.custom_adherents.errors|striptags }}</p>
+            {% endif %}
+            <p class="text-xs text-text-soft dark:text-white/50 mt-1">
+                Optional individuals on top of the groups — only active employees not already
+                adherents/signers of this policy can be added (typically new joiners).
+            </p>
+        </div>
+    </div>
+
+    <div class="drawer-footer justify-end">
+        <button type="button" class="btn-secondary" @click="close()">Cancel</button>
+        <button type="submit" class="btn-primary">
+            <i data-lucide="save" class="w-4 h-4"></i><span>Save</span>
+        </button>
+    </div>
+</form>

@@ -1,0 +1,73 @@
+{# Results fragment for ShiftSummaryView's htmx request: rows for the #}
+{# current page only, plus the full-set count and pager.             #}
+{% include "partials/_result_count.html" with count_noun="employees" %}
+
+<div class="card p-0 table-scroll">
+    <table class="table-sticky min-w-full text-sm">
+        <thead>
+            <tr class="text-text-mute text-xs uppercase tracking-wider border-b border-bg-soft dark:border-white/10">
+                <th class="px-2 py-2 text-left">Employee ID</th>
+                <th class="px-2 py-2 text-left">Name</th>
+                <th class="px-2 py-2 text-left">Team</th>
+                <th class="px-2 py-2 text-right">Days worked</th>
+                <th class="px-2 py-2 text-right">OFF</th>
+                <th class="px-2 py-2 text-right">CL</th>
+                <th class="px-2 py-2 text-right">SL</th>
+                <th class="px-2 py-2 text-right">AL</th>
+                <th class="px-2 py-2 text-right">LWP</th>
+                <th class="px-2 py-2 text-right">MTL</th>
+                <th class="px-2 py-2 text-right">GH</th>
+                <th class="px-2 py-2 text-right">CPL</th>
+                <th class="px-2 py-2 text-right" title="Allocated for the employee's current AL anniversary cycle">AL allocated (cycle)</th>
+                <th class="px-2 py-2 text-right" title="AL used so far in the employee's current anniversary cycle, regardless of this report's date range">AL used (cycle)</th>
+                <th class="px-2 py-2 text-right" title="AL allocated minus AL used in the current anniversary cycle">AL balance (cycle)</th>
+                <th class="px-2 py-2 text-right">CL allocated</th>
+                <th class="px-2 py-2 text-right">SL allocated</th>
+                <th class="px-2 py-2 text-right">Total allocated</th>
+                <th class="px-2 py-2 text-right">Taken</th>
+                <th class="px-2 py-2 text-right">Remaining</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in rows %}
+                <tr class="border-b border-bg-soft/50 dark:border-white/5 hover:bg-bg-soft/40 dark:hover:bg-white/5">
+                    <td class="px-2 py-1.5 tabular-nums">
+                        <a href="{% url 'roster_week' %}?employee={{ row.employee_pk }}&from={{ start_date|date:'Y-m-d' }}&to={{ end_date|date:'Y-m-d' }}"
+                           class="text-brand hover:underline font-medium dark:text-brand-accent"
+                           title="Open roster to edit this employee's shifts">{{ row.employee_id|default:"—" }}</a>
+                    </td>
+                    <td class="px-2 py-1.5 font-medium">{{ row.employee_name }}</td>
+                    <td class="px-2 py-1.5 text-text-mute">{{ row.team }}</td>
+                    <td class="px-2 py-1.5 text-right tabular-nums">{{ row.days_worked }}</td>
+                    <td class="px-2 py-1.5 text-right tabular-nums">{{ row.OFF }}</td>
+                    <td class="px-2 py-1.5 text-right tabular-nums">{{ row.CL }}</td>
+                    <td class="px-2 py-1.5 text-right tabular-nums">{{ row.SL }}</td>
+                    <td class="px-2 py-1.5 text-right tabular-nums">{{ row.AL }}</td>
+                    <td class="px-2 py-1.5 text-right tabular-nums">{{ row.LWP }}</td>
+                    <td class="px-2 py-1.5 text-right tabular-nums">{{ row.MTL }}</td>
+                    <td class="px-2 py-1.5 text-right tabular-nums">{{ row.GH }}</td>
+                    <td class="px-2 py-1.5 text-right tabular-nums">{{ row.CPL }}</td>
+                    <td class="px-2 py-1.5 text-right tabular-nums">{{ row.al_allocated }}</td>
+                    <td class="px-2 py-1.5 text-right tabular-nums">{{ row.al_cycle_used }}</td>
+                    <td class="px-2 py-1.5 text-right tabular-nums">{{ row.al_cycle_balance }}</td>
+                    <td class="px-2 py-1.5 text-right tabular-nums">{{ row.cl_allocated }}</td>
+                    <td class="px-2 py-1.5 text-right tabular-nums">{{ row.sl_allocated }}</td>
+                    <td class="px-2 py-1.5 text-right tabular-nums font-semibold">{{ row.total_leave_allocated }}</td>
+                    <td class="px-2 py-1.5 text-right tabular-nums">{{ row.total_leave_taken }}</td>
+                    <td class="px-2 py-1.5 text-right tabular-nums font-semibold">{{ row.leave_remaining }}</td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="20" class="px-3 py-4 text-text-mute italic text-center">
+                        No active employees found.
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{# Boost only the pager — row links (roster) must stay full navigations. #}
+<div hx-boost="true" class="shrink-0">
+    {% include "partials/_pagination.html" %}
+</div>

@@ -1,0 +1,15 @@
+{% if object %}
+    <dl class="grid grid-cols-1 gap-y-2 text-sm">
+        <div><dt class="text-text-mute text-xs">Drug use history</dt>
+             <dd>{{ object.has_history_of_drug_use|yesno:"Yes,No" }}</dd></div>
+        <div><dt class="text-text-mute text-xs">Convicted</dt>
+             <dd>{{ object.is_convicted|yesno:"Yes,No" }}</dd></div>
+        {% if object.case_document %}
+            <div><dt class="text-text-mute text-xs">Case document</dt>
+                 <dd><a href="{{ object.case_document.url }}" class="text-brand hover:underline dark:text-brand-accent">View</a></dd></div>
+        {% endif %}
+        {% if object.note %}<div><dt class="text-text-mute text-xs">Note</dt><dd class="whitespace-pre-line">{{ object.note }}</dd></div>{% endif %}
+    </dl>
+{% else %}
+    {% include "employees/sections/_empty.html" %}
+{% endif %}

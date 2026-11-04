@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+{% block title %}Offboarding cases · Orbis{% endblock %}
+
+{% block content %}
+<div class="page-fill">
+  <div class="shrink-0 flex flex-wrap items-start justify-between gap-4">
+    <div>
+      <h1 class="text-2xl font-semibold text-text-main dark:text-white">Offboarding cases</h1>
+      <p class="mt-1 text-sm text-text-soft">Cases and resignations with one workflow: accept when you decide, then clearance starts.</p>
+    </div>
+    <div class="w-full max-w-sm">
+      <form method="get" class="flex gap-2" action="{% url 'offboarding:case_list' %}">
+        <input type="hidden" name="tab" value="{{ active_tab }}">
+        <input type="text" name="q" value="{{ search_query }}" placeholder="Search employee / id / status"
+               class="form-input w-full" />
+        <button type="submit" class="btn-secondary">Search</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="shrink-0 border-b border-bg-soft dark:border-white/10">
+    <nav class="flex flex-wrap gap-2" aria-label="Offboarding tabs">
+      <a href="{% url 'offboarding:case_list' %}?tab=cases{% if search_query %}&q={{ search_query|urlencode }}{% endif %}"
+         class="rounded-t-lg px-4 py-2 text-sm {% if active_tab == 'cases' %}bg-white text-text-main shadow-sm dark:bg-white/10 dark:text-white{% else %}text-text-soft hover:text-text-main dark:hover:text-white{% endif %}">
+        Offboarding cases ({{ counts.cases }})
+      </a>
+      <a href="{% url 'offboarding:case_list' %}?tab=pending{% if search_query %}&q={{ search_query|urlencode }}{% endif %}"
+         class="rounded-t-lg px-4 py-2 text-sm {% if active_tab == 'pending' %}bg-white text-text-main shadow-sm dark:bg-white/10 dark:text-white{% else %}text-text-soft hover:text-text-main dark:hover:text-white{% endif %}">
+        Pending resignations ({{ counts.pending }})
+      </a>
+      <a href="{% url 'offboarding:case_list' %}?tab=all{% if search_query %}&q={{ search_query|urlencode }}{% endif %}"
+         class="rounded-t-lg px-4 py-2 text-sm {% if active_tab == 'all' %}bg-white text-text-main shadow-sm dark:bg-white/10 dark:text-white{% else %}text-text-soft hover:text-text-main dark:hover:text-white{% endif %}">
+        All resignations ({{ counts.all }})
+      </a>
+    </nav>
+  </div>
+
+  {% include "partials/_result_count.html" with count_noun="records" %}
+
+  <div class="card p-0 table-scroll">
+    {% if row_type == 'cases' %}
+      <table class="table-sticky w-full text-sm">
+        <thead class="text-left text-xs uppercase text-text-soft border-b border-bg-soft dark:border-white/10">
+          <tr>
+            <th class="py-2 px-3">Employee</th>
+            <th class="py-2 px-3">Type</th>
+            <th class="py-2 px-3">LWD</th>
+            <th class="py-2 px-3">Progress</th>
+            <th class="py-2 px-3">Status</th>
+            <th class="py-2 px-3"></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for c in cases %}
+            <tr class="border-b border-bg-soft dark:border-white/5">
+              <td class="py-2 px-3">
+                <div class="font-medium">{{ c.resignation.employee.display_name }}</div>
+                <div class="text-xs text-text-soft">{{ c.resignation.employee.email }}</div>
+              </td>
+              <td class="py-2 px-3">{{ c.resignation.get_separation_type_display }}</td>
+              <td class="py-2 px-3 text-text-soft">{{ c.resignation.last_working_date }}</td>
+              <td class="py-2 px-3 text-text-soft">{% with c.progress as p %}{{ p.0 }} / {{ p.1 }}{% endwith %}</td>
+              <td class="py-2 px-3"><span class="badge badge-muted">{{ c.get_status_display }}</span></td>
+              <td class="py-2 px-3 text-right">
+                <a href="{% url 'offboarding:case_detail' c.pk %}" class="btn-secondary text-xs">Open</a>
+              </td>
+            </tr>
+          {% empty %}
+            <tr><td colspan="6" class="py-6 px-3 text-center text-text-soft">No cases.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <table class="table-sticky w-full text-sm">
+        <thead class="text-left text-xs uppercase text-text-soft border-b border-bg-soft dark:border-white/10">
+          <tr>
+            <th class="py-2 px-3">Employee</th>
+            <th class="py-2 px-3">Type</th>
+            <th class="py-2 px-3">LWD</th>
+            <th class="py-2 px-3">Notice start</th>
+            <th class="py-2 px-3">Status</th>
+            <th class="py-2 px-3">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for r in resignation_rows %}
+            <tr class="border-b border-bg-soft dark:border-white/5">
+              <td class="py-2 px-3">
+                <div class="font-medium">{{ r.employee.display_name }}</div>
+                <div class="text-xs text-text-soft">{{ r.employee.email }}</div>
+              </td>
+              <td class="py-2 px-3">{{ r.get_separation_type_display }}</td>
+              <td class="py-2 px-3 text-text-soft">{{ r.last_working_date }}</td>
+              <td class="py-2 px-3 text-text-soft">{{ r.notice_start_date }}</td>
+              <td class="py-2 px-3"><span class="badge badge-muted">{{ r.get_status_display }}</span></td>
+                <td class="py-2 px-3 text-right">
+                {% if can_act_on_resignation and r.status == 'PENDING' %}
+                  <a href="{% url 'offboarding:resignation_decide' r.pk %}?next={{ request.get_full_path|urlencode }}"
+                     class="btn-primary text-xs">Accept / Reject</a>
+                {% elif r.case %}
+                  <a href="{% url 'offboarding:case_detail' r.case.pk %}" class="btn-secondary text-xs">Open case</a>
+                {% else %}
+                  <span class="text-xs text-text-soft">No action</span>
+                {% endif %}
+              </td>
+            </tr>
+          {% empty %}
+            <tr><td colspan="6" class="py-6 px-3 text-center text-text-soft">No resignations.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% endif %}
+  </div>
+
+  {% include "partials/_pagination.html" %}
+</div>
+{% endblock %}

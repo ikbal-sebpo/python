@@ -1,0 +1,3 @@
+# Dev-only: the OpenProject sync tools (never installed on the server).
+# pip install -r tools/openproject/requirements.txt && playwright install chromium
+playwright==1.62.0

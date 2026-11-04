@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}{{ page_title }} · Orbis{% endblock %}
+
+{% block content %}
+<div class="max-w-xl">
+    <div class="card">
+        <div class="flex items-start gap-3">
+            <div class="w-10 h-10 rounded bg-red-500/15 text-red-600 dark:text-red-400 flex items-center justify-center shrink-0">
+                <i data-lucide="alert-triangle" class="w-5 h-5"></i>
+            </div>
+            <div class="flex-1">
+                <h1 class="text-lg font-semibold text-text-main dark:text-white">Delete shift type?</h1>
+                <p class="text-sm text-text-soft dark:text-white/60 mt-1">
+                    <strong>{{ object.name }}</strong> will be removed. Existing Shift rows that
+                    reference it are protected — you'll need to reassign them first.
+                </p>
+                <form method="post" class="mt-6 flex gap-2">
+                    {% csrf_token %}
+                    <button type="submit" class="btn-primary bg-red-600 hover:bg-red-700 focus:ring-red-400">
+                        <i data-lucide="trash-2" class="w-4 h-4"></i><span>Yes, delete</span>
+                    </button>
+                    <a href="{% url 'shift_type_list' %}" class="btn-secondary">Cancel</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

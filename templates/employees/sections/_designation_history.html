@@ -1,0 +1,18 @@
+{% if rows %}
+    <ul class="space-y-3 text-sm">
+        {% for row in rows %}
+            <li class="flex items-start justify-between gap-3">
+                <div class="min-w-0">
+                    <div class="font-medium">{{ row.designation }}</div>
+                    <div class="text-text-soft dark:text-white/60 text-xs">
+                        {{ row.effective_from|date:"Y-m-d" }} → {{ row.effective_to|date:"Y-m-d"|default:"present" }}
+                        · {{ row.get_reason_display }}
+                    </div>
+                </div>
+                {% include "employees/sections/_row_actions.html" %}
+            </li>
+        {% endfor %}
+    </ul>
+{% else %}
+    {% include "employees/sections/_empty.html" %}
+{% endif %}

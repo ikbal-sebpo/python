@@ -1,0 +1,27 @@
+{# Shared row table for the loan upload report: expects `rows` and `heading`. #}
+<details class="mt-4" open>
+    <summary class="cursor-pointer text-xs font-semibold uppercase tracking-wide text-text-soft dark:text-white/70">
+        {{ heading }} ({{ rows|length }} loan(s))
+    </summary>
+    <div class="overflow-x-auto mt-2">
+        <table class="table-simple text-sm">
+            <thead><tr><th class="w-12">Row</th><th>Employee</th><th>File reference</th><th>Approved</th><th class="text-right">Principal</th><th class="text-right">Instalment</th><th>Disbursed</th><th>First deduction</th><th class="text-right">Recovered before Orbis</th><th></th></tr></thead>
+            <tbody>
+                {% for r in rows %}
+                    <tr>
+                        <td>{{ r.line_no }}</td>
+                        <td>{{ r.employee_id }} · {{ r.employee.display_name }}</td>
+                        <td class="font-mono text-xs">{{ r.file_reference }}</td>
+                        <td>{{ r.approved_on|date:"Y-m-d" }}</td>
+                        <td class="text-right tabular-nums">{{ r.principal|taka }}</td>
+                        <td class="text-right tabular-nums">{{ r.installment_amount|taka }} × {{ r.installment_count }}</td>
+                        <td>{{ r.disbursed_on|date:"Y-m-d" }}</td>
+                        <td>{{ r.first_deduction.0 }}-{{ r.first_deduction.1|stringformat:"02d" }}</td>
+                        <td class="text-right tabular-nums">{{ r.opening_recovered|taka }}</td>
+                        <td class="text-xs text-text-mute">{% if r.existing %}already in Orbis{% endif %}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</details>

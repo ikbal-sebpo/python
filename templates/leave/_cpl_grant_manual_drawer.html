@@ -1,0 +1,43 @@
+{% comment %}
+    Drawer body for manually recording a CplGrant (worked a scheduled
+    weekly off day, or another ad-hoc reason) — there's no Holiday to
+    auto-detect this from. GET loads this fragment into #drawer-body; POST
+    re-renders it with errors, or (on success) a bare 204 + HX-Redirect back
+    to the employee's balance page.
+{% endcomment %}
+<div class="drawer-body space-y-4">
+    <div class="rounded border-l-4 border-brand-accent bg-bg-soft/40 dark:bg-white/5 px-3 py-2 text-sm">
+        For <strong>{{ target_employee.display_name }}</strong>
+        <span class="text-text-mute">({{ target_employee.email }})</span>
+    </div>
+
+    {% if treatment_warning %}
+        <div class="rounded border border-amber-300 bg-amber-50 text-amber-800 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-300 px-3 py-2 text-sm">
+            This department is overtime-only for CpL. You can still record this if you're sure it's correct.
+        </div>
+    {% endif %}
+
+    {% if form.non_field_errors %}
+        <div class="rounded border border-red-200 bg-red-50 text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-300 px-3 py-2 text-sm">
+            {{ form.non_field_errors|striptags }}
+        </div>
+    {% endif %}
+
+    <form method="post" id="cpl-grant-manual-form" action="{{ action_url }}"
+          hx-post="{{ action_url }}"
+          hx-target="#drawer-body"
+          hx-swap="innerHTML"
+          class="grid grid-cols-1 gap-4">
+        {% csrf_token %}
+        {% include "accounts/_field.html" with field=form.work_date %}
+        {% include "accounts/_field.html" with field=form.work_context %}
+        {% include "accounts/_field.html" with field=form.note %}
+    </form>
+</div>
+
+<div class="drawer-footer justify-end">
+    <button type="button" class="btn-secondary" @click="close()">Cancel</button>
+    <button type="submit" form="cpl-grant-manual-form" class="btn-primary">
+        <i data-lucide="calendar-plus" class="w-4 h-4"></i><span>Record CpL grant</span>
+    </button>
+</div>

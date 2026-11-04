@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% block title %}Import pre-Orbis AL record · Orbis{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <h1 class="text-xl font-semibold">Import pre-Orbis AL record</h1>
+    <p class="text-sm text-text-soft dark:text-white/60 mt-1">
+        Restricted to HR. Stores each employee's Annual Leave position <span class="font-medium">as HR calculated
+        it</span> at the Orbis cut-over date. It is a historical record for the Service Book only — it does
+        <span class="font-medium">not</span> change anyone's live leave balance, and it is not shown on the profile
+        or the balance page.
+    </p>
+</div>
+
+<div class="card mb-4">
+    <h2 class="text-sm font-semibold mb-3">1. Download a template</h2>
+    <div class="flex flex-wrap items-center gap-2">
+        <a href="{% url 'leave_al_history_upload_template' %}?as_of=2025-12-31" class="btn-secondary">
+            <i data-lucide="file-spreadsheet" class="w-4 h-4"></i><span>Excel template</span>
+        </a>
+        <span class="text-xs text-text-mute ml-2">
+            Prefilled with every active employee's ID, name and joining date for reference. Fill the four figure
+            columns from HR's AL calculation; leave a row blank to skip that employee.
+        </span>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <h2 class="text-sm font-semibold mb-2">2. File format</h2>
+    <p class="text-sm text-text-soft dark:text-white/70 mb-2">
+        One row per employee, six columns in this order, header on row 1 (HR's own column titles are fine —
+        columns are read by position):
+    </p>
+    <table class="table-simple text-sm mb-2">
+        <thead><tr><th>Employee ID</th><th>Till 2024</th><th>2025 AL Taken</th><th>2025 AL Balance</th><th>60 Cap Till 2025</th><th>Note</th></tr></thead>
+        <tbody>
+            <tr><td>104</td><td>204</td><td>0</td><td>12</td><td>60</td><td></td></tr>
+            <tr><td>4917</td><td>33</td><td>12</td><td>0</td><td>33</td><td>15 taken in 2025, 3 deducted from previous balance</td></tr>
+        </tbody>
+    </table>
+    <ul class="text-sm text-text-soft dark:text-white/70 list-disc pl-5 space-y-1">
+        <li>The <span class="font-medium">as-of date</span> below is the year-end HR's figures are stated at
+            (<span class="font-medium">2025-12-31</span> for the first batch) — it must be a 31 December. The Service Book
+            rolls the figures forward one calendar year at a time from there; Orbis's own leave ledger covers everything after it.</li>
+        <li>Employees with <span class="font-medium">under 12 months' service</span> at the as-of date, or who joined after
+            it, are skipped and listed in the report — the policy allocates no Annual Leave before the first anniversary.</li>
+        <li>The capped balance must be 0–60. If it doesn't equal min(60, Till + Balance) the row is still stored as given,
+            with a warning so HR can double-check.</li>
+        <li>Re-uploading an employee for the same as-of date <span class="font-medium">replaces</span> their record.</li>
+    </ul>
+</div>
+
+<div class="card mb-4">
+    <h2 class="text-sm font-semibold mb-3">3. Upload your filled file</h2>
+    <form id="al-history-upload-form"
+          method="post"
+          enctype="multipart/form-data"
+          hx-post="{% url 'leave_al_history_upload' %}"
+          hx-encoding="multipart/form-data"
+          hx-target="#upload-result"
+          hx-swap="innerHTML"
+          hx-indicator="#upload-spinner"
+          class="flex flex-wrap items-end gap-3">
+        {% csrf_token %}
+        <div>
+            <label class="block text-xs font-medium text-text-soft dark:text-white/70 mb-1" for="{{ form.as_of.id_for_label }}">
+                {{ form.as_of.label }}
+            </label>
+            {{ form.as_of }}
+            {% if form.as_of.errors %}<p class="text-xs text-red-600 mt-1">{{ form.as_of.errors|join:" " }}</p>{% endif %}
+        </div>
+        <input type="file" name="file" accept=".xlsx,.csv" required class="form-input w-auto max-w-xs">
+        <button type="submit" name="action" value="preview" class="btn-secondary">
+            <i data-lucide="eye" class="w-4 h-4"></i><span>Preview only</span>
+        </button>
+        <button type="submit" name="action" value="apply" class="btn-primary">
+            <i data-lucide="upload-cloud" class="w-4 h-4"></i><span>Apply upload</span>
+        </button>
+        <span id="upload-spinner" class="htmx-indicator inline-flex items-center gap-1 text-xs text-text-mute">
+            <i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i>Working…
+        </span>
+    </form>
+    <p class="text-xs text-text-mute mt-2">
+        Tip: click <span class="font-medium">Preview only</span> first to see what would be written and who would be
+        skipped, then click <span class="font-medium">Apply upload</span> — the file stays attached.
+    </p>
+</div>
+
+<div id="upload-result">
+    {% if report or inline_error %}
+        {% include "leave/_al_history_upload_report.html" with report=report parsed_preview=parsed_preview preview=preview aborted=aborted inline_error=inline_error as_of=as_of %}
+    {% endif %}
+</div>
+
+<script>
+    document.body.addEventListener('htmx:afterSwap', function (evt) {
+        if (window.lucide && typeof window.lucide.createIcons === 'function') {
+            window.lucide.createIcons();
+        }
+    });
+</script>
+{% endblock %}

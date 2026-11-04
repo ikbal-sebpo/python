@@ -1,0 +1,14 @@
+{# Pinned below <main> in base.html (shrink-0, outside the scroll region), so .page-fill list pages just get a little shorter. Also included on the login page. #}
+<footer class="shrink-0 px-6 py-2 md:px-8 text-center text-[11px] leading-relaxed
+               text-text-mute dark:text-white/40 border-t border-bg-soft dark:border-white/10">
+    <span>&copy; {% now "Y" %} SEBPO BD. All Rights Reserved.</span>
+    <span class="block sm:inline">
+        <span class="hidden sm:inline" aria-hidden="true">·</span>
+        Designed and Developed by Software Development Department.
+    </span>
+    {% if user.is_authenticated %}
+        <span class="hidden sm:inline" aria-hidden="true">·</span>
+        <a href="{% url 'project_credits' %}"
+           class="underline-offset-2 hover:underline hover:text-brand-accent">Project credits</a>
+    {% endif %}
+</footer>

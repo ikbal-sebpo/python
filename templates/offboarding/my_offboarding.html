@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block title %}My offboarding · Orbis{% endblock %}
+
+{% block content %}
+<div class="space-y-6 max-w-3xl">
+  <h1 class="text-2xl font-semibold text-text-main dark:text-white">My offboarding</h1>
+
+  {% if not resignation %}
+    <div class="card">
+      <p class="text-sm text-text-soft mb-4">You haven't submitted a resignation.</p>
+      <a href="{% url 'offboarding:resignation_submit' %}" class="btn-primary">
+        <i data-lucide="door-open" class="w-4 h-4"></i><span>Submit resignation</span>
+      </a>
+    </div>
+  {% else %}
+    <div class="card">
+      <div class="flex items-start justify-between gap-4 mb-4">
+        <div>
+          <div class="text-xs uppercase text-text-soft">Status</div>
+          <div class="text-lg font-semibold">{{ resignation.get_status_display }}</div>
+        </div>
+        {% if resignation.is_pending %}
+          <form method="post" action="{% url 'offboarding:resignation_withdraw' resignation.pk %}">
+            {% csrf_token %}
+            <button class="btn-secondary text-red-600">
+              <i data-lucide="undo-2" class="w-4 h-4"></i><span>Withdraw</span>
+            </button>
+          </form>
+        {% endif %}
+      </div>
+      <dl class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+        <div><dt class="text-xs uppercase text-text-soft">Separation type</dt>
+          <dd>{{ resignation.get_separation_type_display }}</dd></div>
+        <div><dt class="text-xs uppercase text-text-soft">Notice start</dt>
+          <dd>{{ resignation.notice_start_date }}</dd></div>
+        <div><dt class="text-xs uppercase text-text-soft">Last working day</dt>
+          <dd>{{ resignation.last_working_date }}</dd></div>
+        <div><dt class="text-xs uppercase text-text-soft">Notice period</dt>
+          <dd>{{ resignation.notice_period_days }} days</dd></div>
+      </dl>
+      <div class="mt-4">
+        <dt class="text-xs uppercase text-text-soft mb-1">Reason</dt>
+        <dd class="text-sm whitespace-pre-line">{{ resignation.reason }}</dd>
+      </div>
+      {% if resignation.process_note %}
+        <div class="mt-4 text-sm">
+          <strong>HR note:</strong> {{ resignation.process_note }}
+        </div>
+      {% endif %}
+    </div>
+
+    {% if case %}
+      <div class="card">
+        <h2 class="font-semibold text-text-main dark:text-white mb-2">Clearance progress</h2>
+        {% with case.progress as p %}
+          <p class="text-sm text-text-soft mb-3">{{ p.0 }} of {{ p.1 }} steps complete.</p>
+        {% endwith %}
+        <ul class="space-y-1 text-sm">
+          {% for s in case.steps.all %}
+            <li class="flex items-center justify-between">
+              <span>{{ s.order }}. {{ s.step_name }}</span>
+              <span class="badge badge-muted text-xs">{{ s.get_status_display }}</span>
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
+    {% endif %}
+  {% endif %}
+</div>
+{% endblock %}

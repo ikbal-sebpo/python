@@ -1,0 +1,11 @@
+{% comment %}
+    Context:
+      employee  CustomUser
+      totals    list[(name, count)] sorted; non-zero only
+      oob       True on out-of-band swap after a cell save
+{% endcomment %}
+<td id="row-total-{{ employee.pk }}"
+    {% if oob %}hx-swap-oob="true"{% endif %}
+    class="text-left px-3 py-2 text-[11px] align-middle whitespace-nowrap bg-bg-soft/30 dark:bg-white/[0.03] border-l border-bg-soft dark:border-white/10">
+    {% for name, n in totals %}<span class="text-text-soft dark:text-white/70">{{ name }}:<span class="font-medium text-brand dark:text-brand-accent tabular-nums">{{ n }}</span></span>{% if not forloop.last %} <span class="text-text-mute">|</span> {% endif %}{% empty %}<span class="text-text-mute">—</span>{% endfor %}
+</td>

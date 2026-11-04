@@ -1,0 +1,37 @@
+[
+    {"model": "accounts.designation", "pk": 1, "fields": {"name": "Operator", "is_active": true, "created_at": "2026-04-24T00:00:00Z", "updated_at": "2026-04-24T00:00:00Z"}},
+    {"model": "accounts.designation", "pk": 2, "fields": {"name": "Senior Operator", "is_active": true, "created_at": "2026-04-24T00:00:00Z", "updated_at": "2026-04-24T00:00:00Z"}},
+    {"model": "accounts.designation", "pk": 3, "fields": {"name": "Team Lead", "is_active": true, "created_at": "2026-04-24T00:00:00Z", "updated_at": "2026-04-24T00:00:00Z"}},
+    {"model": "accounts.designation", "pk": 4, "fields": {"name": "Manager", "is_active": true, "created_at": "2026-04-24T00:00:00Z", "updated_at": "2026-04-24T00:00:00Z"}},
+    {"model": "accounts.designation", "pk": 5, "fields": {"name": "HR Executive", "is_active": true, "created_at": "2026-04-24T00:00:00Z", "updated_at": "2026-04-24T00:00:00Z"}},
+
+    {"model": "accounts.accesslevel", "pk": 1, "fields": {"name": "Employee", "rank": 10, "is_active": true, "created_at": "2026-04-24T00:00:00Z", "updated_at": "2026-04-24T00:00:00Z"}},
+    {"model": "accounts.accesslevel", "pk": 2, "fields": {"name": "Supervisor", "rank": 20, "is_active": true, "created_at": "2026-04-24T00:00:00Z", "updated_at": "2026-04-24T00:00:00Z"}},
+    {"model": "accounts.accesslevel", "pk": 3, "fields": {"name": "Manager", "rank": 30, "is_active": true, "created_at": "2026-04-24T00:00:00Z", "updated_at": "2026-04-24T00:00:00Z"}},
+    {"model": "accounts.accesslevel", "pk": 4, "fields": {"name": "Administrator", "rank": 40, "is_active": true, "created_at": "2026-04-24T00:00:00Z", "updated_at": "2026-04-24T00:00:00Z"}},
+
+    {"model": "accounts.worklocation", "pk": 1, "fields": {"name": "Work from Office (WFO)", "is_active": true, "created_at": "2026-04-24T00:00:00Z", "updated_at": "2026-04-24T00:00:00Z"}},
+    {"model": "accounts.worklocation", "pk": 2, "fields": {"name": "Work from Home (WFH)", "is_active": true, "created_at": "2026-04-24T00:00:00Z", "updated_at": "2026-04-24T00:00:00Z"}},
+    {"model": "accounts.worklocation", "pk": 3, "fields": {"name": "Hybrid", "is_active": true, "created_at": "2026-04-24T00:00:00Z", "updated_at": "2026-04-24T00:00:00Z"}},
+
+    {"model": "accounts.grade", "pk": 1, "fields": {"name": "A-1", "rank": 0, "is_active": true, "created_at": "2026-08-31T00:00:00Z", "updated_at": "2026-08-31T00:00:00Z"}},
+    {"model": "accounts.grade", "pk": 2, "fields": {"name": "A-2", "rank": 0, "is_active": true, "created_at": "2026-08-31T00:00:00Z", "updated_at": "2026-08-31T00:00:00Z"}},
+    {"model": "accounts.grade", "pk": 3, "fields": {"name": "A-3", "rank": 0, "is_active": true, "created_at": "2026-08-31T00:00:00Z", "updated_at": "2026-08-31T00:00:00Z"}},
+    {"model": "accounts.grade", "pk": 4, "fields": {"name": "A-4", "rank": 0, "is_active": true, "created_at": "2026-08-31T00:00:00Z", "updated_at": "2026-08-31T00:00:00Z"}},
+    {"model": "accounts.grade", "pk": 5, "fields": {"name": "G-1", "rank": 0, "is_active": true, "created_at": "2026-08-31T00:00:00Z", "updated_at": "2026-08-31T00:00:00Z"}},
+    {"model": "accounts.grade", "pk": 6, "fields": {"name": "G-2", "rank": 0, "is_active": true, "created_at": "2026-08-31T00:00:00Z", "updated_at": "2026-08-31T00:00:00Z"}},
+    {"model": "accounts.grade", "pk": 7, "fields": {"name": "G-3", "rank": 0, "is_active": true, "created_at": "2026-08-31T00:00:00Z", "updated_at": "2026-08-31T00:00:00Z"}},
+    {"model": "accounts.grade", "pk": 8, "fields": {"name": "G-4", "rank": 0, "is_active": true, "created_at": "2026-08-31T00:00:00Z", "updated_at": "2026-08-31T00:00:00Z"}},
+    {"model": "accounts.grade", "pk": 9, "fields": {"name": "G-5", "rank": 0, "is_active": true, "created_at": "2026-08-31T00:00:00Z", "updated_at": "2026-08-31T00:00:00Z"}},
+    {"model": "accounts.grade", "pk": 10, "fields": {"name": "G-8", "rank": 0, "is_active": true, "created_at": "2026-08-31T00:00:00Z", "updated_at": "2026-08-31T00:00:00Z"}},
+    {"model": "accounts.grade", "pk": 11, "fields": {"name": "G-10", "rank": 0, "is_active": true, "created_at": "2026-08-31T00:00:00Z", "updated_at": "2026-08-31T00:00:00Z"}},
+    {"model": "accounts.grade", "pk": 12, "fields": {"name": "G-11", "rank": 0, "is_active": true, "created_at": "2026-08-31T00:00:00Z", "updated_at": "2026-08-31T00:00:00Z"}},
+    {"model": "accounts.grade", "pk": 13, "fields": {"name": "G-12", "rank": 0, "is_active": true, "created_at": "2026-08-31T00:00:00Z", "updated_at": "2026-08-31T00:00:00Z"}},
+    {"model": "accounts.grade", "pk": 14, "fields": {"name": "G-13", "rank": 0, "is_active": true, "created_at": "2026-08-31T00:00:00Z", "updated_at": "2026-08-31T00:00:00Z"}},
+    {"model": "accounts.grade", "pk": 15, "fields": {"name": "L-6", "rank": 0, "is_active": true, "created_at": "2026-08-31T00:00:00Z", "updated_at": "2026-08-31T00:00:00Z"}},
+    {"model": "accounts.grade", "pk": 16, "fields": {"name": "L-7", "rank": 0, "is_active": true, "created_at": "2026-08-31T00:00:00Z", "updated_at": "2026-08-31T00:00:00Z"}},
+    {"model": "accounts.grade", "pk": 17, "fields": {"name": "L-8", "rank": 0, "is_active": true, "created_at": "2026-08-31T00:00:00Z", "updated_at": "2026-08-31T00:00:00Z"}},
+    {"model": "accounts.grade", "pk": 18, "fields": {"name": "L-9", "rank": 0, "is_active": true, "created_at": "2026-08-31T00:00:00Z", "updated_at": "2026-08-31T00:00:00Z"}},
+    {"model": "accounts.grade", "pk": 19, "fields": {"name": "L-10", "rank": 0, "is_active": true, "created_at": "2026-08-31T00:00:00Z", "updated_at": "2026-08-31T00:00:00Z"}},
+    {"model": "accounts.grade", "pk": 20, "fields": {"name": "S-9", "rank": 0, "is_active": true, "created_at": "2026-08-31T00:00:00Z", "updated_at": "2026-08-31T00:00:00Z"}}
+]

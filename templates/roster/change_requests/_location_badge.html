@@ -1,0 +1,8 @@
+{% comment %} code: MHK / MBD / RAOWA / WFH / "" — same colouring as roster/_cell.html's location select. {% endcomment %}
+{% if code == 'WFH' %}
+    <span class="badge bg-brand-blue/15 text-brand-blue" title="Work from home">WFH</span>
+{% elif code %}
+    <span class="badge bg-brand-accent/15 text-brand-accent" title="Office">{{ code }}</span>
+{% else %}
+    <span class="text-xs text-text-mute">—</span>
+{% endif %}

@@ -1,0 +1,20 @@
+{% if rows %}
+    <ul class="space-y-3 text-sm">
+        {% for row in rows %}
+            <li class="flex items-start justify-between gap-3">
+                <div class="min-w-0">
+                    <div class="text-xs text-text-mute uppercase tracking-wider">{{ row.get_contact_type_display }}</div>
+                    <div>{{ row.contact_number }}</div>
+                    {% if row.emergency_contact_name %}
+                        <div class="text-text-soft dark:text-white/60 text-xs">
+                            {{ row.emergency_contact_name }}{% if row.relation_with_emergency_contact %} ({{ row.relation_with_emergency_contact }}){% endif %}
+                        </div>
+                    {% endif %}
+                </div>
+                {% include "employees/sections/_row_actions.html" %}
+            </li>
+        {% endfor %}
+    </ul>
+{% else %}
+    {% include "employees/sections/_empty.html" %}
+{% endif %}

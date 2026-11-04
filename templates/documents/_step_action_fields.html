@@ -1,0 +1,56 @@
+{% if form.non_field_errors %}
+  <div class="rounded border border-red-200 bg-red-50 text-red-700 px-3 py-2 text-sm">
+    {{ form.non_field_errors|striptags }}
+  </div>
+{% endif %}
+
+{% if form.has_salary_month_wizard %}
+  <div class="rounded border border-bg-soft bg-white p-3 dark:border-white/10 dark:bg-white/5">
+    <div class="grid grid-cols-5 gap-1 text-xs font-medium">
+      <button type="button" class="rounded px-2 py-1.5 text-center"
+              :class="step === 0 ? 'bg-brand text-white' : 'bg-bg-soft text-text-soft dark:bg-white/10 dark:text-white/70'"
+              @click="step = 0">Details</button>
+      {% for group in form.salary_month_field_groups %}
+        <button type="button" class="rounded px-2 py-1.5 text-center"
+                :class="step === {{ forloop.counter }} ? 'bg-brand text-white' : 'bg-bg-soft text-text-soft dark:bg-white/10 dark:text-white/70'"
+                @click="step = {{ forloop.counter }}">{{ group.title }}</button>
+      {% endfor %}
+      <button type="button" class="rounded px-2 py-1.5 text-center"
+              :class="step === 4 ? 'bg-brand text-white' : 'bg-bg-soft text-text-soft dark:bg-white/10 dark:text-white/70'"
+              @click="step = 4">Review</button>
+    </div>
+  </div>
+
+  <section x-show="step === 0" x-cloak class="space-y-4">
+    {% for field in form.salary_common_fields %}
+      {% include "accounts/_field.html" with field=field %}
+    {% endfor %}
+  </section>
+
+  {% for group in form.salary_month_field_groups %}
+    <section x-show="step === {{ forloop.counter }}" x-cloak class="space-y-4">
+      <div class="flex items-center justify-between">
+        <h2 class="text-sm font-semibold text-text-main dark:text-white">{{ group.title }}</h2>
+        <span class="text-xs text-text-mute">Salary details</span>
+      </div>
+      <div class="grid gap-3 sm:grid-cols-2">
+        {% for field in group.fields %}
+          {% include "accounts/_field.html" with field=field %}
+        {% endfor %}
+      </div>
+    </section>
+  {% endfor %}
+
+  <section x-show="step === 4" x-cloak class="space-y-4">
+    {% for field in form.action_fields %}
+      {% include "accounts/_field.html" with field=field %}
+    {% endfor %}
+    {% for field in form.extra_action_fields %}
+      {% include "accounts/_field.html" with field=field %}
+    {% endfor %}
+  </section>
+{% else %}
+  {% for field in form %}
+    {% include "accounts/_field.html" with field=field %}
+  {% endfor %}
+{% endif %}

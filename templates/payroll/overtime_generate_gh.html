@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% block title %}Generate GH OT · Orbis{% endblock %}
+
+{% block content %}
+<div x-data="{ source: '{{ source|default:'sw_creative' }}' }">
+    <div class="mb-4">
+        <h1 class="text-xl font-semibold">Generate GH OT</h1>
+        <p class="text-sm text-text-soft dark:text-white/60 mt-1" x-show="source === 'sw_creative'" x-cloak>
+            Software Development and Creative Development earn overtime solely for working a government
+            holiday. Pick a date that's already a seeded government holiday, with attendance already synced
+            for it — this creates one GH OT entry per present employee (checked in, with enough office hours)
+            who doesn't already have one for that date. Doesn't sync attendance itself, so run
+            <span class="font-medium">sync_attendance_punches --date &lt;date&gt;</span> first for a date that
+            hasn't been synced yet.
+        </p>
+        <p class="text-sm text-text-soft dark:text-white/60 mt-1" x-show="source === 'general_bpo'" x-cloak>
+            General BPO also earns overtime solely for working a government holiday, but presence and hours
+            both come live from ttms.sebpo.net — no local sync step needed. This creates one GH OT entry per
+            employee TTMS reports worked hours for, paid at their <span class="font-medium">exact</span>
+            worked hours (not a flat grant), for anyone who doesn't already have one for that date.
+        </p>
+        <a href="{% url 'payroll_overtime_list' %}" class="text-sm text-brand hover:underline dark:text-brand-accent">
+            &larr; Back to overtime entries
+        </a>
+    </div>
+
+    <div class="card mb-4">
+        <h2 class="text-sm font-semibold mb-3">1. Pick a source and a date</h2>
+        <form hx-post="{% url 'payroll_overtime_generate_gh' %}"
+              hx-target="#gh-ot-result"
+              hx-swap="innerHTML"
+              hx-indicator="#gh-ot-spinner"
+              class="flex flex-wrap items-end gap-3">
+            {% csrf_token %}
+            <div>
+                <label class="block text-xs text-text-mute mb-1">Source</label>
+                <select name="source" x-model="source" class="form-input w-64">
+                    {% for value, label in sources.items %}
+                        <option value="{{ value }}" {% if value == source %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+                <label class="block text-xs text-text-mute mb-1">Work date</label>
+                <input type="text" name="work_date" data-flatpickr placeholder="YYYY-MM-DD"
+                       autocomplete="off" class="form-input w-36" value="{{ work_date_raw|default:'' }}" required>
+            </div>
+            <div>
+                <label class="block text-xs text-text-mute mb-1">Min. hours to count as present</label>
+                <input type="number" name="min_hours" step="0.5" min="0" class="form-input w-24"
+                       value="{{ min_hours }}">
+            </div>
+            <div x-show="source === 'sw_creative'" x-cloak>
+                <label class="block text-xs text-text-mute mb-1">OT hours to grant</label>
+                <input type="number" name="grant_hours" step="0.5" min="0" class="form-input w-24"
+                       value="{{ grant_hours }}">
+            </div>
+            <button type="submit" name="action" value="preview" class="btn-secondary">
+                <i data-lucide="eye" class="w-4 h-4"></i><span>Preview</span>
+            </button>
+            <span id="gh-ot-spinner" class="htmx-indicator inline-flex items-center gap-1 text-xs text-text-mute">
+                <i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i>Working…
+            </span>
+        </form>
+    </div>
+
+    <div id="gh-ot-result">
+        {% if report or inline_error %}
+            {% include "payroll/_overtime_generate_gh_report.html" %}
+        {% endif %}
+    </div>
+</div>
+
+<script>
+    document.body.addEventListener('htmx:afterSwap', function (evt) {
+        if (window.lucide && typeof window.lucide.createIcons === 'function') {
+            window.lucide.createIcons();
+        }
+    });
+</script>
+{% endblock %}

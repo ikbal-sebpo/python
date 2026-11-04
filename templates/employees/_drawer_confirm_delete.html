@@ -1,0 +1,27 @@
+{% comment %}htmx drawer body for delete confirmation.{% endcomment %}
+<form method="post" action="{{ action_url }}"
+      hx-post="{{ action_url }}"
+      hx-target="#section-card-{{ spec.slug }}"
+      hx-swap="outerHTML"
+      class="flex flex-col flex-1 min-h-0">
+    {% csrf_token %}
+    <div class="drawer-body space-y-4">
+        <div class="flex items-start gap-3">
+            <div class="w-10 h-10 rounded bg-red-500/15 text-red-600 dark:text-red-400 flex items-center justify-center shrink-0">
+                <i data-lucide="alert-triangle" class="w-5 h-5"></i>
+            </div>
+            <div>
+                <h3 class="text-base font-semibold text-text-main dark:text-white">Delete this {{ spec.singular_label|lower }}?</h3>
+                <p class="text-sm text-text-soft dark:text-white/60 mt-1">
+                    <strong>{{ row }}</strong> will be permanently removed.
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="drawer-footer justify-end">
+        <button type="button" class="btn-secondary" @click="close()">Cancel</button>
+        <button type="submit" class="btn-primary bg-red-600 hover:bg-red-700 focus:ring-red-400">
+            <i data-lucide="trash-2" class="w-4 h-4"></i><span>Yes, delete</span>
+        </button>
+    </div>
+</form>

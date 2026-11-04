@@ -1,0 +1,393 @@
+{% load static tailwind_tags %}<!DOCTYPE html>
+<html lang="en-CA" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="dark light">
+    <title>{% block title %}Orbis{% endblock %}</title>
+
+    {# Pre-paint theme to avoid FOUC. #}
+    <script>
+        (function () {
+            try {
+                // Dark mode is the default; only light if the user explicitly chose it.
+                var storedTheme = localStorage.getItem('orbis-theme');
+                if (storedTheme !== 'light') {
+                    document.documentElement.classList.add('dark');
+                }
+            } catch (e) {}
+        })();
+    </script>
+
+    {% include "partials/_favicon.html" %}
+    <link rel="preconnect" href="https://fonts.bunny.net" crossorigin>
+    <link rel="stylesheet" href="https://fonts.bunny.net/css?family=figtree:400,500,600|roboto:400,500&display=swap">
+
+    {% tailwind_css %}
+
+    {# Toast notifications — fixed, non-blocking, auto-dismissing. Styled in a #}
+    {# self-contained block so JS-created nodes never get purged by Tailwind.  #}
+    <style>
+        #toast-container {
+            position: fixed;
+            bottom: 1rem;
+            right: 1rem;
+            z-index: 60;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            max-width: min(24rem, calc(100vw - 2rem));
+            pointer-events: none; /* container never blocks clicks */
+        }
+        .orbis-toast {
+            pointer-events: auto; /* but each toast is dismissable */
+            display: flex;
+            align-items: flex-start;
+            gap: 0.5rem;
+            padding: 0.625rem 0.75rem;
+            border-radius: 0.5rem;
+            border-left: 4px solid var(--toast-accent, #2A9D8F);
+            background: #0B333F;
+            color: #fff;
+            font-size: 0.8125rem;
+            line-height: 1.3;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+            opacity: 0;
+            transform: translateY(0.5rem);
+            transition: opacity .2s ease, transform .2s ease;
+        }
+        html:not(.dark) .orbis-toast { background: #ffffff; color: #0B333F; }
+        .orbis-toast.orbis-toast-in { opacity: 1; transform: translateY(0); }
+        .orbis-toast.orbis-toast-out { opacity: 0; transform: translateY(0.5rem); }
+        .orbis-toast-success { --toast-accent: #2A9D8F; }
+        .orbis-toast-error   { --toast-accent: #E76F51; }
+        .orbis-toast-icon { width: 1rem; height: 1rem; flex: 0 0 auto; margin-top: 1px; color: var(--toast-accent); }
+        .orbis-toast-msg { flex: 1 1 auto; word-break: break-word; }
+        .orbis-toast-close {
+            flex: 0 0 auto; margin: -0.125rem -0.125rem 0 0;
+            font-size: 1rem; line-height: 1; opacity: .55;
+            background: none; border: 0; color: inherit; cursor: pointer;
+        }
+        .orbis-toast-close:hover { opacity: 1; }
+        @media (prefers-reduced-motion: reduce) {
+            .orbis-toast { transition: opacity .2s ease; transform: none; }
+            .orbis-toast.orbis-toast-out { transform: none; }
+        }
+
+        /* Flatpickr inside a hover/focus popover (the roster + leave Filters
+           panels) must render INSIDE the panel — `data-flatpickr-static`.
+           Flatpickr otherwise appends the calendar to <body>, so reaching for
+           it leaves the .group and the CSS-only popover closes under the
+           cursor. Flatpickr only injects .flatpickr-wrapper in static mode,
+           so these rules touch exactly those inputs; display:block keeps the
+           injected wrapper from collapsing an input's `w-full`. */
+        .flatpickr-wrapper { display: block; width: 100%; }
+        /* Opt-in for a field in a panel's right-hand column: the 308px
+           calendar would otherwise run off a laptop screen. */
+        .flatpickr-align-right .flatpickr-calendar.static { left: auto; right: 0; }
+    </style>
+
+    {# Third-party JS/CSS is vendored under static/vendor/ (pinned versions #}
+    {# in the filenames) — no runtime dependency on public CDNs, and       #}
+    {# WhiteNoise serves them hashed + compressed + far-future-cached.     #}
+    <link rel="stylesheet" href="{% static 'vendor/flatpickr-4.6.13.min.css' %}">
+
+    <script defer src="{% static 'vendor/alpinejs-3.14.8.min.js' %}"></script>
+    {# htmx config: parse responses inside <template> so bare <td>/<th>      #}
+    {# elements survive HTML parsing — needed for OOB swaps in the roster   #}
+    {# grid (cell update returns the changed cell + day-count + row-total + #}
+    {# emp-name partials in one response). htmx reads this meta during init.#}
+    <meta name="htmx-config" content='{"useTemplateFragments": true}'>
+    <script src="{% static 'vendor/htmx-1.9.12.min.js' %}" defer></script>
+    <script src="{% static 'vendor/flatpickr-4.6.13.min.js' %}" defer></script>
+    <script src="{% static 'js/address-cascade.js' %}" defer></script>
+
+    {% block extra_head %}{% endblock %}
+</head>
+<body class="h-screen overflow-hidden">
+
+<div id="toast-container" aria-live="polite" aria-atomic="false"></div>
+
+<div class="flex h-screen">
+    {% include "partials/sidebar.html" %}
+
+    <div class="flex flex-col flex-1 min-w-0 min-h-0">
+        {% include "partials/topbar.html" %}
+
+        {# main_class exists so a page can drop e.g. the bottom padding — a #}
+        {# position:sticky bottom-0 child (policies/sign.html's accept bar)  #}
+        {# sticks to <main>'s padding edge, not its true border edge, so     #}
+        {# default bottom padding would otherwise show as dead space below  #}
+        {# it that the sticky element can never cover.                      #}
+        <main class="flex-1 min-h-0 overflow-y-auto {% block main_class %}px-6 pb-6 pt-0 md:px-8 md:pb-8{% endblock %}">
+            {% block content %}{% endblock %}
+        </main>
+
+        {% include "partials/footer.html" %}
+    </div>
+</div>
+
+
+<script src="{% static 'vendor/lucide-0.544.0.min.js' %}"></script>
+<script>
+    (function () {
+        var sidebar = document.getElementById('sidebar');
+
+        // Attach CSRF token to every htmx request. Reads from the cookie
+        // so it works even on pages without a server-rendered form.
+        function csrfCookie() {
+            var m = document.cookie.match(/(?:^|;\s*)csrftoken=([^;]+)/);
+            return m ? decodeURIComponent(m[1]) : '';
+        }
+        document.body.addEventListener('htmx:configRequest', function (evt) {
+            evt.detail.headers['X-CSRFToken'] = csrfCookie();
+        });
+
+        // ---- Toast notifications ------------------------------------------
+        // Non-blocking, auto-dismissing. Call window.orbisToast(msg, opts) from
+        // anywhere, or let the htmx wiring below drive it.
+        window.orbisToast = function (message, opts) {
+            if (!message) return;
+            opts = opts || {};
+            var type = opts.type === 'error' ? 'error' : 'success';
+            var container = document.getElementById('toast-container');
+            if (!container) return;
+
+            var el = document.createElement('div');
+            el.className = 'orbis-toast orbis-toast-' + type;
+            el.setAttribute('role', type === 'error' ? 'alert' : 'status');
+
+            var icon = document.createElement('i');
+            icon.setAttribute('data-lucide', type === 'error' ? 'alert-triangle' : 'check-circle-2');
+            icon.className = 'orbis-toast-icon';
+            var msg = document.createElement('span');
+            msg.className = 'orbis-toast-msg';
+            msg.textContent = message;
+            var close = document.createElement('button');
+            close.type = 'button';
+            close.className = 'orbis-toast-close';
+            close.setAttribute('aria-label', 'Dismiss');
+            close.innerHTML = '&times;';
+            el.appendChild(icon);
+            el.appendChild(msg);
+            el.appendChild(close);
+            container.appendChild(el);
+            if (window.lucide) window.lucide.createIcons();
+
+            requestAnimationFrame(function () { el.classList.add('orbis-toast-in'); });
+
+            var duration = opts.duration || (type === 'error' ? 6000 : 4000);
+            var timer = setTimeout(dismiss, duration);
+            function dismiss() {
+                clearTimeout(timer);
+                el.classList.remove('orbis-toast-in');
+                el.classList.add('orbis-toast-out');
+                setTimeout(function () { el.remove(); }, 250);
+            }
+            close.addEventListener('click', dismiss);
+        };
+
+        // Success toasts arrive as an HX-Trigger response header:
+        //   {"orbis:toast": {"message": "...", "type": "success"}}
+        // htmx dispatches an `orbis:toast` event with that object as detail.
+        document.body.addEventListener('orbis:toast', function (evt) {
+            var d = evt.detail || {};
+            window.orbisToast(d.message, {type: d.type, duration: d.duration});
+        });
+
+        // Surface server + network errors that htmx would otherwise swallow
+        // (e.g. a 403 on a roster cell the user can't edit — the swap is
+        // skipped, so without this the change just silently reverts). The
+        // view sends a plain-text reason in the HX-Error-Message header.
+        document.body.addEventListener('htmx:responseError', function (evt) {
+            var xhr = evt.detail.xhr;
+            var reason = xhr.getResponseHeader('HX-Error-Message');
+            if (!reason) {
+                if (xhr.status === 403) reason = "You don't have permission to make this change.";
+                else if (xhr.status === 404) reason = "That item no longer exists.";
+                else reason = "Something went wrong — your change was not saved.";
+            }
+            window.orbisToast(reason, {type: 'error'});
+        });
+        document.body.addEventListener('htmx:sendError', function () {
+            window.orbisToast("Network error — your change was not saved.", {type: 'error'});
+        });
+
+        // django.contrib.messages replayed through the same toast API
+        // (2026-09-15). Before this they rendered as a banner at the top of
+        // <main>, which pushed the page down on every save — most visible on
+        // the fixed-shell list pages, where it shrinks the scrolling table.
+        // Only full page loads reach here; htmx-driven saves already use the
+        // HX-Trigger path above, and a view that redirects (204 + HX-Redirect
+        // included) lands on a fresh page, so its message arrives this way.
+        {% if messages %}{% for m in messages %}
+        window.orbisToast("{{ m|escapejs }}", {type: "{% if 'error' in m.tags or 'warning' in m.tags %}error{% else %}success{% endif %}"});
+        {% endfor %}{% endif %}
+
+        // ---- Notification bell (partials/_notification_bell.html) ----------
+        // After each refresh: prefix the tab title with the pending count, and
+        // when the pending set changed, write its signature to localStorage —
+        // the `storage` event fires in every *other* tab, which re-polls at
+        // once. So an approval in one tab (htmx or a full-page POST) updates
+        // the bell everywhere without waiting 30s. A tab that re-polls gets
+        // the same signature back and doesn't write, so there is no loop.
+        (function () {
+            var body = document.getElementById('notification-bell-body');
+            if (!body) return;
+            var SIG_KEY = 'orbis:bell-signature';
+            var baseTitle = document.title.replace(/^\(\d+\+?\)\s*/, '');
+            body.addEventListener('htmx:afterSwap', function (evt) {
+                if (evt.detail.target !== body) return;
+                var root = body.querySelector('[data-bell-signature]');
+                if (!root) return;
+                var total = parseInt(root.getAttribute('data-bell-total'), 10) || 0;
+                document.title = total ? '(' + (total > 9 ? '9+' : total) + ') ' + baseTitle : baseTitle;
+                var sig = root.getAttribute('data-bell-signature');
+                try {
+                    if (localStorage.getItem(SIG_KEY) !== sig) localStorage.setItem(SIG_KEY, sig);
+                } catch (e) { /* storage blocked — polling still works */ }
+            });
+            window.addEventListener('storage', function (evt) {
+                if (evt.key === SIG_KEY && window.htmx) htmx.trigger(document.body, 'orbis:approvals-changed');
+            });
+        })();
+
+        // Re-render lucide icons + re-init Flatpickr after htmx swaps.
+        document.body.addEventListener('htmx:afterSettle', function (evt) {
+            if (window.lucide) window.lucide.createIcons();
+            wireFlatpickr(evt.target || document);
+            wireDepartmentTeamCascade(evt.target || document);
+        });
+
+        // Attach Flatpickr to every [data-flatpickr] input. ISO format only.
+        // Click anywhere on the input to open the calendar. This is the only
+        // date picker in the project — see core/forms.py for the Python side.
+        function wireFlatpickr(root) {
+            if (!window.flatpickr) return;
+            var scope = root || document;
+            scope.querySelectorAll('input[data-flatpickr]').forEach(function (el) {
+                if (el._flatpickr) return;
+                flatpickr(el, {
+                    dateFormat: "Y-m-d",
+                    allowInput: true,
+                    static: el.hasAttribute('data-flatpickr-static'),
+                });
+            });
+            scope.querySelectorAll('input[data-flatpickr-datetime]').forEach(function (el) {
+                if (el._flatpickr) return;
+                flatpickr(el, {
+                    dateFormat: "Y-m-d H:i",
+                    enableTime: true,
+                    time_24hr: true,
+                    allowInput: true,
+                    static: el.hasAttribute('data-flatpickr-static'),
+                });
+            });
+        }
+
+        // Narrow a team <select> to the department picked in another
+        // <select>, client-side. These filters live in a hover popover, so
+        // reloading the page just to re-scope the list (the old inline
+        // form's `onchange="this.form.submit()"`) would close the panel
+        // mid-edit. UX only — the server still clamps a submitted team to
+        // the chosen department (see roster.views._effective_team_id), so a
+        // stale or tampered value is dropped there either way.
+        function wireDepartmentTeamCascade(root) {
+            var scope = root || document;
+            scope.querySelectorAll('select[data-team-for]').forEach(function (teamSel) {
+                if (teamSel._cascadeWired) return;
+                var deptSel = document.getElementById(teamSel.dataset.teamFor);
+                if (!deptSel) return;
+                teamSel._cascadeWired = true;
+                // Snapshot every option up front — filtering rebuilds the list
+                // from this, so switching departments back and forth is lossless.
+                var all = Array.prototype.map.call(teamSel.options, function (o) {
+                    return {value: o.value, label: o.textContent, dept: o.dataset.department || ''};
+                });
+                function apply() {
+                    var dept = deptSel.value;
+                    var wanted = teamSel.value;
+                    teamSel.textContent = '';
+                    all.forEach(function (o) {
+                        // The blank row (the all-teams choice) is always
+                        // offered. With a department picked, keep only its
+                        // teams; a team with no department survives only
+                        // while no department is picked — which is what
+                        // visible_teams() does server-side.
+                        if (o.value && dept && o.dept !== dept) return;
+                        var el = document.createElement('option');
+                        el.value = o.value;
+                        el.textContent = o.label;
+                        if (o.dept) el.dataset.department = o.dept;
+                        teamSel.appendChild(el);
+                    });
+                    teamSel.value = wanted;
+                    // The previous pick belongs to another department now.
+                    if (teamSel.selectedIndex < 0) teamSel.selectedIndex = 0;
+                }
+                deptSel.addEventListener('change', apply);
+                apply();
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            if (window.lucide) window.lucide.createIcons();
+            wireFlatpickr(document);
+            wireDepartmentTeamCascade(document);
+
+            var themeBtn = document.getElementById('theme-toggle');
+            if (themeBtn) {
+                themeBtn.addEventListener('click', function () {
+                    var root = document.documentElement;
+                    root.classList.toggle('dark');
+                    localStorage.setItem('orbis-theme', root.classList.contains('dark') ? 'dark' : 'light');
+                    if (window.lucide) window.lucide.createIcons();
+                });
+            }
+
+            // Sidebar hover flyouts. Sidebar is always narrow (4rem) so every
+            // icon has a flyout that pops out on hover/focus. position:fixed
+            // (set by JS) escapes the parent aside's overflow-hidden. A
+            // 120ms hide-debounce bridges the 4px gap between icon + panel.
+            (function initSidebarFlyouts() {
+                if (!sidebar) return;
+                sidebar.querySelectorAll('.sidebar-group').forEach(function (group) {
+                    var trigger = group.querySelector('.nav-item');
+                    var flyout = group.querySelector('.sidebar-flyout');
+                    if (!trigger || !flyout) return;
+
+                    var hideTimer = null;
+                    function show() {
+                        clearTimeout(hideTimer);
+                        var rect = trigger.getBoundingClientRect();
+                        flyout.style.position = 'fixed';
+                        flyout.style.top = rect.top + 'px';
+                        flyout.style.left = (rect.right + 4) + 'px';
+                        flyout.style.display = 'block';
+                    }
+                    function scheduleHide() {
+                        clearTimeout(hideTimer);
+                        hideTimer = setTimeout(function () {
+                            flyout.style.display = '';
+                            flyout.style.position = '';
+                            flyout.style.top = '';
+                            flyout.style.left = '';
+                        }, 120);
+                    }
+                    function cancelHide() { clearTimeout(hideTimer); }
+
+                    group.addEventListener('mouseenter', show);
+                    group.addEventListener('mouseleave', scheduleHide);
+                    flyout.addEventListener('mouseenter', cancelHide);
+                    flyout.addEventListener('mouseleave', scheduleHide);
+                    group.addEventListener('focusin', show);
+                    group.addEventListener('focusout', scheduleHide);
+                });
+            })();
+        });
+    })();
+</script>
+
+{% block extra_scripts %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,1 @@
+[Orbis] Resignation submitted: {{ resignation.employee.display_name }}

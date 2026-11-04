@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+{% block title %}Upload test salary · Orbis{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <h1 class="text-xl font-semibold">Upload test salary</h1>
+    <p class="text-sm text-text-soft dark:text-white/60 mt-1">
+        Give the total number of days someone was under test this period — however many
+        separate stretches those days fell across. The system works out the deduction; you
+        don't enter an amount.
+        {% if period %}
+            Deductions land in the <span class="font-medium">{{ period }}</span> period.
+        {% endif %}
+    </p>
+    <a href="{% url 'payroll_variable_pay_list' %}" class="text-sm text-brand hover:underline dark:text-brand-accent">
+        &larr; Back to variable pay
+    </a>
+</div>
+
+{% if not period %}
+    <div class="card mb-4 border border-red-300 dark:border-red-700/50">
+        <p class="text-sm text-red-800 dark:text-red-200">
+            No payroll period exists yet — one has to be created before test salary can be uploaded.
+        </p>
+    </div>
+{% elif not component %}
+    <div class="card mb-4 border border-red-300 dark:border-red-700/50">
+        <p class="text-sm text-red-800 dark:text-red-200">
+            The <span class="font-mono">TEST_SALARY_DEDUCTION</span> pay component is missing. Run
+            <span class="font-mono">manage.py seed_payroll_components</span> before uploading.
+        </p>
+    </div>
+{% endif %}
+
+<div class="card mb-4">
+    <h2 class="text-sm font-semibold mb-3">1. Download a template</h2>
+    <div class="flex flex-wrap items-center gap-2">
+        <a href="{% url 'payroll_test_salary_upload_template' %}" class="btn-secondary">
+            <i data-lucide="file-spreadsheet" class="w-4 h-4"></i><span>Excel template</span>
+        </a>
+        <span class="text-xs text-text-mute ml-2">
+            Blank rows for the two columns below, plus a reference sheet of your managed
+            employees' IDs and names.
+        </span>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <h2 class="text-sm font-semibold mb-2">2. File format</h2>
+    <p class="text-sm text-text-soft dark:text-white/70 mb-2">
+        One row per employee, two columns, header on row 1:
+    </p>
+    <table class="table-simple text-sm mb-2">
+        <thead><tr><th>Employee ID</th><th>Days</th></tr></thead>
+        <tbody>
+            <tr><td>3500</td><td>13</td></tr>
+        </tbody>
+    </table>
+    <ul class="text-sm text-text-soft dark:text-white/70 list-disc pl-5 space-y-1">
+        <li><span class="font-medium">Days is the total for the whole period</span> — if someone
+            fell under test across more than one stretch of the month, add them together and
+            enter one number. Whole numbers from 1 to 31.</li>
+        <li>The number is <span class="font-medium">taken as given</span> — already-unpaid (LWP)
+            days should be netted out before you enter it; the system doesn't check the roster.</li>
+        <li>The total is <span class="font-medium">capped at the whole variable portion</span> per
+            person per period.</li>
+        <li><span class="font-medium">Trainees are rejected</span> — they're on a flat package and
+            never carry this deduction.</li>
+        <li>Re-uploading for the same employee <span class="font-medium">replaces</span> their day
+            count for the period rather than adding to it — useful for a correction. An
+            already-approved row is left alone.</li>
+        <li>Every row lands as <span class="font-medium">Pending</span>. The department head approves
+            it, and the payroll run must then be recalculated, before it takes effect.</li>
+    </ul>
+</div>
+
+<div class="card mb-4">
+    <h2 class="text-sm font-semibold mb-3">3. Upload your filled file</h2>
+    <form id="test-salary-upload-form"
+          method="post"
+          enctype="multipart/form-data"
+          hx-post="{% url 'payroll_test_salary_upload' %}"
+          hx-encoding="multipart/form-data"
+          hx-target="#upload-result"
+          hx-swap="innerHTML"
+          hx-indicator="#upload-spinner"
+          class="flex flex-wrap items-center gap-3">
+        {% csrf_token %}
+        <input type="file" name="file" accept=".xlsx,.csv" required class="form-input w-auto max-w-xs">
+        <button type="submit" name="action" value="preview" class="btn-secondary">
+            <i data-lucide="eye" class="w-4 h-4"></i><span>Preview only</span>
+        </button>
+        <button type="submit" name="action" value="apply" class="btn-primary">
+            <i data-lucide="upload-cloud" class="w-4 h-4"></i><span>Apply upload</span>
+        </button>
+        <span id="upload-spinner" class="htmx-indicator inline-flex items-center gap-1 text-xs text-text-mute">
+            <i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i>Working…
+        </span>
+    </form>
+    <p class="text-xs text-text-mute mt-2">
+        Tip: click <span class="font-medium">Preview only</span> first — it validates the windows
+        without writing. Amounts are computed on apply.
+    </p>
+</div>
+
+<div id="upload-result">
+    {% if report or inline_error %}
+        {% include "payroll/_test_salary_upload_report.html" with report=report parsed_preview=parsed_preview preview=preview aborted=aborted inline_error=inline_error %}
+    {% endif %}
+</div>
+
+<script>
+    document.body.addEventListener('htmx:afterSwap', function (evt) {
+        if (window.lucide && typeof window.lucide.createIcons === 'function') {
+            window.lucide.createIcons();
+        }
+    });
+</script>
+{% endblock %}

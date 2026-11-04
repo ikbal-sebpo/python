@@ -1,0 +1,48 @@
+{% comment %}
+    Finance confirms the money has been paid out. Shows which payroll the
+    first instalment will come out of (Q71) before they commit.
+{% endcomment %}
+<div class="drawer-body space-y-4">
+    {% if form.non_field_errors %}
+        <div class="rounded border border-red-200 bg-red-50 text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-300 px-3 py-2 text-sm">
+            {{ form.non_field_errors|striptags }}
+        </div>
+    {% endif %}
+
+    <dl class="grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-sm">
+        <dt class="text-text-mute">Employee</dt>
+        <dd class="font-medium">{{ loan.employee.display_name }}{% if loan.employee.employee_id %} <span class="text-text-mute">· {{ loan.employee.employee_id }}</span>{% endif %}</dd>
+        <dt class="text-text-mute">File reference</dt>
+        <dd class="font-mono text-xs">{{ loan.file_reference }} · approved {{ loan.approved_on|date:"Y-m-d" }}</dd>
+        <dt class="text-text-mute">Principal</dt>
+        <dd class="tabular-nums font-semibold">{{ loan.principal|taka }}</dd>
+        <dt class="text-text-mute">Instalments</dt>
+        <dd class="tabular-nums">{{ loan.installment_amount|taka }} × {{ loan.installment_count }}</dd>
+    </dl>
+
+    <form method="post" id="loan-disburse-form" action="{{ action_url }}"
+          hx-post="{{ action_url }}" hx-target="#drawer-body" hx-swap="innerHTML"
+          class="grid grid-cols-1 gap-4">
+        {% csrf_token %}
+        {% include "accounts/_field.html" with field=form.disbursed_on %}
+        {% include "accounts/_field.html" with field=form.note %}
+    </form>
+
+    <div class="rounded border border-border dark:border-white/10 bg-bg-soft dark:bg-white/5 px-3 py-2 text-sm">
+        First instalment:
+        <span class="font-medium">{{ preview_period }}</span>
+        {% if not loan.first_deduction_period %}
+            <span class="text-text-mute">— the payroll after the disbursement month (that month's own salary is already being paid out).
+            Change the date above if the money went out on a different day; HR can also set the month explicitly on the loan.</span>
+        {% else %}
+            <span class="text-text-mute">— set by HR on the loan.</span>
+        {% endif %}
+    </div>
+</div>
+
+<div class="drawer-footer justify-end">
+    <button type="button" class="btn-secondary" @click="close()">Cancel</button>
+    <button type="submit" form="loan-disburse-form" class="btn-primary">
+        <i data-lucide="banknote" class="w-4 h-4"></i><span>Mark disbursed</span>
+    </button>
+</div>

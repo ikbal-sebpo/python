@@ -1,0 +1,772 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Payroll in Orbis — Process Design</title>
+<style>
+  :root{
+    --teal-dark:#0A4958;
+    --teal:#41B3B3;
+    --ink:#12242a;
+    --mute:#5b7078;
+    --line:#dfe8ea;
+    --bg:#ffffff;
+    --panel:#f4fafa;
+    --warn:#fff8ec;
+    --warn-line:#f5a623;
+    --bad:#fff4f4;
+    --bad-line:#cc3333;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  }
+  .wrap{max-width:960px;margin:0 auto;padding:0 24px 96px}
+  header.masthead{
+    background:var(--teal-dark); color:#fff; padding:44px 24px 36px; margin-bottom:40px;
+  }
+  header.masthead .inner{max-width:960px;margin:0 auto}
+  header.masthead h1{margin:0 0 6px;font-size:32px;letter-spacing:-.02em}
+  header.masthead p{margin:0;opacity:.85;font-size:16px}
+  .badge{
+    display:inline-block;margin-bottom:14px;padding:4px 11px;border-radius:999px;
+    background:var(--teal);color:#04303a;font-size:12px;font-weight:700;
+    letter-spacing:.08em;text-transform:uppercase;
+  }
+  h2{
+    margin:48px 0 14px;font-size:23px;letter-spacing:-.01em;color:var(--teal-dark);
+    padding-bottom:8px;border-bottom:2px solid var(--line);
+  }
+  h3{margin:30px 0 10px;font-size:17px;color:var(--teal-dark)}
+  p,li{color:var(--ink)}
+  a{color:var(--teal-dark)}
+  table{border-collapse:collapse;width:100%;margin:18px 0;font-size:14.5px;display:block;overflow-x:auto}
+  th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+  th{background:var(--panel);color:var(--teal-dark);font-weight:700}
+  tbody tr:nth-child(even){background:#fafcfc}
+  .meta{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:6px 20px;margin:0 0 28px}
+  .meta table{margin:12px 0;font-size:14px}
+  .meta th{width:200px;background:transparent;border:none;border-bottom:1px solid var(--line)}
+  .meta td{border:none;border-bottom:1px solid var(--line)}
+  .callout{
+    border-left:4px solid var(--teal); background:var(--panel);
+    padding:14px 18px; margin:22px 0; border-radius:0 8px 8px 0;
+  }
+  .callout.warn{border-left-color:var(--warn-line);background:var(--warn)}
+  .callout.bad{border-left-color:var(--bad-line);background:var(--bad)}
+  .callout p{margin:6px 0}
+  figure{margin:26px 0;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#fff}
+  figcaption{
+    background:var(--panel);border-bottom:1px solid var(--line);
+    padding:9px 16px;font-size:13px;font-weight:700;color:var(--teal-dark);
+    letter-spacing:.03em;text-transform:uppercase;
+  }
+  .mermaid{padding:22px 16px;text-align:center;overflow-x:auto}
+  /* Mermaid (htmlLabels mode) doesn't reliably apply a node's own `color:` override to its
+     label text — it falls back to the theme's primaryTextColor, which is dark. On the dark-fill
+     "final state" nodes below that leaves dark text on a dark background. Force it white. */
+  .mermaid .dark .nodeLabel, .mermaid .dark .nodeLabel * { color:#fff !important; }
+  .mermaid .dark tspan, .mermaid .dark text { fill:#fff !important; }
+  code{background:var(--panel);padding:1px 5px;border-radius:4px;font-size:.9em}
+  pre{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:14px 16px;overflow-x:auto;font-size:13.5px}
+  .sign td{height:52px}
+  .foot{margin-top:56px;padding-top:18px;border-top:1px solid var(--line);color:var(--mute);font-size:13.5px}
+  @media print{
+    header.masthead{background:#fff;color:var(--teal-dark);padding:0 0 18px;border-bottom:3px solid var(--teal-dark)}
+    .badge{background:#fff;color:var(--teal-dark);border:1px solid var(--teal-dark)}
+    h2{page-break-after:avoid} figure{page-break-inside:avoid}
+  }
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="inner">
+    <span class="badge">For approval</span>
+    <h1>Payroll in Orbis — Process Design</h1>
+    <p>For review by the Head of HR and the Head of Finance</p>
+  </div>
+</header>
+
+<div class="wrap">
+
+<div class="meta">
+<table>
+  <tr><th>Version</th><td>Draft 1.2</td></tr>
+  <tr><th>Date</th><td>6 August 2026 (updated 11 August 2026 after the HR/Finance decisions meeting; updated 13 August 2026 after reviewing HR's and Finance's actual working templates; updated 20 August 2026 after reviewing July 2026's actual filled-in HR payroll master compilation; updated 24 August 2026 after Finance provided their actual tax computation template)</td></tr>
+  <tr><th>Prepared by</th><td>Software Development Team</td></tr>
+  <tr><th>Source documents</th><td><em>HR Payroll Compilation Process</em> (HR Operations SOP), <em>Finance Salary SOP</em>, <em>HR Payroll File Template.xlsx</em>, <em>Finance Monthly_Salary_Template.xlsm</em>, <em>Monthly_Salary_Template_Reporting.xlsm</em>, <em>Master Sheet_July_2026.xlsx</em> (HR's actual July 2026 payroll compilation), <em>Tax Calculation.xlsx</em> (Finance's per-employee ITA-2023 salary tax computation template)</td></tr>
+  <tr><th>Status</th><td><strong>Awaiting formal sign-off (section 14).</strong> Most open decisions in section 12 were locked at the 11 August 2026 meeting; the 13 August 2026 template review, the 20 August 2026 master-sheet review and the 24 August 2026 tax-calculation review reopened a few of them and raised new ones — see section 12. <strong>Phase 1 (compensation master), Phase 2 (rate tables + input pipeline), Phase 3 (calculation engine + register, no approval chain) and Phase 4 (in-house TDS calculation) implementation started 20/24 August 2026, ahead of formal sign-off, by explicit decision</strong> — the approval chain, payslips/bank advice, loans/settlement and everything downstream (Phase 5+) still waits for sign-off and for the remaining open questions in section 12.</td></tr>
+</table>
+</div>
+
+<h2>1. Why we are changing</h2>
+
+<p>Payroll today runs on two separate Excel workbooks and a chain of emails.</p>
+<ul>
+  <li><strong>HR Operations</strong> emails every departmental Payroll POC on the 15th/16th, waits 3–4 working days for files, compiles them into an HR master workbook, and runs a 26-point manual validation.</li>
+  <li><strong>Finance</strong> then takes HR's file and <strong>copies it into a second workbook</strong> — Finance SOP steps 2, 3, 4 and 6 are all "copy the latest data across and verify" — before adding loans, bank accounts, TDS and the bank advice.</li>
+</ul>
+
+<p>Meanwhile Orbis already holds, accurately and updated daily, the employee master, the roster, all leave, joining and last-working dates, departments, teams, designations, work locations and billing status.</p>
+
+<div class="callout bad">
+<p>The same information exists in <strong>three</strong> places and is reconciled by hand every month. Most of the validation effort in both SOPs is not checking payroll correctness — it is checking that the three copies still agree.</p>
+</div>
+
+<p><strong>What we are proposing:</strong> one payroll process inside Orbis that reads the data it already owns, asks people only for what it genuinely cannot know, calculates salary, routes it for approval, and produces the bank advice and payslips.</p>
+
+<h3>What changes for each team</h3>
+<table>
+<thead><tr><th>Team</th><th>Today</th><th>After</th></tr></thead>
+<tbody>
+<tr><td><strong>Department supervisors</strong></td><td>Fill in and email a payroll Excel file every month</td><td>Upload <strong>one overtime sheet</strong>. Nothing else.</td></tr>
+<tr><td><strong>HR Operations</strong></td><td>Chase files, compile a master, validate 26 points by hand</td><td>Review a pre-built register with exceptions already flagged</td></tr>
+<tr><td><strong>Finance</strong></td><td>Re-key HR's file into a second workbook, then calculate</td><td>Open the same run HR prepared, review, approve</td></tr>
+<tr><td><strong>Employees</strong></td><td>Receive a payslip by email</td><td>Same, plus a permanent payslip history in Orbis</td></tr>
+<tr><td><strong>Management</strong></td><td>Approve by email</td><td>Approve in Orbis, with the approval permanently recorded</td></tr>
+</tbody>
+</table>
+
+<h2>2. What Orbis already knows</h2>
+
+<div class="callout">
+<p>This is the most important table in this document. <strong>Every row is information departments currently supply by email that they will no longer need to supply.</strong></p>
+</div>
+
+<table>
+<thead><tr><th>Information</th><th>Where Orbis already holds it</th></tr></thead>
+<tbody>
+<tr><td>New joiners</td><td>Employee record — joining date</td></tr>
+<tr><td>Leavers and last working day</td><td>Employee record + Offboarding module</td></tr>
+<tr><td>Final settlement completed</td><td>Offboarding case status</td></tr>
+<tr><td>Department / team transfers</td><td>Employee record</td></tr>
+<tr><td>Confirmation status and date</td><td>Employee record</td></tr>
+<tr><td>Promotions and designation changes</td><td>Employee record</td></tr>
+<tr><td>Casual, Sick, Annual, Maternity, Compensatory leave</td><td>Leave module + Roster</td></tr>
+<tr><td>Leave Without Pay (LWP)</td><td>Leave module — marked as unpaid leave</td></tr>
+<tr><td>Half-day leave</td><td>Leave module</td></tr>
+<tr><td>Payable days</td><td>Calculated from joining date, last working day and unpaid leave</td></tr>
+<tr><td>Night shift count</td><td>Roster — count of night shifts worked</td></tr>
+<tr><td>Special / custom / quarterly shift count</td><td>Roster</td></tr>
+<tr><td>Government and festival holidays</td><td>Holiday calendar</td></tr>
+<tr><td>Billable / Non-billable</td><td>Employee job information</td></tr>
+<tr><td>Live / Bench / Trainee</td><td>Employee job information</td></tr>
+<tr><td>Workstation (MHK, RAOWA, MBD, JHP)</td><td>Employee record</td></tr>
+<tr><td>WFO / WFH / Hybrid</td><td>Employee record</td></tr>
+<tr><td>Leave encashment</td><td>Leave module — encashment requests</td></tr>
+</tbody>
+</table>
+
+<h3>What Orbis still needs from people</h3>
+<table>
+<thead><tr><th>Information</th><th>Who provides it</th><th>How</th></tr></thead>
+<tbody>
+<tr><td><strong>Overtime hours</strong></td><td>Department supervisors</td><td>Excel upload — date, employee ID, OT type, hours</td></tr>
+<tr><td><strong>Salary structure</strong></td><td>Finance / HR</td><td>Entered once per employee; updated on increment or promotion</td></tr>
+<tr><td><strong>Bank account details</strong></td><td>Finance</td><td>Entered once per employee; updated on change</td></tr>
+<tr><td><strong>Salary loans and advances</strong></td><td>Finance</td><td>Entered when approved; deducted automatically thereafter</td></tr>
+<tr><td><strong>Performance bonus / incentive</strong></td><td>Department head or HR</td><td>Excel upload <em>or</em> single entry</td></tr>
+<tr><td><strong>Disciplinary adjustments</strong></td><td>HR (Legal)</td><td>Single entry with mandatory reason</td></tr>
+<tr><td><strong>Tax category</strong> (Men / Women &amp; Senior Citizen / Disabled &amp; 3rd gender / Freedom Fighter / Parents of disabled child)</td><td>HR / Finance</td><td>Entered once per employee, updated if it changes. <strong>Confirmed 24 Aug 2026</strong> — TDS is now calculated in-system every period from gross salary + this category + the investment declaration below; Finance no longer uploads a monthly TDS Excel (superseded, question 1, section 12).</td></tr>
+<tr><td><strong>Annual investment declaration</strong> (savings certificate, life insurance premium, DPS, share market, retirement fund contribution)</td><td>Employee, reviewed by Finance</td><td>Entered once per tax year (Jul–Jun), updated if it changes. Feeds the tax rebate calculation — defaults to zero investment (no rebate beyond the income-based term) until declared.</td></tr>
+<tr><td><strong>Rates</strong> (OT, night, Eid)</td><td>Finance / HR</td><td>Configured once, updated when rates change. Overtime basis (exact-second vs. flat-per-day) is configured per department (locked 11 Aug 2026).</td></tr>
+<tr><td><strong>Meal deduction rate</strong></td><td>Finance</td><td>Tiered by the employee's own gross salary (locked 11 Aug 2026)</td></tr>
+<tr><td><strong>Eid coverage parameters</strong></td><td>Management approval</td><td>Dates and rates entered per Eid; eligible days derived from roster</td></tr>
+<tr><td><strong>Meal count</strong></td><td><em>(automatic)</em></td><td>Pulled from meals.sebpo.net</td></tr>
+</tbody>
+</table>
+
+<h2>3. Overview of the new process</h2>
+
+<figure>
+<figcaption>Diagram 1 — End-to-end payroll lifecycle</figcaption>
+<pre class="mermaid">
+flowchart LR
+    A["Period opens&lt;br/&gt;16th"] --&gt; B["Inputs collected&lt;br/&gt;16th → 15th"]
+    B --&gt; C["Period closes&lt;br/&gt;15th"]
+    C --&gt; D["HR locks inputs"]
+    D --&gt; E["System calculates"]
+    E --&gt; F["HR reviews register&lt;br/&gt;+ variance report"]
+    F --&gt; G{"Approval chain"}
+    G -- "rejected" --&gt; E
+    G -- "approved" --&gt; H["Run locked&lt;br/&gt;(permanent record)"]
+    H --&gt; I["Bank advice&lt;br/&gt;→ bank"]
+    H --&gt; J["Payslips&lt;br/&gt;→ employees"]
+    I --&gt; K["Marked paid"]
+    J --&gt; K
+
+    style K fill:#41B3B3,color:#000
+    style G fill:#f5a623,color:#000
+    classDef dark fill:#0A4958,color:#fff
+    class A,H dark
+</pre>
+</figure>
+
+<div class="callout">
+<p>Once a run is <strong>locked</strong> it can never be edited. This is deliberate — a payslip issued to an employee and a file sent to the bank must remain exactly as they were. Corrections are made by a separate correction run (see section 11).</p>
+</div>
+
+<h2>4. Today vs. proposed</h2>
+
+<figure>
+<figcaption>Diagram 2 — Current manual process against the proposed Orbis process</figcaption>
+<pre class="mermaid">
+flowchart TB
+    subgraph now["TODAY — three copies of the truth"]
+        direction TB
+        N1["HR emails all&lt;br/&gt;department POCs"] --&gt; N2["Departments fill in&lt;br/&gt;Excel files"]
+        N2 --&gt; N3["HR chases missing files&lt;br/&gt;(3–4 working days)"]
+        N3 --&gt; N4["HR compiles into&lt;br/&gt;HR master workbook"]
+        N4 --&gt; N5["HR validates&lt;br/&gt;26 checkpoints by hand"]
+        N5 --&gt; N6["File handed&lt;br/&gt;to Finance"]
+        N6 --&gt; N7["Finance COPIES it into&lt;br/&gt;Finance workbook"]
+        N7 --&gt; N8["Finance adds loans,&lt;br/&gt;bank details, TDS"]
+        N8 --&gt; N9["Management approval&lt;br/&gt;by email"]
+        N9 --&gt; N10["Bank advice emailed&lt;br/&gt;+ payslips sent"]
+    end
+
+    subgraph next["PROPOSED — one system of record"]
+        direction TB
+        P1["Orbis opens&lt;br/&gt;the period"] --&gt; P2["Supervisors upload&lt;br/&gt;overtime only"]
+        P2 --&gt; P3["Everything else read&lt;br/&gt;from Orbis automatically"]
+        P3 --&gt; P4["HR locks + calculates"]
+        P4 --&gt; P5["Exceptions flagged&lt;br/&gt;automatically"]
+        P5 --&gt; P6["Approval chain&lt;br/&gt;inside Orbis"]
+        P6 --&gt; P7["Bank advice + payslips&lt;br/&gt;generated"]
+    end
+
+    style now fill:#fff4f4,stroke:#c33
+    style next fill:#f0fbfa,stroke:#0A4958
+    style N5 fill:#ffd9d9
+    style N7 fill:#ffd9d9
+    style P3 fill:#c9f0ec
+    style P5 fill:#c9f0ec
+</pre>
+</figure>
+
+<div class="callout bad">
+<p>The two highlighted red boxes are the steps that change structurally: <strong>manual duplicate-checking is replaced by automated validation, exception review and reconciliation reports</strong>, and <strong>Finance re-keying HR's file disappears</strong> because there is only one controlled payroll run.</p>
+</div>
+
+<h2>5. Monthly timeline</h2>
+
+<p>The payroll period runs <strong>16th of the previous month → 15th of the current month</strong>, named after the current month. July payroll covers 16 June – 15 July.</p>
+
+<figure>
+<figcaption>Diagram 3 — July 2026 payroll cycle</figcaption>
+<pre class="mermaid">
+gantt
+    title July 2026 payroll cycle
+    dateFormat YYYY-MM-DD
+    axisFormat %d %b
+
+    section Payroll period
+    Period 16 Jun – 15 Jul :done, per, 2026-06-16, 2026-07-15
+
+    section Inputs
+    Supervisors upload overtime as it happens  :active, ot,  2026-06-16, 2026-07-16
+    HR enters bonus / disciplinary             :active, adj, 2026-07-10, 2026-07-16
+    Meal counts pulled automatically           :         mc, 2026-07-16, 1d
+
+    section Processing
+    HR locks inputs                 :crit, lock, 2026-07-16, 1d
+    System calculates               :crit, calc, 2026-07-16, 1d
+    HR reviews register + variance  :      rev,  2026-07-17, 2d
+
+    section Approval
+    Approval chain                  :crit, appr, 2026-07-19, 3d
+
+    section Disbursement
+    Bank advice sent to bank        :      bank, 2026-07-22, 1d
+    Payslips issued to employees    :      slip, 2026-07-23, 1d
+</pre>
+</figure>
+
+<p>Compared with today, input collection is no longer a bottleneck: supervisors upload overtime <strong>as it happens</strong> through the month rather than scrambling in a 3–4 day window after an email.</p>
+
+<h2>6. Payroll control framework</h2>
+
+<p>The goal is not only to automate payroll. The goal is to replace spreadsheet control with system control.</p>
+
+<table>
+<thead><tr><th>Control</th><th>How Orbis will enforce it</th></tr></thead>
+<tbody>
+<tr><td><strong>Single source of truth</strong></td><td>Employee, roster, leave and offboarding data are read directly from their owning modules; payroll stores only a locked snapshot of what was used.</td></tr>
+<tr><td><strong>Segregation of duties</strong></td><td>Salary and bank access are governed by payroll-specific permissions, not general HR profile access. The person who uploads or edits an input should not be the only approver of the final run.</td></tr>
+<tr><td><strong>Maker-checker approvals</strong></td><td>Payroll runs move through a configurable approval chain. Every approval, rejection and reason is permanently recorded.</td></tr>
+<tr><td><strong>Exception-based review</strong></td><td>HR and Finance review flagged exceptions and variances instead of manually checking every copied field in a workbook.</td></tr>
+<tr><td><strong>Immutable output</strong></td><td>Once a run is locked, payslips and bank advice are never edited. Corrections use reversal, supplementary or final-settlement runs.</td></tr>
+<tr><td><strong>Audit trail</strong></td><td>Uploads, corrections, calculations, approvals, bank advice generation, payslip release and paid confirmation all create audit events.</td></tr>
+<tr><td><strong>Controlled exports</strong></td><td>Payroll register, bank advice and GL/cost-centre exports are generated from the locked run and should be downloadable only by authorised payroll/finance users.</td></tr>
+</tbody>
+</table>
+
+<h3>Operating roles</h3>
+<table>
+<thead><tr><th>Activity</th><th>Primary owner</th><th>Checker / approver</th></tr></thead>
+<tbody>
+<tr><td>Salary structure setup and revision</td><td>HR / Finance payroll owner</td><td>Payroll approver</td></tr>
+<tr><td>Bank account setup and verification</td><td>Finance</td><td>Finance approver</td></tr>
+<tr><td>Overtime upload</td><td>Department supervisor</td><td>HR review through exception report</td></tr>
+<tr><td>Bonus / incentive input</td><td>Department head or HR</td><td>Payroll approver</td></tr>
+<tr><td>Disciplinary adjustment</td><td>HR / Legal</td><td>Payroll approver</td></tr>
+<tr><td>Tax category &amp; investment declaration entry</td><td>Employee / HR / Finance</td><td>Finance review through exception report</td></tr>
+<tr><td>TDS calculation</td><td><em>(automatic)</em></td><td>Finance reviews the computed figure through the register/variance report</td></tr>
+<tr><td>Payroll calculation</td><td>Payroll admin</td><td>HR + Finance reviewers</td></tr>
+<tr><td>Payroll run review (per department)</td><td>Department approving manager</td><td>"Reviewed" sign-off, own department's employees only</td></tr>
+<tr><td>Payroll run approval (org-wide)</td><td>HR authorised users</td><td>—</td></tr>
+<tr><td>Final payroll approval</td><td>Finance</td><td>—</td></tr>
+<tr><td>Bank advice release</td><td>Finance</td><td>Final payroll approver</td></tr>
+<tr><td>Payslip release</td><td>Payroll admin / system</td><td>Locked approved run</td></tr>
+<tr><td>Paid confirmation</td><td>Finance</td><td>Audit trail</td></tr>
+<tr><td>Disbursement authorisation</td><td>Management</td><td>Signed on the printed bank advice; the scanned signed copy is then uploaded into Orbis (confirmed 13 August 2026)</td></tr>
+</tbody>
+</table>
+
+<div class="callout warn">
+<p><strong>Locked 11 August 2026:</strong> the approval chain is Department Review (own department) → HR Approval (org-wide) → Finance Approval (final). Management's disbursement sign-off happens on a printed document, and a scanned copy is uploaded into Orbis afterward (confirmed 13 August 2026). <strong>Confirmed 13 August 2026:</strong> no preparer is blocked from approving the same run — Finance's approval is the only real finalisation gate.</p>
+</div>
+
+<h3>Payroll calendar and cut-off rules</h3>
+<table>
+<thead><tr><th>Event</th><th>Normal timing</th><th>Rule</th></tr></thead>
+<tbody>
+<tr><td>Period opens</td><td>16th</td><td>OT and variable inputs may be uploaded from this date.</td></tr>
+<tr><td>Period closes</td><td>15th</td><td>Roster, leave, LWP and attendance-derived inputs stop accruing for the period.</td></tr>
+<tr><td>Input lock</td><td>16th or next working day</td><td>Late inputs are blocked from the regular run unless HR reopens inputs.</td></tr>
+<tr><td>HR review</td><td>After calculation</td><td>Exceptions and variance must be cleared, explained or held.</td></tr>
+<tr><td>Finance review</td><td>After HR review</td><td>Bank, tax, loan, deductions and totals are checked.</td></tr>
+<tr><td>Final approval</td><td>Before bank advice</td><td>No bank advice or payslip can be issued before approval.</td></tr>
+<tr><td>Paid confirmation</td><td>After bank disbursement</td><td>Finance marks the run paid and records the payment reference.</td></tr>
+</tbody>
+</table>
+
+<p>Late overtime, bonus, bank changes, leave corrections or resignation updates discovered after input lock should not be inserted silently. They must either trigger an explicit reopen before approval, or move to a supplementary/correction run after the regular run is locked.</p>
+
+<h3>Pre-payroll checklist</h3>
+<ul>
+  <li>Missing approved salary structure.</li>
+  <li>Missing or unverified bank account.</li>
+  <li>New joiner with no salary structure.</li>
+  <li>Leaver / LWD case requiring final settlement review.</li>
+  <li>Employee on salary hold.</li>
+  <li>LWP, half-day or unpaid absence affecting payable days.</li>
+  <li>Unapproved or unresolved leave inside the period.</li>
+  <li>Excessive overtime or duplicate overtime upload.</li>
+  <li>Zero net pay, negative net pay, or postponed loan instalment.</li>
+  <li>Large net-pay variance against the previous month.</li>
+  <li>Missing tax category for an included employee (TDS can't be calculated without one).</li>
+</ul>
+
+<h3>Post-payroll checklist</h3>
+<ul>
+  <li>Bank advice total equals the approved net payable total.</li>
+  <li>Bank advice employee count equals the payable employee count excluding held rows.</li>
+  <li>Payslip count equals employees included in the locked run.</li>
+  <li>Held employees are excluded from payment and carried to the next appropriate run.</li>
+  <li>GL / cost-centre summary has been exported or reviewed if required.</li>
+  <li>Any failed payslip email or PDF generation has a visible retry/error status.</li>
+</ul>
+
+<h2>7. Where every input comes from</h2>
+
+<figure>
+<figcaption>Diagram 4 — Derived automatically vs. entered by a person</figcaption>
+<pre class="mermaid">
+flowchart TB
+    subgraph auto["DERIVED AUTOMATICALLY — nobody keys these"]
+        direction LR
+        A1["Joiners, leavers,&lt;br/&gt;transfers, confirmations"]
+        A2["All leave types&lt;br/&gt;incl. LWP"]
+        A3["Payable days"]
+        A4["Night shift count"]
+        A5["Special shift count"]
+        A6["Holidays"]
+        A7["Billable, Live/Bench,&lt;br/&gt;location"]
+        A8["Eid coverage days"]
+        A9["Leave encashment"]
+    end
+
+    subgraph human["ENTERED BY A PERSON"]
+        direction LR
+        H1["Overtime hours&lt;br/&gt;supervisors — Excel"]
+        H2["Salary structure&lt;br/&gt;Finance — once per employee"]
+        H3["Bank account&lt;br/&gt;Finance"]
+        H4["Loans and advances&lt;br/&gt;Finance"]
+        H5["Bonus / incentive&lt;br/&gt;Dept head or HR"]
+        H6["Disciplinary&lt;br/&gt;HR — reason required"]
+        H7["Tax declaration&lt;br/&gt;Employee → Finance"]
+        H8["Rate cards&lt;br/&gt;Finance — set once"]
+    end
+
+    subgraph ext["PULLED FROM ANOTHER SYSTEM"]
+        E1["Meal count&lt;br/&gt;meals.sebpo.net"]
+    end
+
+    auto --&gt; RUN["PAYROLL RUN"]
+    human --&gt; RUN
+    ext --&gt; RUN
+
+    style auto fill:#f0fbfa,stroke:#0A4958
+    style human fill:#fffaf0,stroke:#f5a623
+    style ext fill:#f7f0fb,stroke:#7b4fa8
+    classDef dark fill:#0A4958,color:#fff
+    class RUN dark
+</pre>
+</figure>
+
+<h3>Overtime upload format</h3>
+<table>
+<thead><tr><th>Working date</th><th>Employee ID</th><th>Overtime type</th><th>OT hours</th></tr></thead>
+<tbody>
+<tr><td>2026-06-18</td><td>1042</td><td>Regular OT</td><td>02:30:00</td></tr>
+<tr><td>2026-06-21</td><td>1042</td><td>GH OT</td><td>08:00:00</td></tr>
+</tbody>
+</table>
+
+<p>Overtime types: <strong>Regular OT</strong>, <strong>GH OT</strong> (General Holiday — renamed 2026-09-07 from "Holiday OT"), <strong>Eid Package</strong>, <strong>Special OT</strong> (renamed 2026-09-07 from "Eid Special OT" — broadened to any special occasion, not just Eid).</p>
+
+<div class="callout warn">
+<p><strong>Locked 11 August 2026:</strong> the pay basis is not fixed per overtime type — some departments pay per exact second worked, others pay a flat fixed amount per day worked regardless of hours. This is configured per department.</p>
+</div>
+
+<p>The upload runs a <strong>preview first</strong> — it shows exactly what will be created, changed or rejected, with a specific error message against any bad row. Nothing is saved until the supervisor confirms. A supervisor can only upload for employees in their own reporting line. Re-uploading the same sheet corrects the earlier figures rather than duplicating them.</p>
+
+<div class="callout warn">
+<p>Per the current decision, a supervisor's upload is <strong>final</strong> — there is no separate departmental approval step for overtime. HR can still correct or void entries during the compilation window. <em>See open question 4 in section 12 if the heads wish to add a gate.</em></p>
+</div>
+
+<h2>8. How salary is calculated</h2>
+
+<figure>
+<figcaption>Diagram 5 — Calculation stages, in order</figcaption>
+<pre class="mermaid">
+flowchart TB
+    S0["Who gets paid&lt;br/&gt;everyone employed at any point in the period"]
+    S1["Payable days&lt;br/&gt;joining / last working day / unpaid leave"]
+    S2["Gross salary&lt;br/&gt;single figure, no component breakdown&lt;br/&gt;reduced pro-rata if not a full month"]
+    S3["Variable earnings&lt;br/&gt;overtime, night allowance, special shift,&lt;br/&gt;Eid coverage, meal, bonus, incentive, arrears"]
+    S4["GROSS SALARY"]
+    S5["Other deductions&lt;br/&gt;disciplinary, recoveries"]
+    S6["Income tax (TDS)"]
+    S7["Loan / advance instalment&lt;br/&gt;never takes net pay below zero"]
+    S8["NET PAY"]
+
+    S0 --&gt; S1 --&gt; S2 --&gt; S3 --&gt; S4 --&gt; S5 --&gt; S6 --&gt; S7 --&gt; S8
+
+    style S4 fill:#41B3B3,color:#000
+    classDef dark fill:#0A4958,color:#fff
+    class S8 dark
+</pre>
+</figure>
+
+<h3>Payable days</h3>
+<pre>Eligible days   = days employed within the period
+                  (from joining date or period start, whichever is later,
+                   to last working day or period end, whichever is earlier)
+
+Payable days    = Eligible days − unpaid leave (LWP) − half-day adjustments
+
+Pro-rata factor = Payable days ÷ days in period</pre>
+
+<p>This single formula replaces the SOP's separate "Added Days for New Joiners", "Minus Days" and manual leaver adjustments.</p>
+
+<div class="callout">
+<p><strong>Why tax comes before loans.</strong> A disciplinary deduction reduces taxable pay, so it is applied before tax. A loan repayment does not reduce taxable pay, so it is applied after. The loan instalment is also capped so net pay can never go negative — if that happens the instalment is postponed to the next month and flagged, never silently dropped.</p>
+</div>
+
+<p><strong>Rates.</strong> Overtime, night allowance, Eid coverage and meal rates are held in a rate table with a start and end date, and can differ by department, team, sub-project, work location and grade. The most specific matching rate wins. This covers the existing structure — Data Solution 3 OT rates, Digital Advertising &amp; BPO 3, IT 1; night allowance 1–4 rates by department; separate WFO and WFH Eid rates — without needing a software change when a rate changes.</p>
+
+<h2>9. Review and approval</h2>
+
+<figure>
+<figcaption>Diagram 6 — Payroll run states</figcaption>
+<pre class="mermaid">
+stateDiagram-v2
+    direction TB
+    [*] --&gt; Draft
+    Draft --&gt; InputsOpen: period opened
+    InputsOpen --&gt; InputsOpen: overtime, bonus, disciplinary entered
+    InputsOpen --&gt; InputsLocked: HR locks inputs
+    InputsLocked --&gt; Calculated: system calculates
+    Calculated --&gt; Calculated: recalculate
+    Calculated --&gt; InputsOpen: reopen if something is missing
+    Calculated --&gt; PendingApproval: HR submits
+    PendingApproval --&gt; PartiallyApproved: approver 1 approves
+    PartiallyApproved --&gt; Approved: final approver approves
+    PendingApproval --&gt; Rejected: rejected, reason required
+    PartiallyApproved --&gt; Rejected: rejected, reason required
+    Rejected --&gt; Calculated: HR corrects
+    Approved --&gt; Locked: run locked permanently
+    Locked --&gt; Paid: disbursement confirmed
+    Locked --&gt; Reversed: reversal (exceptional)
+    Paid --&gt; Reversed: reversal (exceptional)
+    Paid --&gt; [*]
+</pre>
+</figure>
+
+<figure>
+<figcaption>Diagram 7 — Configurable approval chain</figcaption>
+<pre class="mermaid">
+flowchart LR
+    R["Payroll run&lt;br/&gt;calculated"] --&gt; S1["Department managers&lt;br/&gt;Review (own department)"]
+    S1 --&gt; S2["HR&lt;br/&gt;Approve (org-wide)"]
+    S2 --&gt; S3["Finance&lt;br/&gt;Approve (final)"]
+    S3 --&gt; A["APPROVED / LOCKED"]
+    A --&gt; M["Management signs&lt;br/&gt;printed disbursement doc&lt;br/&gt;(outside Orbis)"]
+    S1 -. reject .-&gt; X["Returned to HR&lt;br/&gt;with reason"]
+    S2 -. reject .-&gt; X
+    S3 -. reject .-&gt; X
+
+    style X fill:#ffd9d9
+    style M fill:#f5a623,color:#000
+    classDef dark fill:#0A4958,color:#fff
+    class A dark
+</pre>
+</figure>
+
+<div class="callout warn">
+<p><strong>Locked 11 August 2026:</strong> the chain is Department Review → HR Approval → Finance Approval, with each department's review scoped to its own employees. No threshold escalation is used. Management's disbursement approval is a signature on the printed advice; a scanned copy is then uploaded into Orbis (confirmed 13 August 2026). <strong>Confirmed 13 August 2026:</strong> no preparer is blocked from approving the same run.</p>
+</div>
+
+<h3>What reviewers see</h3>
+<ul>
+  <li><strong>The payroll register</strong> — every employee, every earning and deduction, gross and net.</li>
+  <li><strong>The variance report</strong> — every employee whose net pay moved more than a set percentage against last month, with the reason. This is the automated replacement for the 26-point manual checklist, and far more likely to catch a genuine error.</li>
+  <li><strong>Exception list</strong> — employees on salary hold, missing bank details, missing salary structure, negative net, zero payable days.</li>
+</ul>
+
+<p><strong>Salary hold.</strong> An approver can place an individual employee on hold without rejecting the whole run. Held employees are excluded from the payment total and the bank advice, and roll into the next correction run.</p>
+
+<h2>10. Payment and payslips</h2>
+
+<figure>
+<figcaption>Diagram 8 — Disbursement and payslip delivery</figcaption>
+<pre class="mermaid">
+flowchart TB
+    A["Run approved&lt;br/&gt;and locked"] --&gt; B["Bank advice generated&lt;br/&gt;per bank"]
+    A --&gt; C["Payslips generated"]
+    B --&gt; D{"Advice total =&lt;br/&gt;run net total?"}
+    D -- "no" --&gt; E["Blocked —&lt;br/&gt;cannot be sent"]
+    D -- "yes" --&gt; F["Advice sent to bank"]
+    C --&gt; G["Payslip issued to each&lt;br/&gt;employee's official email"]
+    G --&gt; H["Employee can also view&lt;br/&gt;payslip history in Orbis"]
+    F --&gt; I["Disbursement confirmed —&lt;br/&gt;run marked Paid"]
+
+    style E fill:#ffd9d9
+    style I fill:#41B3B3,color:#000
+    classDef dark fill:#0A4958,color:#fff
+    class A dark
+</pre>
+</figure>
+
+<div class="callout warn">
+<p><strong>Locked 11 August 2026:</strong> Finance owns exporting the payroll summary, bank advice and any other required documents once a run is approved; every export/download is logged.</p>
+</div>
+
+<p>Two Finance SOP validations become structural guarantees rather than manual checks:</p>
+<ul>
+  <li><em>"Total Bank Advice amount equals the final payroll amount"</em> — the system refuses to release an advice that does not reconcile.</li>
+  <li><em>"No employee receives another employee's payslip"</em> — each payslip is permanently bound to one employee's payroll record; there is no step at which they could be mismatched.</li>
+</ul>
+
+<p>Employees keep access to Orbis through their last working day specifically so they can download payslips and letters.</p>
+
+<h2>11. Exceptions and corrections</h2>
+
+<figure>
+<figcaption>Diagram 9 — Exception paths</figcaption>
+<pre class="mermaid">
+flowchart TB
+    subgraph a["During processing"]
+        A1["Missing bank account"] --&gt; A2["Flagged before approval;&lt;br/&gt;employee held"]
+        A3["Missing salary structure"] --&gt; A2
+        A4["Negative net pay"] --&gt; A5["Loan instalment postponed,&lt;br/&gt;flagged"]
+        A6["Individual dispute"] --&gt; A7["Salary hold — rest of&lt;br/&gt;the run proceeds"]
+    end
+
+    subgraph b["After the run is locked"]
+        B1["Error found after&lt;br/&gt;payslips issued"] --&gt; B2["Reversal run&lt;br/&gt;cancels the original"]
+        B2 --&gt; B3["Correction run&lt;br/&gt;pays the difference"]
+        B4["Backdated promotion"] --&gt; B5["Arrears calculated&lt;br/&gt;automatically"]
+        B5 --&gt; B3
+    end
+
+    style a fill:#fffaf0,stroke:#f5a623
+    style b fill:#fff4f4,stroke:#c33
+</pre>
+</figure>
+
+<div class="callout">
+<p><strong>A locked run is never edited.</strong> If an error is found after payslips have gone out, the original run stays exactly as issued and a reversal plus a correction run are created. The audit trail always shows what was actually paid and what was actually corrected — which is what an auditor, and the tax authority, will expect.</p>
+<p><strong>Unresolved issues carry forward.</strong> HR SOP step 13 ("Pending Issue Resolution") is currently a person remembering. In Orbis, an unresolved note automatically appears against the same employee in the next period until it is closed.</p>
+</div>
+
+<h2>12. Decisions from HR and Finance</h2>
+
+<p>Most items were locked at the 11 August 2026 HR/Finance decisions meeting. The 13 August 2026 review of HR's and Finance's actual (blank) templates reopened a handful of them and raised several new ones, resolved across two same-day follow-ups. The 20 August 2026 review of July 2026's actual <strong>filled-in</strong> master compilation — real production data rather than a blank template — confirmed those figures with concrete numbers and surfaced three further questions. The 24 August 2026 review of Finance's actual tax computation template superseded questions 1–2 below with a real in-house calculation. <strong>Five questions remain open</strong>, all listed below.</p>
+
+<h3>Resolved (11 August 2026)</h3>
+<table>
+<thead><tr><th>#</th><th>Question</th><th>Decision</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>TDS calculation method</td><td><s><strong>Deferred.</strong> Finance uploads a monthly Excel of computed TDS per employee; Orbis merges it into the run. In-system calculation is a later phase.</s> <strong>Superseded 24 August 2026</strong> — Finance provided their actual calculation template; TDS is now computed in-system every period. See the 24 August 2026 section below.</td></tr>
+<tr><td>2</td><td>Mid-year cutover</td><td><s><strong>Moot for now</strong> — since TDS is uploaded rather than calculated, there is no cutover balance to capture until the in-house engine is built.</s> <strong>Superseded 24 August 2026</strong> — resolved directly (no YTD cutover fields needed, matching Finance's own template). See the 24 August 2026 section below.</td></tr>
+<tr><td>3</td><td>Approval chain</td><td><strong>Department Review</strong> (own department) → <strong>HR Approval</strong> (org-wide) → <strong>Finance Approval</strong> (final). No threshold escalation. Management's disbursement sign-off is a signature on the printed advice, outside Orbis.</td></tr>
+<tr><td>6</td><td>Overtime rounding</td><td>Reframed — it isn't a rounding question. <strong>Overtime basis varies by department:</strong> some pay per exact second worked, others pay a flat amount per day regardless of hours.</td></tr>
+<tr><td>8</td><td>Meal</td><td><strong>Deduction from the employee</strong>, tiered by the employee's own gross salary: ≤25,000 → 20 BDT/meal; 25,000–50,000 → 30 BDT/meal; &gt;50,000 → 50 BDT/meal.</td></tr>
+<tr><td>10</td><td>Gratuity formula</td><td><strong>No gratuity scheme exists at SEBPO.</strong></td></tr>
+<tr><td>11</td><td>Provident Fund / WPPF</td><td><strong>None exists.</strong></td></tr>
+<tr><td>12</td><td>Festival bonus</td><td><strong>2 Eids per year, 50% of gross salary each.</strong> No grade-banding.</td></tr>
+<tr><td>14</td><td>Salary visibility</td><td><strong>Downline managers</strong> see their reporting line's salary. <strong>HR and Finance see everyone's.</strong></td></tr>
+<tr><td>15</td><td>Historical salary data</td><td><strong>Not backfilled.</strong> Only changes made in Orbis going forward carry effective-dated history.</td></tr>
+<tr><td>18</td><td>Cut-off exceptions</td><td>Bank-detail edits, loan changes and backdated adjustments <strong>may be applied to the current run</strong> (before it is finally locked) rather than forced into a supplementary run.</td></tr>
+<tr><td>20</td><td>Payroll export access</td><td><strong>Finance</strong> exports the register, bank advice and other documents. <strong>Every download is logged.</strong></td></tr>
+<tr><td>21</td><td>Statutory outputs</td><td><strong>Deferred to phase 2+.</strong> Not required for initial go-live.</td></tr>
+<tr><td>24</td><td>Bank advice format(s)</td><td><strong>Answered by Finance's own workbook, not a new meeting.</strong> Three named formats: <strong>Bank Asia PLC (BAL)</strong>, <strong>Eastern Bank PLC (EBL)</strong>, <strong>Modhumoti Bank Limited</strong>, each with its own advice letter/reference-number convention — seeded directly into the bank-format registry (13 August 2026).</td></tr>
+</tbody>
+</table>
+
+<p>Also settled outside the numbered list: bank account fields (bank name, branch, routing number, account number) are stored against the employee and shown in their profile; Finance will supply the file template for each bank.</p>
+
+<h3>Resolved (13 August 2026, template review follow-up)</h3>
+<p>Finance answered the 13 August 2026 template-review questions the same day. None of these overturn a locked decision; most narrow or fully confirm one.</p>
+<table>
+<thead><tr><th>#</th><th>Question</th><th>Decision</th></tr></thead>
+<tbody>
+<tr><td>7</td><td>"Eid Package" OT type</td><td><strong>Flat payment per occasion, not hourly.</strong> It is a fixed 3-day / 24-hour coverage package (WFH 12,000 Tk / WFO 15,000 Tk). Hours worked beyond the package window are paid as ordinary overtime, not at a separate Eid rate.</td></tr>
+<tr><td>23</td><td>Management sign-off record</td><td><strong>Orbis will store it.</strong> Add upload functionality for the scanned signed disbursement document rather than leaving that step entirely outside the system.</td></tr>
+<tr><td>25</td><td>Festival bonus tenure gate</td><td><strong>Still current.</strong> The &gt;180-day tenure gate is measured against the Eid date itself.</td></tr>
+<tr><td>26</td><td>Salary-banded night-shift / OT rates</td><td><strong>Confirmed, scoped to two departments.</strong> The salary-band dimension applies only to <strong>Software Development</strong> and <strong>Creative Development</strong>. Every other department uses a single flat per-hour rate, as already listed in HR's compilation file.</td></tr>
+<tr><td>27</td><td>Third overtime basis (gross ÷ 30 × days × 1.5)</td><td><strong>Not active anymore.</strong> Dead formula left over in the workbook — no third overtime basis needed.</td></tr>
+<tr><td>28</td><td>Eid coverage structure</td><td><strong>Confirmed: no continuous rate.</strong> It is a flat package (WFH 12,000 Tk / WFO 15,000 Tk) covering 24 hours across a 3-day span. Hours worked beyond the package are paid as ordinary overtime. (Same answer as #7 — the package <em>is</em> "Eid Package.")</td></tr>
+<tr><td>29</td><td>GL split formula for the statutory salary breakdown</td><td><strong>Deferred.</strong> Not required for initial go-live; the derived percentages (Basic 50% / Housing 25% / Medical 5% / Conveyance 10% / remainder to Other, tiered Mobile/Internet) are captured in the technical plan for whenever this is picked back up.</td></tr>
+<tr><td>30</td><td>Disbursement isn't bank-transfer-only</td><td><strong>Confirmed required.</strong> Cash, Cheque and MFS wallets must all be supported alongside bank transfer at go-live.</td></tr>
+<tr><td>31</td><td>MFS providers</td><td><strong>bKash and Nagad.</strong></td></tr>
+<tr><td>32</td><td>"Service benefit" long-service award</td><td><strong>Real scheme, paid at separation</strong> (part of final settlement, not monthly payroll). Modelling is <strong>deferred</strong> to a later phase.</td></tr>
+</tbody>
+</table>
+
+<h3>Resolved (13 August 2026, second follow-up)</h3>
+<table>
+<thead><tr><th>#</th><th>Question</th><th>Decision</th></tr></thead>
+<tbody>
+<tr><td>4</td><td>Overtime approval</td><td><strong>Confirmed: no gate.</strong> The supervisor's upload remains final, as originally designed — no department-head approval step is added.</td></tr>
+<tr><td>5</td><td>Night shift crossing midnight</td><td><strong>Attributed to the period containing the shift's start date.</strong> A 22:00–06:00 shift starting 15 July counts in the payroll period that includes 15 July (the "16 Jun – 15 Jul" July run), regardless of when it ends.</td></tr>
+<tr><td>13</td><td>Payslip delivery</td><td><strong>Neither a PDF attachment nor a link — the numbers go directly in the email body.</strong> No downloadable artifact is emailed at all. The full payslip PDF is still generated and kept for in-app viewing (section 10, "payslip history in Orbis"); the delivery email itself carries only the numeric summary as plain text.</td></tr>
+<tr><td>16</td><td>Unauthorised absence (ABS)</td><td><strong>Confirmed as designed: fully paid.</strong> Not a bug — unauthorised absence does not reduce payable days.</td></tr>
+<tr><td>17</td><td>Cross-year period</td><td><strong>No special rule needed.</strong> January's payable-days calculation only consumes LWP-flagged shift-days pulled directly from the roster; it never touches annual leave balance, accrual or carry-forward. The 16 Dec – 15 Jan period's calendar-year boundary therefore has no effect on payroll math.</td></tr>
+<tr><td>19</td><td>Preparer vs approver</td><td><strong>No blocking needed.</strong> There is no separate "approver" role in Orbis's payroll chain distinct from finalisation — Finance's approval is the run's final finalisation step regardless of who entered any upstream input. Preparer/approver segregation is not enforced as a system constraint.</td></tr>
+<tr><td>33</td><td>Legacy leave-balance cutover</td><td><strong>Confirmed: a one-time legacy import is likely needed.</strong> Exact scope and source (Oracle export vs. an old workbook) still to be worked out with HR/Finance before cutover.</td></tr>
+</tbody>
+</table>
+
+<h3>Resolved (20 August 2026, answered by July's actual master compilation)</h3>
+<p><em>Master Sheet_July_2026.xlsx</em> — the real HR master file used to run July 2026's payroll, not a blank template — carries concrete rate figures the 13 August 2026 template review couldn't see. Like the bank advice formats (question 24), these are answered by the file itself rather than a new meeting; flagged to HR/Finance for confirmation before Phase 2 rate-table seeding. It also incidentally reinforces section 1's case for the change: even HR's own file has its <code>Work Station</code> and <code>Work Location</code> columns inconsistently populated against each other (mixed casing, a stray garbage value) — the exact kind of drift that goes away once payroll reads these fields from the employee record instead of a hand-filled spreadsheet.</p>
+<table>
+<thead><tr><th>#</th><th>Question</th><th>Decision</th></tr></thead>
+<tbody>
+<tr><td>37</td><td>AdOps's flat overtime rate, exact figures</td><td><strong>200 Tk/day (Below Team Leader), 250 Tk/day (Team Leader and above)</strong> — flat per day, banded by designation tier, consistent with the "flat amount per day" OT basis already locked for this department (question 6).</td></tr>
+<tr><td>38</td><td>Night-duty rate structure, full picture</td><td>HR's file tracks night duty as <strong>three separate categories, not one</strong>: <strong>Regular</strong> (salary-banded, Software Development &amp; Creative Development only — 350/450 Tk and 250/400 Tk either side of the 40,000 Tk threshold, as already confirmed at question 26), and <strong>Quarterly</strong> / <strong>Special Shift</strong> (flat <strong>500 Tk/day</strong>, the same figure across every other department — AdOps, Creative, BPO — regardless of salary).</td></tr>
+<tr><td>39</td><td>"Special Shift Transport"</td><td>A pay component not previously identified in either SOP or template review: a flat <strong>400 Tk/day</strong> transport allowance paid to AdOps staff on Quarterly/Special-shift days, tracked as its own column separate from the night-duty allowance. Evidenced by several free-text corrections in July's file requesting a missed top-up from a prior payroll, always in exact multiples of 400 Tk/day.</td></tr>
+</tbody>
+</table>
+
+<h3>Resolved (24 August 2026, answered by Finance's actual tax computation template)</h3>
+<p><em>Tax Calculation.xlsx</em> — the real per-employee worksheet Finance uses to compute salary income tax under the Income Tax Act 2023 — was analysed and hand-verified formula-by-formula against a worked example (matched to the taka). This directly resolves questions 1 and 2 above, differently than locked on 11 August 2026: TDS moves from "Finance uploads a monthly figure" to "Orbis calculates it every period," because the actual method is now known.</p>
+<table>
+<thead><tr><th>#</th><th>Question</th><th>Decision</th></tr></thead>
+<tbody>
+<tr><td>1 (superseded)</td><td>TDS calculation method</td><td><strong>Calculated in-system, every period</strong>, from: gross monthly salary → annualised gross (minus a tiered mobile/internet reimbursement, plus one year's Eid bonus already locked at 2×50% of gross) → statutory exemption of min(annual gross ÷ 3, 500,000 Tk) → progressive tax on the remainder across 6 slabs (0% up to a category-specific threshold, then 10/15/20/25/30%) → an investment-based rebate (the <em>lowest</em> of 3% of taxable income / 10% of declared annual investment / a 750,000 Tk cap) → a 5,000 Tk minimum-tax floor → ÷ 12 for the monthly deduction. Full model in the technical plan section 4.</td></tr>
+<tr><td>2 (superseded)</td><td>Mid-year cutover</td><td><strong>Moot, confirmed differently than originally framed.</strong> Finance's own template doesn't do a year-to-date true-up either — it recomputes the full annual projection and divides by 12 every time an input changes. Orbis matches that exactly: no opening-YTD-taxable/tax fields are needed. A salary change mid-year shifts the monthly figure from that point forward, same as Finance's practice — final reconciliation happens at return filing, not through payroll.</td></tr>
+<tr><td>40 (reopened 24 Aug 2026)</td><td>Tax category source, per employee</td><td><strong>Auto-defaults from PersonalInfo.gender (Male &rarr; Men, Female &rarr; Women &amp; Senior Citizen), always overridable.</strong> Originally locked as pure manual entry to match Finance's template; reopened because HR asked for the gender-based default directly. Not a hard lock — Disabled &amp; 3rd gender / Freedom Fighter / Parents of a disabled child still need a manual pick (Orbis doesn't track those attributes), and a senior male citizen (65+) also qualifies for the Women &amp; Senior Citizen threshold, so a gender-only auto-pick must stay overridable rather than locked.</td></tr>
+<tr><td>41</td><td>Investment declaration data source</td><td><strong>Real per-employee declarations, not Finance's "assumed maximum" shortcut</strong> — asked and confirmed 24 August 2026. Finance's template hardcodes a large assumed-investment figure instead of tracking real numbers per employee, which silently under- or over-states the rebate for anyone whose real investment doesn't happen to clear whatever cap that assumption was covering for. Orbis instead adds a real annual investment declaration (the same 5 categories: savings certificate, life insurance premium, DPS, share market, retirement fund contribution), defaulting to zero until an employee/Finance actually enters one.</td></tr>
+</tbody>
+</table>
+
+<h3>Still open</h3>
+<table>
+<thead><tr><th>#</th><th>Question</th><th>Needed by</th><th>Owner</th></tr></thead>
+<tbody>
+<tr><td>22</td><td><strong>Leave encashment rate, restated.</strong> Since there is no Basic figure anymore (only gross is stored), the original "Gross ÷ 30 / Basic ÷ 30 / Basic ÷ 26" options collapse to a gross-only choice. Confirm: Gross ÷ 30 or Gross ÷ 26?</td><td>Calculation</td><td>Finance</td></tr>
+<tr><td>34</td><td><strong>"Test Salary" pay category.</strong> July's file flags 11 new hires with entries like "6 days Test Salary, From June 25 to June 30, 2026" — a short trial-period daily rate distinct from the existing Trainee resource status. What is the rate/rule, and is it a separate probationary tier that precedes Trainee, or the same thing tracked differently?</td><td>Compensation master design (Phase 1)</td><td>HR</td></tr>
+<tr><td>35</td><td><strong>Dormant third AdOps OT rate.</strong> HR's actual template carries a live column, <code>Adops regular special 300 rate OT</code>, for a third flat AdOps rate (300 Tk) distinct from the 200/250 Tk bands confirmed at question 37 — unused in July 2026. Is this a real third tier still in occasional use (and for which role/project), or dormant like the gross÷30×days×1.5 formula settled at question 27?</td><td>Rate table seeding (Phase 2)</td><td>Finance</td></tr>
+<tr><td>36</td><td><strong>"Custom Shift" flag.</strong> 62 of AdOps's 895 employees (all Digital Advertising) are tagged "Custom Shift" in July's compilation — schedules handled outside the standard night/OT lookup. What makes a shift "custom," and can it be represented as an ordinary roster shift type, or does it need a manual override path in Orbis?</td><td>Rate table seeding (Phase 2)</td><td>HR</td></tr>
+<tr><td>42</td><td><strong>Minimum tax floor of 5,000 Tk.</strong> Finance's template hardcodes a flat 5,000 Tk minimum-tax floor, which matches the Dhaka City Corporation rate under ITA-2023 §165 — other areas are lower (4,000 / 3,000 Tk). Built as a configurable value defaulting to 5,000 Tk, not hardcoded — confirm whether any employees are registered outside Dhaka and need the lower floor.</td><td>Tax calculation accuracy</td><td>Finance</td></tr>
+</tbody>
+</table>
+
+<h2>13. Rollout approach</h2>
+
+<p>Each stage is usable on its own; nothing waits for the whole system.</p>
+
+<table>
+<thead><tr><th>Stage</th><th>What it delivers</th><th>Visible benefit</th></tr></thead>
+<tbody>
+<tr><td><strong>1. Compensation master</strong> ✅ <em>(built 20 August 2026)</em></td><td>Salary structures, bank accounts, grades, cost centres</td><td>Salary data leaves Excel and becomes queryable and access-controlled</td></tr>
+<tr><td><strong>2. Inputs</strong> ✅ <em>(overtime upload built 20 August 2026; bonus/incentive/disciplinary and rate cards still to come)</em></td><td>Overtime upload, bonus/incentive/disciplinary entry, rate cards</td><td><strong>Departments stop emailing spreadsheets</strong> — well before the calculator exists</td></tr>
+<tr><td><strong>3. Calculation and register</strong> ✅ <em>(built 20 August 2026, register-only — no approval chain yet)</em></td><td>The payroll engine and the register</td><td>Run in parallel with the manual process and compare, employee by employee</td></tr>
+<tr><td><strong>4. Tax</strong> ✅ <em>(built 24 August 2026)</em></td><td>TDS calculation and employee declarations</td><td>Net pay calculated in Orbis</td></tr>
+<tr><td><strong>5. Approval and payment</strong></td><td>Approval chain, payslips, bank advice</td><td>Finance's workbook is retired</td></tr>
+<tr><td><strong>6. Loans and settlement</strong></td><td>Loan ledger, final settlement, arrears, festival bonus</td><td>Full coverage of the Finance SOP</td></tr>
+<tr><td><strong>7. Meals and Eid coverage</strong></td><td>Automatic meal counts, derived Eid coverage</td><td>Last two manual inputs removed</td></tr>
+</tbody>
+</table>
+
+<div class="callout">
+<p><strong>Before cutover, we will reconcile.</strong> We will load a completed historical month, run it through the engine, and compare every employee's net pay against what was actually paid. We expect to do this for <strong>two consecutive months with zero unexplained difference</strong> before Orbis becomes the system of record.</p>
+</div>
+
+<p>The go-live decision should be signed only after HR and Finance confirm:</p>
+<ul>
+  <li>Every variance is either zero or explained and accepted.</li>
+  <li>Bank advice totals match the historical paid totals.</li>
+  <li>Payslip totals match the register.</li>
+  <li>Held or disputed employees are handled consistently with the SOP.</li>
+  <li>Required approvals, audit events and export permissions work in Orbis.</li>
+</ul>
+
+<h2>14. Approval</h2>
+
+<table class="sign">
+<thead><tr><th>Role</th><th>Name</th><th>Signature</th><th>Date</th></tr></thead>
+<tbody>
+<tr><td>Head of HR</td><td></td><td></td><td></td></tr>
+<tr><td>Head of Finance</td><td></td><td></td><td></td></tr>
+<tr><td>Head of Software Development</td><td></td><td></td><td></td></tr>
+</tbody>
+</table>
+
+<p><strong>Comments / requested changes:</strong></p>
+<table><tbody><tr><td style="height:140px"></td></tr></tbody></table>
+
+<p class="foot">
+Technical detail — data model, calculation engine, permissions and delivery phases — is in <code>docs/PAYROLL_PLAN.md</code>.<br>
+This page renders its diagrams with Mermaid loaded from a CDN; open it with an internet connection. The same diagrams are in <code>docs/PAYROLL_PROCESS.md</code>.
+</p>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+<script>
+  mermaid.initialize({
+    startOnLoad: true,
+    theme: 'base',
+    themeVariables: {
+      primaryColor: '#f0fbfa',
+      primaryTextColor: '#12242a',
+      primaryBorderColor: '#0A4958',
+      lineColor: '#5b7078',
+      fontFamily: '-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif',
+      fontSize: '14px'
+    },
+    flowchart: { htmlLabels: true, curve: 'basis' },
+    gantt: { barHeight: 22, fontSize: 12 }
+  });
+</script>
+
+</body>
+</html>

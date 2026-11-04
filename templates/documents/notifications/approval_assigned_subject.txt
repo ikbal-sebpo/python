@@ -1,0 +1,1 @@
+[Orbis] Document approval required: {{ request_obj.document_type.display_name }} for {{ request_obj.employee.display_name }}

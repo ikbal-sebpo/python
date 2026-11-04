@@ -1,0 +1,13 @@
+Hello {{ recipient.first_name|default:recipient.email }},
+
+A new version of a policy you previously acknowledged has been published, and
+your re-acknowledgement is required:
+
+  {{ policy.key }} — {{ policy.title }}{% if version %} (version {{ version.version }}){% endif %}
+{% if version.change_note %}
+  What changed: {{ version.change_note }}
+{% endif %}
+Review and sign the new version here (Orbis login required):
+  {{ sign_url }}
+
+— Orbis

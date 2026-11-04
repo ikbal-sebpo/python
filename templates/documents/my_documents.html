@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% block title %}My documents · Orbis{% endblock %}
+
+{% block content %}
+<div class="page-fill">
+  <div class="shrink-0 flex items-center justify-between gap-4">
+    <h1 class="text-2xl font-semibold text-text-main dark:text-white">My documents</h1>
+    <a href="{% url 'documents:request_start' %}" class="btn-primary">
+      <i data-lucide="plus" class="w-4 h-4"></i><span>New request</span>
+    </a>
+  </div>
+
+  <form method="get" class="card shrink-0 flex flex-wrap gap-3 items-end">
+    {% for field in filter_form %}
+      <div>
+        <label class="text-xs text-text-soft dark:text-white/60 block mb-1">{{ field.label }}</label>
+        {{ field }}
+      </div>
+    {% endfor %}
+    <button type="submit" class="btn-secondary"><i data-lucide="search" class="w-4 h-4"></i><span>Filter</span></button>
+  </form>
+
+  {% include "partials/_result_count.html" with count_noun="documents" %}
+
+  <div class="card p-0 table-scroll">
+    <table class="table-sticky w-full text-sm">
+      <thead class="text-left text-xs uppercase text-text-soft dark:text-white/60 border-b border-bg-soft dark:border-white/10">
+        <tr>
+          <th class="py-2 px-3">Type</th>
+          <th class="py-2 px-3">Submitted</th>
+          <th class="py-2 px-3">Status</th>
+          <th class="py-2 px-3">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in requests %}
+          <tr class="border-b border-bg-soft dark:border-white/5">
+            <td class="py-2 px-3">
+              <a href="{% url 'documents:request_detail' r.id %}"
+                 class="font-medium text-text-main dark:text-white hover:underline">
+                {{ r.document_type.display_name }}
+              </a>
+            </td>
+            <td class="py-2 px-3 text-text-soft dark:text-white/60">{{ r.applied_at|date:"Y-m-d H:i" }}</td>
+            <td class="py-2 px-3"><span class="badge badge-muted">{{ r.get_status_display }}</span></td>
+            <td class="py-2 px-3">
+              {% if r.is_approved and r.generated_file %}
+                <a href="{% url 'documents:download_pdf' r.id %}" class="btn-secondary text-xs">
+                  <i data-lucide="download" class="w-3 h-3"></i><span>Download</span>
+                </a>
+                <a href="{% url 'documents_public:verify_document' r.id %}" class="btn-secondary text-xs">
+                  <i data-lucide="check-circle" class="w-3 h-3"></i><span>Verify</span>
+                </a>
+              {% endif %}
+              <a href="{% url 'documents:request_detail' r.id %}" class="btn-secondary text-xs">Details</a>
+            </td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="4" class="py-6 px-3 text-center text-text-soft dark:text-white/60">
+            No documents yet.
+          </td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  {% include "partials/_pagination.html" %}
+</div>
+{% endblock %}

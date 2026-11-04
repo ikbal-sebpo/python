@@ -1,0 +1,59 @@
+{# Result fragment for /payroll/loans/upload/ — swapped in by HTMX on each submit. #}
+<div class="card mb-4">
+    <h2 class="text-sm font-semibold mb-3">Result</h2>
+
+    {% if inline_error %}
+        <div class="mb-3 px-3 py-2 rounded border border-red-300 bg-red-50 text-red-800 dark:border-red-700/50 dark:bg-red-900/20 dark:text-red-200 text-sm">
+            {{ inline_error }}
+        </div>
+    {% endif %}
+
+    {% if report %}
+        {% if aborted %}
+            <div class="mb-3 px-3 py-2 rounded border border-red-300 bg-red-50 text-red-800 dark:border-red-700/50 dark:bg-red-900/20 dark:text-red-200 text-sm">
+                Upload aborted. Nothing was written. Fix the errors below and re-upload.
+            </div>
+        {% elif preview %}
+            <div class="mb-3 px-3 py-2 rounded border border-blue-300 bg-blue-50 text-blue-800 dark:border-blue-700/50 dark:bg-blue-900/20 dark:text-blue-200 text-sm">
+                Preview only — nothing was written. Click <span class="font-medium">Upload</span> to commit the same file.
+            </div>
+        {% else %}
+            <div class="mb-3 px-3 py-2 rounded border border-emerald-300 bg-emerald-50 text-emerald-800 dark:border-emerald-700/50 dark:bg-emerald-900/20 dark:text-emerald-200 text-sm">
+                <span class="font-medium">{{ report.created|length }}</span> loan(s) created,
+                <span class="font-medium">{{ report.updated|length }}</span> corrected. Recalculate the open run to apply them.
+            </div>
+        {% endif %}
+
+        {% if report.parse_errors %}
+            <h3 class="text-xs font-semibold uppercase tracking-wide text-red-700 dark:text-red-300 mt-4 mb-2">Errors ({{ report.parse_errors|length }})</h3>
+            <div class="overflow-x-auto">
+                <table class="table-simple text-sm">
+                    <thead><tr><th class="w-12">Row</th><th>Employee ID</th><th>File reference</th><th>Error</th></tr></thead>
+                    <tbody>
+                        {% for err in report.parse_errors %}
+                            <tr class="text-red-700 dark:text-red-300">
+                                <td>{{ err.line_no }}</td>
+                                <td>{{ err.raw.Employee_ID|default:"—" }}</td>
+                                <td>{{ err.raw.File_reference|default:"—" }}</td>
+                                <td>{{ err.message }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endif %}
+
+        {% if parsed_preview %}
+            {% with rows=parsed_preview heading="Would be written" %}
+                {% include "payroll/_loan_upload_rows.html" %}
+            {% endwith %}
+        {% else %}
+            {% if report.created %}
+                {% with rows=report.created heading="Created" %}{% include "payroll/_loan_upload_rows.html" %}{% endwith %}
+            {% endif %}
+            {% if report.updated %}
+                {% with rows=report.updated heading="Corrected (opening and note only)" %}{% include "payroll/_loan_upload_rows.html" %}{% endwith %}
+            {% endif %}
+        {% endif %}
+    {% endif %}
+</div>

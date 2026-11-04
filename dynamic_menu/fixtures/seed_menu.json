@@ -1,0 +1,24 @@
+[
+    {"model": "auth.group", "pk": 1, "fields": {"name": "Admins"}},
+    {"model": "auth.group", "pk": 2, "fields": {"name": "HR"}},
+    {"model": "auth.group", "pk": 3, "fields": {"name": "All Employees"}},
+    {"model": "auth.group", "pk": 4, "fields": {"name": "Senior Leadership"}},
+    {"model": "auth.group", "pk": 5, "fields": {"name": "IT"}},
+    {"model": "auth.group", "pk": 6, "fields": {"name": "Finance"}},
+
+    {"model": "dynamic_menu.mainmenu", "pk": 1, "fields": {
+        "title": "Users", "icon_class": "users", "url": "user_list",
+        "rank": 10, "is_active": true, "groups": [1],
+        "added_at": "2026-04-24T00:00:00Z", "updated_at": "2026-04-24T00:00:00Z"
+    }},
+    {"model": "dynamic_menu.mainmenu", "pk": 2, "fields": {
+        "title": "Employees", "icon_class": "user-round", "url": "employee_list",
+        "rank": 20, "is_active": true, "groups": [1, 2],
+        "added_at": "2026-04-24T00:00:00Z", "updated_at": "2026-04-24T00:00:00Z"
+    }},
+    {"model": "dynamic_menu.mainmenu", "pk": 3, "fields": {
+        "title": "Roster", "icon_class": "calendar-days", "url": "roster_week",
+        "rank": 30, "is_active": true, "groups": [1, 2],
+        "added_at": "2026-04-24T00:00:00Z", "updated_at": "2026-04-24T00:00:00Z"
+    }}
+]

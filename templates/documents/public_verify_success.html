@@ -1,0 +1,51 @@
+{% extends "documents/_public_base.html" %}
+{% block title %}Verified · {{ doc.document_type.display_name }}{% endblock %}
+
+{% block content %}
+<div class="bg-white rounded-lg shadow p-8 border border-bg-soft">
+  <div class="flex items-center gap-3 mb-4">
+    <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center text-green-700 text-xl">✓</div>
+    <h1 class="text-2xl font-semibold">Document verified</h1>
+  </div>
+
+  <p class="text-text-soft mb-6">This document was issued by {{ doc.document_type.display_name|default:"the organisation" }} and is authentic.</p>
+
+  <dl class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm border-t border-bg-soft pt-4">
+    <div>
+      <dt class="text-xs uppercase text-text-soft">Employee</dt>
+      <dd class="font-medium">{{ doc.employee.display_name }}</dd>
+    </div>
+    <div>
+      <dt class="text-xs uppercase text-text-soft">Document type</dt>
+      <dd class="font-medium">{{ doc.document_type.display_name }}</dd>
+    </div>
+    <div>
+      <dt class="text-xs uppercase text-text-soft">Reference</dt>
+      <dd class="font-mono text-xs">{{ doc.id }}</dd>
+    </div>
+    <div>
+      <dt class="text-xs uppercase text-text-soft">Generated</dt>
+      <dd>{{ generated_at|date:"Y-m-d H:i" }}</dd>
+    </div>
+  </dl>
+
+  {% if signers %}
+    <div class="mt-6 border-t border-bg-soft pt-4">
+      <h2 class="text-sm font-semibold uppercase text-text-soft mb-2">Signed by</h2>
+      <ul class="space-y-1 text-sm">
+        {% for s in signers %}
+          <li>
+            <strong>{{ s.signatory.display_name|default:"(group)" }}</strong>
+            <span class="text-text-soft">· {{ s.approver_group.name }}</span>
+            {% if s.signed_at %}<span class="text-text-soft text-xs"> · {{ s.signed_at|date:"Y-m-d" }}</span>{% endif %}
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+  {% endif %}
+
+  <div class="mt-6 text-center">
+    <a href="{{ preview_url }}" class="text-brand-accent hover:underline">Preview document →</a>
+  </div>
+</div>
+{% endblock %}

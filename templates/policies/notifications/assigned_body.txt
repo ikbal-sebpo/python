@@ -1,0 +1,14 @@
+Hello {{ recipient.first_name|default:recipient.email }},
+
+You are required to read and acknowledge the following policy:
+
+  {{ policy.key }} — {{ policy.title }}{% if version %} (version {{ version.version }}){% endif %}
+{% if policy.description %}
+  {{ policy.description }}
+{% endif %}{% if policy.due_days %}
+Please sign within {{ policy.due_days }} day(s).
+{% endif %}
+Review and sign here (Orbis login required):
+  {{ sign_url }}
+
+— Orbis

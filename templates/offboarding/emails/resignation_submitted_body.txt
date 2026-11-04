@@ -1,0 +1,16 @@
+Hello {{ recipient.first_name|default:recipient.email }},
+
+{{ resignation.employee.display_name }} ({{ resignation.employee.email }})
+has submitted a resignation.
+
+Type:               {{ resignation.get_separation_type_display }}
+Notice start:       {{ resignation.notice_start_date }}
+Last working day:   {{ resignation.last_working_date }}
+Notice period:      {{ resignation.notice_period_days }} days
+
+Reason:
+{{ resignation.reason }}
+
+HR can accept / reject the resignation from the Orbis Offboarding section.
+
+— Orbis

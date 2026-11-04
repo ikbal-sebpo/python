@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% block title %}{{ page_title }} · Orbis{% endblock %}
+
+{% block content %}
+<div class="space-y-4">
+    <div class="card flex items-start justify-between gap-4">
+        <div>
+            <h1 class="text-xl font-semibold text-text-main dark:text-white">
+                Leave register — {{ year }}
+            </h1>
+            <div class="text-sm text-text-soft dark:text-white/60 mt-1">
+                For <strong>{{ target.display_name }}</strong>
+                {% if target.employee_id %}<span class="text-text-mute"> · {{ target.employee_id }}</span>{% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2 class="text-sm font-semibold uppercase tracking-wider text-text-mute mb-3">Year summary</h2>
+        <table class="min-w-full text-sm">
+            <thead>
+                <tr class="text-text-mute text-xs border-b border-bg-soft dark:border-white/10">
+                    <th class="px-2 py-2 text-left">Type</th>
+                    <th class="px-2 py-2 text-right">Opening</th>
+                    <th class="px-2 py-2 text-right">Accrued</th>
+                    <th class="px-2 py-2 text-right">Carried</th>
+                    <th class="px-2 py-2 text-right">Used</th>
+                    <th class="px-2 py-2 text-right">Encashed</th>
+                    <th class="px-2 py-2 text-right">Available</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for bal in balances %}
+                    <tr class="border-b border-bg-soft/50 dark:border-white/5">
+                        <td class="px-2 py-1.5">{{ bal.leave_policy.shift_type.name }}</td>
+                        <td class="px-2 py-1.5 text-right tabular-nums">{{ bal.opening }}</td>
+                        <td class="px-2 py-1.5 text-right tabular-nums">{{ bal.accrued }}</td>
+                        <td class="px-2 py-1.5 text-right tabular-nums">{{ bal.carried_forward }}</td>
+                        <td class="px-2 py-1.5 text-right tabular-nums">{{ bal.used }}</td>
+                        <td class="px-2 py-1.5 text-right tabular-nums">{{ bal.encashed }}</td>
+                        <td class="px-2 py-1.5 text-right tabular-nums font-semibold">{{ bal.available }}</td>
+                    </tr>
+                {% empty %}
+                    <tr><td colspan="7" class="px-2 py-3 text-text-mute italic text-center">No balance rows.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="card">
+        <h2 class="text-sm font-semibold uppercase tracking-wider text-text-mute mb-3">Approved leaves (Form-9 style)</h2>
+        <table class="min-w-full text-sm">
+            <thead>
+                <tr class="text-text-mute text-xs border-b border-bg-soft dark:border-white/10">
+                    <th class="px-2 py-2 text-left">SL</th>
+                    <th class="px-2 py-2 text-left">Type</th>
+                    <th class="px-2 py-2 text-left">From</th>
+                    <th class="px-2 py-2 text-left">To</th>
+                    <th class="px-2 py-2 text-right">Working</th>
+                    <th class="px-2 py-2 text-right">Sandwich</th>
+                    <th class="px-2 py-2 text-right">Billed</th>
+                    <th class="px-2 py-2 text-left">Granted on</th>
+                    <th class="px-2 py-2 text-left">Approved by</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for app in approvals %}
+                    <tr class="border-b border-bg-soft/50 dark:border-white/5">
+                        <td class="px-2 py-1.5 tabular-nums">{{ forloop.counter }}</td>
+                        <td class="px-2 py-1.5">{{ app.leave_type.name }}</td>
+                        <td class="px-2 py-1.5 tabular-nums">{{ app.start_date|date:"Y-m-d" }}</td>
+                        <td class="px-2 py-1.5 tabular-nums">{{ app.end_date|date:"Y-m-d" }}</td>
+                        <td class="px-2 py-1.5 text-right tabular-nums">{{ app.working_days }}</td>
+                        <td class="px-2 py-1.5 text-right tabular-nums">{{ app.sandwich_days }}</td>
+                        <td class="px-2 py-1.5 text-right tabular-nums font-semibold">{{ app.effective_days }}</td>
+                        <td class="px-2 py-1.5 text-text-mute">{{ app.processed_at|date:"Y-m-d"|default:"—" }}</td>
+                        <td class="px-2 py-1.5 text-text-mute">{{ app.processed_by.display_name|default:"—" }}</td>
+                    </tr>
+                {% empty %}
+                    <tr><td colspan="9" class="px-2 py-3 text-text-mute italic text-center">No approved leaves in {{ year }}.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

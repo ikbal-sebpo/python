@@ -1,0 +1,589 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    html {
+        font-family: 'Figtree', 'Roboto', ui-sans-serif, system-ui, sans-serif;
+    }
+    body {
+        @apply bg-bg-main text-text-main antialiased;
+    }
+    .dark body {
+        @apply bg-brand-navy text-white;
+    }
+    /* Alpine x-cloak — keep elements hidden until Alpine attaches so the
+     * mobile drawer + employees drawer don't flash visible on page load. */
+    [x-cloak] {
+        display: none !important;
+    }
+    /* Hide the native disclosure triangle on Safari/Chrome so <summary>
+     * elements (mobile drawer accordion) can render their own chevron.
+     * Firefox respects `list-style: none` which Tailwind's `list-none`
+     * utility on the <summary> handles. */
+    summary::-webkit-details-marker {
+        display: none;
+    }
+}
+
+@layer components {
+    .card {
+        @apply bg-bg-card rounded shadow-card p-5;
+    }
+    .dark .card {
+        @apply bg-white/5 shadow-none ring-1 ring-white/5;
+    }
+
+    /* Opaque panel for dropdowns, popovers, menus — never translucent. */
+    .menu-panel {
+        @apply bg-bg-card rounded shadow-lg ring-1 ring-bg-soft;
+    }
+    .dark .menu-panel {
+        @apply bg-brand-navy ring-white/10 shadow-xl;
+    }
+
+    .nav-item {
+        @apply flex items-center gap-3 px-4 py-2.5 text-sm text-text-soft
+               hover:bg-bg-soft hover:text-brand
+               border-r-2 border-transparent transition-colors;
+    }
+    .nav-item.active {
+        @apply text-brand font-medium bg-bg-soft border-brand-accent;
+    }
+    .dark .nav-item {
+        @apply text-white/70 hover:bg-white/5 hover:text-brand-accent;
+    }
+    .dark .nav-item.active {
+        @apply text-white bg-white/5 border-brand-accent;
+    }
+
+    /* Sidebar is always a 4rem icon rail. Labels live in the flyouts that
+     * pop out on hover; the sidebar itself never widens. */
+    .sidebar {
+        width: 4rem;
+    }
+    .sidebar .nav-item {
+        @apply justify-center px-0;
+    }
+
+    .btn-primary {
+        @apply inline-flex items-center justify-center gap-2 px-4 py-2
+               rounded bg-brand text-white text-sm font-medium
+               hover:bg-brand-light focus:outline-none focus:ring-2
+               focus:ring-brand-accent focus:ring-offset-2 focus:ring-offset-bg-main
+               disabled:opacity-60 disabled:cursor-not-allowed transition-colors;
+    }
+    .btn-secondary {
+        @apply inline-flex items-center justify-center gap-2 px-4 py-2
+               rounded bg-bg-soft text-text-main text-sm font-medium
+               hover:bg-bg-soft/80 focus:outline-none focus:ring-2
+               focus:ring-brand-accent transition-colors;
+    }
+    .dark .btn-secondary {
+        @apply bg-white/10 text-white hover:bg-white/15;
+    }
+
+    .form-input {
+        @apply block w-full px-3 py-2 text-sm rounded border border-bg-soft
+               bg-bg-card text-text-main placeholder:text-text-mute
+               focus:border-brand-accent focus:ring-1 focus:ring-brand-accent
+               focus:outline-none transition-colors;
+    }
+    .dark .form-input {
+        @apply bg-white/5 border-white/10 text-white placeholder:text-white/40;
+    }
+
+    /* Native <option> elements inside a dark <select>:
+     * browsers render them through the OS dropdown, which ignores most
+     * Tailwind styles. Set both bg + color explicitly so the text is
+     * readable against the dropdown's own background. */
+    .dark select.form-input option {
+        background-color: #0B333F;
+        color: #ffffff;
+    }
+    select.form-input option {
+        background-color: #ffffff;
+        color: #0A1A1A;
+    }
+
+    .form-label {
+        @apply block text-sm font-medium text-text-soft mb-1;
+    }
+    .dark .form-label {
+        @apply text-white/70;
+    }
+
+    .table-simple {
+        @apply w-full text-sm;
+    }
+    .table-simple th {
+        @apply text-left px-4 py-3 text-xs uppercase tracking-wider
+               text-text-mute border-b border-bg-soft;
+    }
+    /* .table-simple th's own text-left above has higher specificity than a
+       bare utility class on the same element, so text-center (or text-right)
+       silently loses to it without this override. Scoped to text-center only
+       — a th's text-right is relied on as-is by other tables today, so
+       fixing that specificity gap too is a separate, wider change. */
+    .table-simple th.text-center {
+        text-align: center;
+    }
+    .table-simple td {
+        @apply px-4 py-2 border-b border-bg-soft/60 text-text-main;
+    }
+    .dark .table-simple th {
+        @apply border-white/10 text-white/50;
+    }
+    .dark .table-simple td {
+        @apply border-white/5 text-white;
+    }
+
+    /* Sticky header variant for data-dense tables (roster grid). */
+    .table-sticky thead th {
+        position: sticky;
+        top: 0;
+        z-index: 2;
+        background-color: #ffffff;
+    }
+    .dark .table-sticky thead th {
+        background-color: #0B333F;
+    }
+    /* For multi-row headers (e.g. the roster grid), pin only the first row so
+       the rows don't stack on top of each other at top:0. */
+    .table-sticky thead tr:not(:first-child) th {
+        position: static;
+    }
+
+    /* Full-height page body: fills the scroll area under the topbar so a child
+       (e.g. a data table) owns the scroll instead of the whole page. Use as the
+       root element of {% block content %} on list/table pages. */
+    .page-fill {
+        @apply flex flex-col gap-4 h-full;
+    }
+
+    /* Bounded, both-axis scroll region for data tables. Pair with
+       .table-simple.table-sticky so <thead> pins while the body scrolls. */
+    .table-scroll {
+        @apply flex-1 min-h-0 overflow-auto;
+    }
+
+    /* Numbered pager buttons (partials/_pagination.html). */
+    .pager-btn {
+        @apply inline-flex h-8 min-w-8 items-center justify-center rounded px-2
+               text-sm text-text-soft hover:bg-bg-soft
+               dark:text-white/70 dark:hover:bg-white/10;
+    }
+    .pager-current {
+        @apply bg-brand text-white hover:bg-brand dark:bg-brand-accent dark:text-brand-navy dark:hover:bg-brand-accent;
+    }
+    .pager-disabled {
+        @apply opacity-40 pointer-events-none;
+    }
+    .pager-ellipsis {
+        @apply inline-flex h-8 min-w-8 items-center justify-center text-text-mute;
+    }
+
+    /* Hover tooltip: wrap a trigger in .tooltip with a .tooltip-bubble child. */
+    .tooltip {
+        @apply relative inline-flex items-center;
+    }
+    .tooltip-bubble {
+        @apply pointer-events-none absolute left-1/2 top-full z-30 mt-2 w-64
+               -translate-x-1/2 rounded-md bg-brand-navy px-3 py-2 text-xs
+               font-normal normal-case leading-snug text-white opacity-0 shadow-lg
+               transition-opacity duration-150 ring-1 ring-white/10;
+    }
+    .tooltip:hover .tooltip-bubble,
+    .tooltip:focus-within .tooltip-bubble {
+        @apply opacity-100;
+    }
+
+    /* Right-hand drawer (slide-over) used for profile section edits. */
+    .drawer-backdrop {
+        @apply fixed inset-0 bg-black/40 z-40 backdrop-blur-sm;
+    }
+    .drawer-panel {
+        @apply fixed top-0 right-0 h-full w-full sm:w-[32rem] md:w-[40rem] xl:w-[48rem]
+               bg-bg-card shadow-2xl z-50 flex flex-col overflow-hidden;
+    }
+    .dark .drawer-panel {
+        @apply bg-brand-navy ring-1 ring-white/10;
+    }
+    .drawer-header {
+        @apply flex items-center justify-between gap-2 px-5 h-14 shrink-0
+               border-b border-bg-soft;
+    }
+    .dark .drawer-header {
+        @apply border-white/10;
+    }
+    .drawer-body {
+        @apply flex-1 overflow-y-auto p-5;
+    }
+    .drawer-footer {
+        @apply flex items-center gap-2 px-5 py-3 border-t border-bg-soft shrink-0;
+    }
+    .dark .drawer-footer {
+        @apply border-white/10;
+    }
+
+    /* ---- Org chart (templates/employees/org_chart.html + _org_*.html) ----
+       Pure-CSS orthogonal connectors on nested flex markup: a vertical drop
+       from the parent card, a horizontal bus across the children, a drop
+       into each child. Managers sit side by side (.org-row > .org-branch);
+       individual contributors stack in a column off a left spine
+       (.org-leafcol). Colours ride on --org-conn so htmx-loaded fragments
+       inherit the theme from .org-tree. */
+    .org-tree {
+        --org-conn: #9FB0B9;
+        @apply inline-flex justify-center min-w-full p-6;
+    }
+    .dark .org-tree {
+        --org-conn: #4F6B76;
+    }
+    .org-unlinked {
+        @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3 p-0;
+    }
+    .org-node {
+        @apply flex flex-col items-center;
+    }
+    .org-kids {
+        @apply relative flex items-start pt-7;
+    }
+    .org-kids::before {
+        content: "";
+        @apply absolute top-0 left-1/2 h-7;
+        border-left: 1.5px solid var(--org-conn);
+    }
+    .org-row {
+        @apply flex items-start;
+    }
+    .org-branch {
+        @apply relative flex flex-col items-center px-2.5 pt-7;
+    }
+    .org-branch::before {
+        content: "";
+        @apply absolute top-0 left-0 right-0;
+        border-top: 1.5px solid var(--org-conn);
+    }
+    .org-branch:first-child::before { @apply left-1/2; }
+    .org-branch:last-child::before  { @apply right-1/2; }
+    .org-branch:only-child::before  { display: none; }
+    .org-branch::after {
+        content: "";
+        @apply absolute top-0 left-1/2 h-7;
+        border-left: 1.5px solid var(--org-conn);
+    }
+    /* Leaf column: its spine is at the column's left edge (x = 10px, the
+       branch padding), so the drop and the bus junction move there too. */
+    .org-branch--leaves { @apply items-start; }
+    .org-branch--leaves::after { left: 10px; }
+    .org-branch--leaves:last-child::before { right: calc(100% - 10px); }
+    .org-branch--leaves:only-child::before { display: block; left: 10px; @apply right-1/2; }
+    .org-leafcol {
+        @apply list-none m-0 p-0 flex flex-col gap-2;
+    }
+    .org-leafcol--more { @apply mt-2; }
+    .org-leafcol li {
+        @apply relative pl-[22px];
+    }
+    .org-leafcol li::before {
+        content: "";
+        @apply absolute left-0 top-1/2 w-[22px];
+        border-top: 1.5px solid var(--org-conn);
+    }
+    .org-leafcol li::after {
+        content: "";
+        @apply absolute left-0 -top-2 bottom-0;
+        border-left: 1.5px solid var(--org-conn);
+    }
+    .org-leafcol li:last-child::after { @apply bottom-1/2; }
+    .org-leafcol--continues li:last-child::after { @apply -bottom-2; }
+    .org-more {
+        @apply ml-[22px] mt-2 text-xs text-brand hover:underline;
+    }
+
+    .org-card {
+        @apply relative w-56 rounded-md border border-bg-soft bg-bg-card px-3 pt-2.5 pb-2 text-left;
+    }
+    .dark .org-card {
+        @apply border-white/10 bg-white/5;
+    }
+    .org-leafcol .org-card {
+        @apply w-[212px] px-2.5 pt-2 pb-1.5;
+    }
+    .org-card--root {
+        @apply border-brand-accent bg-brand-accent/10;
+    }
+    .org-card--me {
+        @apply border-brand-gold bg-brand-gold/15;
+    }
+    .org-card--warn {
+        @apply border-dashed border-brand-gold bg-brand-gold/10;
+    }
+    .org-card--focus {
+        @apply ring-2 ring-brand-gold;
+    }
+    .org-card.htmx-request {
+        @apply opacity-60;
+    }
+    .org-pill {
+        @apply absolute -top-2 right-2.5 rounded-full bg-brand-gold px-2 text-[10px] font-semibold uppercase tracking-wider text-brand-navy;
+    }
+    .org-card--root .org-pill {
+        @apply bg-brand-accent text-white;
+    }
+    .org-avatar {
+        @apply flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-xs font-semibold text-white;
+    }
+    .org-leafcol .org-avatar { @apply h-8 w-8 text-[11px]; }
+    .org-avatar--0 { background-color: #0A4958; }
+    .org-avatar--1 { background-color: #1F8F8F; }
+    .org-avatar--2 { background-color: #006F99; }
+    .org-avatar--3 { background-color: #B07D00; }
+    .org-avatar--4 { background-color: #6B4EA0; }
+    .org-avatar--5 { background-color: #A24D2E; }
+    .org-avatar--6 { background-color: #2E7D4F; }
+    .org-avatar--7 { background-color: #4B5C6B; }
+    .org-name {
+        @apply block truncate text-sm font-semibold leading-tight text-text-main dark:text-white;
+    }
+    a.org-name:hover { @apply underline; }
+    .org-title {
+        @apply text-xs leading-snug text-text-soft dark:text-white/70;
+    }
+    .org-dept {
+        @apply text-[11px] leading-snug text-text-mute;
+    }
+    .org-foot {
+        @apply mt-2 flex items-center justify-between border-t border-bg-soft pt-1.5 text-xs text-text-soft dark:border-white/10 dark:text-white/60;
+    }
+    .org-toggle {
+        @apply inline-flex items-center gap-1 rounded border border-bg-soft bg-bg-soft px-2 py-0.5 text-xs text-text-main hover:border-brand dark:border-white/10 dark:bg-white/10 dark:text-white;
+    }
+    .org-chip {
+        @apply inline-flex items-center gap-1 rounded-full border border-bg-soft bg-bg-soft px-2.5 py-1 text-xs text-text-main whitespace-nowrap hover:border-brand dark:border-white/10 dark:bg-white/10 dark:text-white;
+    }
+    .org-chip small { @apply text-text-mute; }
+    .org-chip--on {
+        @apply border-brand bg-brand text-white dark:bg-brand-accent dark:border-brand-accent dark:text-brand-navy;
+    }
+    .org-chip--on small { @apply text-white/80 dark:text-brand-navy/70; }
+    .org-legend { @apply inline-flex items-center gap-1.5; }
+    .org-legend-swatch {
+        @apply inline-block h-2.5 w-3.5 rounded-sm border border-bg-soft bg-bg-card dark:border-white/20;
+    }
+    .org-legend-swatch--root { @apply border-brand-accent bg-brand-accent/20; }
+    .org-legend-swatch--me   { @apply border-brand-gold bg-brand-gold/30; }
+    .org-legend-swatch--warn { @apply border-dashed border-brand-gold bg-brand-gold/10; }
+
+    /* Employee directory card. */
+    .employee-card {
+        @apply card flex flex-col gap-3 transition hover:ring-1 hover:ring-brand-accent/40
+               hover:shadow-md cursor-pointer;
+    }
+    .dark .employee-card {
+        @apply hover:ring-brand-accent/40;
+    }
+
+    .badge {
+        @apply inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded;
+    }
+    .badge-success {
+        @apply bg-brand-accent/15 text-brand-accent;
+    }
+    .badge-muted {
+        @apply bg-text-mute/15 text-text-mute;
+    }
+    .badge-info {
+        @apply bg-brand-blue/15 text-brand-blue;
+    }
+    /* badge-warning / badge-danger were used by offboarding + roster
+     * templates before they existed here, so those badges rendered as
+     * uncoloured boxes. brand-gold is the theme's only warning hue; danger
+     * has no brand token, so it borrows Tailwind's red at the same
+     * tint/text weighting as the others. */
+    .badge-warning {
+        @apply bg-brand-gold/20 text-[#8A6200] dark:text-brand-gold;
+    }
+    .badge-danger {
+        @apply bg-red-500/15 text-red-700 dark:text-red-400;
+    }
+
+    /* --- Sidebar group + hover flyout --- */
+
+    /* Each menu row wraps its trigger + flyout in this grouping container
+     * so the JS positioner can find both via a single querySelector. */
+    .sidebar-group {
+        @apply relative;
+    }
+
+    /* Flyout panel — hidden by default; the JS positioner in base.html
+     * flips display:block and sets fixed top/left on hover/focus. We use
+     * position:fixed (not :hover + absolute) because the parent aside has
+     * overflow-hidden and would clip an absolutely-positioned flyout. */
+    .sidebar-flyout {
+        @apply hidden min-w-[12rem] menu-panel py-2;
+        z-index: 60;
+    }
+
+    /* Header — slightly bigger when alone (direct-link menus use a
+     * header-only flyout as a styled label) than when it sits above a list
+     * of submenu items. The border separator only shows when there's
+     * something underneath. */
+    .sidebar-flyout-header {
+        @apply px-3 py-1 text-sm font-semibold text-text-main;
+    }
+    .sidebar-flyout-header:not(:only-child) {
+        @apply pb-2 mb-1 text-xs uppercase tracking-wider font-normal
+               text-text-mute border-b border-bg-soft;
+    }
+    .dark .sidebar-flyout-header {
+        @apply text-white;
+    }
+    .dark .sidebar-flyout-header:not(:only-child) {
+        @apply text-white/40 border-white/10;
+    }
+
+    .sidebar-flyout-item {
+        @apply flex items-center gap-2 px-3 py-2 text-sm text-text-soft rounded
+               hover:bg-bg-soft hover:text-brand transition-colors;
+    }
+    .sidebar-flyout-item.active {
+        @apply text-brand font-medium bg-bg-soft;
+    }
+    .dark .sidebar-flyout-item {
+        @apply text-white/70 hover:bg-white/5 hover:text-brand-accent;
+    }
+    .dark .sidebar-flyout-item.active {
+        @apply text-white bg-white/5;
+    }
+}
+
+/* -------------------------------------------------------------------------
+ * Flatpickr — brand + dark-mode overrides.
+ * Selectors are outside @layer components because Flatpickr injects its
+ * popup directly on <body>, which sits above the Tailwind dark class when
+ * dark mode is driven by html.dark — we scope via html.dark instead.
+ * ----------------------------------------------------------------------- */
+
+.flatpickr-calendar {
+    box-shadow: 0 10px 25px rgba(10, 26, 26, 0.15);
+    border-radius: 0.5rem;
+    font-family: inherit;
+}
+
+.flatpickr-day.selected,
+.flatpickr-day.selected:hover,
+.flatpickr-day.startRange,
+.flatpickr-day.endRange {
+    background: #0A4958;         /* brand */
+    border-color: #0A4958;
+    color: #fff;
+}
+.flatpickr-day.today {
+    border-color: #41B3B3;       /* brand-accent */
+}
+.flatpickr-day:hover {
+    background: rgba(65, 179, 179, 0.18);
+    border-color: transparent;
+}
+
+html.dark .flatpickr-calendar {
+    background: #0B333F;         /* brand-navy */
+    color: #fff;
+    border-color: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+}
+html.dark .flatpickr-calendar.arrowTop::before,
+html.dark .flatpickr-calendar.arrowBottom::before {
+    border-bottom-color: rgba(255, 255, 255, 0.08);
+    border-top-color: rgba(255, 255, 255, 0.08);
+}
+html.dark .flatpickr-calendar.arrowTop::after,
+html.dark .flatpickr-calendar.arrowBottom::after {
+    border-bottom-color: #0B333F;
+    border-top-color: #0B333F;
+}
+html.dark .flatpickr-months,
+html.dark .flatpickr-current-month,
+html.dark .flatpickr-monthDropdown-months,
+html.dark .flatpickr-weekdays,
+html.dark span.flatpickr-weekday {
+    background: transparent;
+    color: #fff;
+}
+html.dark .flatpickr-current-month .flatpickr-monthDropdown-months,
+html.dark .flatpickr-current-month input.cur-year {
+    color: #fff;
+}
+html.dark .flatpickr-current-month .flatpickr-monthDropdown-months .flatpickr-monthDropdown-month {
+    background: #0B333F;
+    color: #fff;
+}
+html.dark .flatpickr-prev-month,
+html.dark .flatpickr-next-month {
+    color: rgba(255, 255, 255, 0.7);
+    fill: rgba(255, 255, 255, 0.7);
+}
+html.dark .flatpickr-prev-month:hover,
+html.dark .flatpickr-next-month:hover {
+    color: #41B3B3;
+    fill: #41B3B3;
+}
+html.dark .flatpickr-day {
+    color: #fff;
+}
+html.dark .flatpickr-day.prevMonthDay,
+html.dark .flatpickr-day.nextMonthDay,
+html.dark .flatpickr-day.flatpickr-disabled {
+    color: rgba(255, 255, 255, 0.35);
+}
+html.dark .flatpickr-day:hover {
+    background: rgba(65, 179, 179, 0.20);
+    color: #fff;
+}
+html.dark .flatpickr-day.today {
+    border-color: #41B3B3;
+    color: #41B3B3;
+}
+html.dark .flatpickr-day.today:hover {
+    background: #41B3B3;
+    color: #0B333F;
+}
+html.dark .flatpickr-day.selected {
+    background: #41B3B3;
+    border-color: #41B3B3;
+    color: #0B333F;
+}
+html.dark .numInputWrapper span.arrowUp::after {
+    border-bottom-color: rgba(255, 255, 255, 0.6);
+}
+html.dark .numInputWrapper span.arrowDown::after {
+    border-top-color: rgba(255, 255, 255, 0.6);
+}
+
+@layer utilities {
+    .dark .text-text-soft {
+        @apply text-white/75;
+    }
+}
+
+/* Fallback for policies/policy-pdf-viewer.js's print guard: blanks the
+   printed output if a print somehow still gets triggered, regardless of how
+   (browser Print menu, extension, etc.) — this is the layer that actually
+   matters, since it governs the print output itself. */
+@media print {
+    body.policy-print-guard * {
+        visibility: hidden !important;
+    }
+    body.policy-print-guard::after {
+        content: "Printing is disabled for this document.";
+        visibility: visible;
+        position: fixed;
+        top: 40%;
+        left: 0;
+        right: 0;
+        text-align: center;
+        font-size: 1.25rem;
+    }
+}

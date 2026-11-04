@@ -1,0 +1,3854 @@
+{
+ "updated": "2026-11-03T18:49:35",
+ "wiki": {
+  "Architecture": "752167c927474feb",
+  "Deployment and Operations": "46bef30f2fc4f09d",
+  "Docs index": "2e9ea7307c2d41ee",
+  "Modules": "931fde5dd393e8d4",
+  "Orbis": "0caa273d16ef5fe2",
+  "Roadmap and Open items": "5cfc2300e580bdd4"
+ },
+ "work_packages": {
+  "accounts": {
+   "hash": null,
+   "id": 1672,
+   "remote": {
+    "category": "Accounts",
+    "description": "CustomUser, Microsoft Entra SSO, scope-based access control, onboarding, Directory API. Spec: docs/PLAN.md, docs/DIRECTORY_API_PLAN.md\n\n---\norbis-key: accounts",
+    "dueDate": "2026-11-02",
+    "parent": null,
+    "startDate": "2026-04-27",
+    "status": "Backlog",
+    "subject": "Accounts, SSO & access control",
+    "type": "Epic"
+   }
+  },
+  "accounts.account-cleanup": {
+   "hash": null,
+   "id": 1720,
+   "remote": {
+    "category": "Accounts",
+    "description": "**Commits:** `16166be` `b32186c`\n\n---\norbis-key: accounts.account-cleanup",
+    "dueDate": "2026-04-29",
+    "parent": "accounts",
+    "startDate": "2026-04-29",
+    "status": "Backlog",
+    "subject": "Drop change-password; superuser-only admin link; My profile entry",
+    "type": "Feature"
+   }
+  },
+  "accounts.admin-picker": {
+   "hash": null,
+   "id": 1723,
+   "remote": {
+    "category": "Accounts",
+    "description": "**Commits:** `1a1baf0`\n\n---\norbis-key: accounts.admin-picker",
+    "dueDate": "2026-07-24",
+    "parent": "accounts",
+    "startDate": "2026-07-24",
+    "status": "Backlog",
+    "subject": "Admin people-picker shows name + employee ID",
+    "type": "Feature"
+   }
+  },
+  "accounts.bulk-onboarding": {
+   "hash": null,
+   "id": 1725,
+   "remote": {
+    "category": "Accounts",
+    "description": "Spec / code: accounts/upload.py\n\n**Commits:** `37e45fd` `a3a2ec9` `3fde139`\n\n---\norbis-key: accounts.bulk-onboarding",
+    "dueDate": "2026-08-31",
+    "parent": "accounts",
+    "startDate": "2026-08-31",
+    "status": "Backlog",
+    "subject": "Bulk new-joiner onboarding (auto ID/email/password, NID, notice period, rehire flag)",
+    "type": "Feature"
+   }
+  },
+  "accounts.directory-api": {
+   "hash": null,
+   "id": 1728,
+   "remote": {
+    "category": "Accounts",
+    "description": "Spec / code: docs/DIRECTORY_API_PLAN.md\n\n**Commits:** `b1e9015` `01c39ca` `b87da65` `b1e22ad`\n\n---\norbis-key: accounts.directory-api",
+    "dueDate": "2026-10-14",
+    "parent": "accounts",
+    "startDate": "2026-10-14",
+    "status": "Backlog",
+    "subject": "Directory API phases 1\u20133 + in-app developer docs",
+    "type": "Feature"
+   }
+  },
+  "accounts.directory-hygiene": {
+   "hash": null,
+   "id": 1874,
+   "remote": {
+    "category": "Accounts",
+    "description": "Merge duplicate MBD location and HR departments, fill department heads, resolve 31 unlinked records, offboarding warning. docs/DIRECTORY_API_PLAN.md \u00a78\n\n**Blocked on:** HR input\n\n---\norbis-key: accounts.directory-hygiene",
+    "dueDate": null,
+    "parent": "accounts",
+    "startDate": null,
+    "status": "Backlog",
+    "subject": "Directory API Phase 4 \u2014 data hygiene",
+    "type": "Feature"
+   }
+  },
+  "accounts.directory-switchover": {
+   "hash": null,
+   "id": 1704,
+   "remote": {
+    "category": "Accounts",
+    "description": "Move TimeLy and dsndd from env tokens to ApiClient tokens. docs/DIRECTORY_API_PLAN.md \u00a713\n\n---\norbis-key: accounts.directory-switchover",
+    "dueDate": null,
+    "parent": "accounts",
+    "startDate": null,
+    "status": "Backlog",
+    "subject": "Directory API switch-over",
+    "type": "Epic"
+   }
+  },
+  "accounts.directory-switchover.dsndd": {
+   "hash": null,
+   "id": 1935,
+   "remote": {
+    "category": "Accounts",
+    "description": "roster:write scope.\n\n**Blocked on:** Date with dsndd team\n\n---\norbis-key: accounts.directory-switchover.dsndd",
+    "dueDate": null,
+    "parent": "accounts.directory-switchover",
+    "startDate": null,
+    "status": "Backlog",
+    "subject": "Switch dsndd (rnc.sebpo.net) to an ApiClient token",
+    "type": "Task"
+   }
+  },
+  "accounts.directory-switchover.entra-ids": {
+   "hash": null,
+   "id": 1936,
+   "remote": {
+    "category": "Accounts",
+    "description": "manage.py import_entra_object_ids on IT's export.\n\n**Blocked on:** IT export\n\n---\norbis-key: accounts.directory-switchover.entra-ids",
+    "dueDate": null,
+    "parent": "accounts.directory-switchover",
+    "startDate": null,
+    "status": "Backlog",
+    "subject": "Backfill Entra object ids",
+    "type": "Task"
+   }
+  },
+  "accounts.directory-switchover.timely": {
+   "hash": null,
+   "id": 1934,
+   "remote": {
+    "category": "Accounts",
+    "description": "Create the client, swap tokens, watch the access log, then remove the env token.\n\n**Blocked on:** Date with TimeLy team\n\n---\norbis-key: accounts.directory-switchover.timely",
+    "dueDate": null,
+    "parent": "accounts.directory-switchover",
+    "startDate": null,
+    "status": "Backlog",
+    "subject": "Switch TimeLy to an ApiClient token",
+    "type": "Task"
+   }
+  },
+  "accounts.entra-writeback": {
+   "hash": null,
+   "id": 1875,
+   "remote": {
+    "category": "Accounts",
+    "description": "Later, separate decision.\n\n**Blocked on:** IT (User.ReadWrite.All)\n\n---\norbis-key: accounts.entra-writeback",
+    "dueDate": null,
+    "parent": "accounts",
+    "startDate": null,
+    "status": "Backlog",
+    "subject": "Stop Oracle \u2192 Entra sync / write back to Entra via Graph",
+    "type": "Feature"
+   }
+  },
+  "accounts.exact-search": {
+   "hash": null,
+   "id": 1727,
+   "remote": {
+    "category": "Accounts",
+    "description": "Spec / code: accounts/filters.py\n\n**Commits:** `017d52b` `787b0fa`\n\n---\norbis-key: accounts.exact-search",
+    "dueDate": "2026-10-30",
+    "parent": "accounts",
+    "startDate": "2026-09-14",
+    "status": "Backlog",
+    "subject": "Exact-match employee ID / email search everywhere",
+    "type": "Feature"
+   }
+  },
+  "accounts.hierarchy-acl": {
+   "hash": null,
+   "id": 1718,
+   "remote": {
+    "category": "Accounts",
+    "description": "Spec / code: accounts/permissions.py\n\n**Commits:** `5c0066a`\n\n---\norbis-key: accounts.hierarchy-acl",
+    "dueDate": "2026-04-27",
+    "parent": "accounts",
+    "startDate": "2026-04-27",
+    "status": "Backlog",
+    "subject": "Hierarchy-based access control",
+    "type": "Feature"
+   }
+  },
+  "accounts.import-org-chart": {
+   "hash": null,
+   "id": 1719,
+   "remote": {
+    "category": "Accounts",
+    "description": "**Commits:** `3e9578b` `74ca8e2`\n\n---\norbis-key: accounts.import-org-chart",
+    "dueDate": "2026-08-27",
+    "parent": "accounts",
+    "startDate": "2026-04-29",
+    "status": "Backlog",
+    "subject": "import_org_chart management command",
+    "type": "Feature"
+   }
+  },
+  "accounts.permissions-pass": {
+   "hash": null,
+   "id": 1876,
+   "remote": {
+    "category": null,
+    "description": "Overloaded is_staff, unused Roster Planner group, separation of duties, delegation, more permission tests. docs/PLAN.md open items #6\n\n---\norbis-key: accounts.permissions-pass",
+    "dueDate": null,
+    "parent": "techdebt",
+    "startDate": null,
+    "status": "Backlog",
+    "subject": "Groups & permissions pass",
+    "type": "Task"
+   }
+  },
+  "accounts.scope-grants": {
+   "hash": null,
+   "id": 1722,
+   "remote": {
+    "category": "Accounts",
+    "description": "Spec / code: docs/PLAN.md\n\n**Commits:** `7fd7c95` `037302f` `702c9a2` `990286f` `05a0392` `8f209f1`\n\n---\norbis-key: accounts.scope-grants",
+    "dueDate": "2026-09-16",
+    "parent": "accounts",
+    "startDate": "2026-07-24",
+    "status": "Backlog",
+    "subject": "Department-wide, department-head and team-level access grants",
+    "type": "Feature"
+   }
+  },
+  "accounts.sso": {
+   "hash": null,
+   "id": 1716,
+   "remote": {
+    "category": "Accounts",
+    "description": "Spec / code: docs/PLAN.md\n\n**Commits:** `9ac0570` `494dc25` `402e310` `9a16d96` `2ad9859`\n\n---\norbis-key: accounts.sso",
+    "dueDate": "2026-04-29",
+    "parent": "accounts",
+    "startDate": "2026-04-27",
+    "status": "Backlog",
+    "subject": "Microsoft Entra SSO login",
+    "type": "Feature"
+   }
+  },
+  "accounts.sso-jit": {
+   "hash": null,
+   "id": 1717,
+   "remote": {
+    "category": "Accounts",
+    "description": "**Commits:** `0a475cf` `f3c3c24` `1eb4162`\n\n---\norbis-key: accounts.sso-jit",
+    "dueDate": "2026-08-27",
+    "parent": "accounts",
+    "startDate": "2026-04-29",
+    "status": "Backlog",
+    "subject": "SSO just-in-time provisioning + preprovision command",
+    "type": "Feature"
+   }
+  },
+  "accounts.sso-only": {
+   "hash": null,
+   "id": 1724,
+   "remote": {
+    "category": "Accounts",
+    "description": "**Commits:** `bc6b216` `0419eac` `029a86b`\n\n---\norbis-key: accounts.sso-only",
+    "dueDate": "2026-10-19",
+    "parent": "accounts",
+    "startDate": "2026-08-27",
+    "status": "Backlog",
+    "subject": "SSO-only sign-in; stop AAD resync after first login",
+    "type": "Feature"
+   }
+  },
+  "accounts.user-admins": {
+   "hash": null,
+   "id": 1721,
+   "remote": {
+    "category": "Accounts",
+    "description": "**Commits:** `2f48418` `555ca37` `697f228` `81e79fa`\n\n---\norbis-key: accounts.user-admins",
+    "dueDate": "2026-09-02",
+    "parent": "accounts",
+    "startDate": "2026-07-20",
+    "status": "Backlog",
+    "subject": "\"User Admins\" group + scope-limited user edit",
+    "type": "Feature"
+   }
+  },
+  "accounts.user-search": {
+   "hash": null,
+   "id": 1726,
+   "remote": {
+    "category": "Accounts",
+    "description": "**Commits:** `1734bdd` `689a530`\n\n---\norbis-key: accounts.user-search",
+    "dueDate": "2026-11-02",
+    "parent": "accounts",
+    "startDate": "2026-10-01",
+    "status": "Backlog",
+    "subject": "User admin: find deactivated users, filter by group",
+    "type": "Feature"
+   }
+  },
+  "attendance": {
+   "hash": null,
+   "id": 1676,
+   "remote": {
+    "category": "Timesheet",
+    "description": "TimeLy presence overlay, local punch history, corrections, range modes and exports. Spec: docs/PLAN.md \"Three modes\"\n\n---\norbis-key: attendance",
+    "dueDate": "2026-11-02",
+    "parent": null,
+    "startDate": "2026-05-06",
+    "status": "Backlog",
+    "subject": "Timesheet (attendance)",
+    "type": "Epic"
+   }
+  },
+  "attendance.corrections": {
+   "hash": null,
+   "id": 1786,
+   "remote": {
+    "category": "Timesheet",
+    "description": "**Commits:** `db5136b` `22d95d8`\n\n---\norbis-key: attendance.corrections",
+    "dueDate": "2026-09-07",
+    "parent": "attendance",
+    "startDate": "2026-09-07",
+    "status": "Backlog",
+    "subject": "Timesheet corrections with supervisor approval",
+    "type": "Feature"
+   }
+  },
+  "attendance.history": {
+   "hash": null,
+   "id": 1785,
+   "remote": {
+    "category": "Timesheet",
+    "description": "**Commits:** `705bc51` `7f5577a` `bbbc547`\n\n---\norbis-key: attendance.history",
+    "dueDate": "2026-09-16",
+    "parent": "attendance",
+    "startDate": "2026-09-07",
+    "status": "Backlog",
+    "subject": "Local attendance history synced from TimeLy",
+    "type": "Feature"
+   }
+  },
+  "attendance.on-time-late": {
+   "hash": null,
+   "id": 1879,
+   "remote": {
+    "category": "Future",
+    "description": "docs/PLAN.md attendance.\n\n---\norbis-key: attendance.on-time-late",
+    "dueDate": null,
+    "parent": "future",
+    "startDate": null,
+    "status": "Backlog",
+    "subject": "Scheduled vs actual attendance (on time / late)",
+    "type": "Feature"
+   }
+  },
+  "attendance.overlay": {
+   "hash": null,
+   "id": 1784,
+   "remote": {
+    "category": "Timesheet",
+    "description": "**Commits:** `f5bbbd7` `fb22005`\n\n---\norbis-key: attendance.overlay",
+    "dueDate": "2026-05-13",
+    "parent": "attendance",
+    "startDate": "2026-05-06",
+    "status": "Backlog",
+    "subject": "TimeLy office-presence overlay on the dashboard",
+    "type": "Feature"
+   }
+  },
+  "attendance.pattern-guard": {
+   "hash": null,
+   "id": 1788,
+   "remote": {
+    "category": "Timesheet",
+    "description": "**Commits:** `ef70c9a`\n\n---\norbis-key: attendance.pattern-guard",
+    "dueDate": "2026-09-22",
+    "parent": "attendance",
+    "startDate": "2026-09-22",
+    "status": "Backlog",
+    "subject": "Roster-pattern fallback limited to the employment window",
+    "type": "Feature"
+   }
+  },
+  "attendance.single-range": {
+   "hash": null,
+   "id": 1787,
+   "remote": {
+    "category": "Timesheet",
+    "description": "**Commits:** `eb82169`\n\n---\norbis-key: attendance.single-range",
+    "dueDate": "2026-09-11",
+    "parent": "attendance",
+    "startDate": "2026-09-11",
+    "status": "Backlog",
+    "subject": "Single-employee date-range mode",
+    "type": "Feature"
+   }
+  },
+  "attendance.team-range": {
+   "hash": null,
+   "id": 1789,
+   "remote": {
+    "category": "Timesheet",
+    "description": "**Commits:** `9ee8574` `fb99f62`\n\n---\norbis-key: attendance.team-range",
+    "dueDate": "2026-11-02",
+    "parent": "attendance",
+    "startDate": "2026-10-01",
+    "status": "Backlog",
+    "subject": "Department/team date-range mode + Excel export",
+    "type": "Feature"
+   }
+  },
+  "attendance.timely-api-v2": {
+   "hash": null,
+   "id": 1878,
+   "remote": {
+    "category": "Timesheet",
+    "description": "Current endpoint is pre-final.\n\n**Blocked on:** TimeLy team\n\n---\norbis-key: attendance.timely-api-v2",
+    "dueDate": null,
+    "parent": "attendance",
+    "startDate": null,
+    "status": "Backlog",
+    "subject": "Move to TimeLy's final attendance API",
+    "type": "Task"
+   }
+  },
+  "audit": {
+   "hash": null,
+   "id": 1683,
+   "remote": {
+    "category": "Access log",
+    "description": "Who accessed which data or page. Spec: docs/ACCESS_LOG_PLAN.md\n\n---\norbis-key: audit",
+    "dueDate": "2026-10-09",
+    "parent": null,
+    "startDate": "2026-10-09",
+    "status": "Backlog",
+    "subject": "Access log",
+    "type": "Epic"
+   }
+  },
+  "audit.access-log": {
+   "hash": null,
+   "id": 1819,
+   "remote": {
+    "category": "Access log",
+    "description": "Spec / code: docs/ACCESS_LOG_PLAN.md\n\n**Commits:** `a4c6ac6` `f212981` `b54f767` `8eb0dc1`\n\n---\norbis-key: audit.access-log",
+    "dueDate": "2026-10-09",
+    "parent": "audit",
+    "startDate": "2026-10-09",
+    "status": "Backlog",
+    "subject": "Access log (who accessed which data or page)",
+    "type": "Feature"
+   }
+  },
+  "core": {
+   "hash": null,
+   "id": 1677,
+   "remote": {
+    "category": "Dashboard",
+    "description": "My/Team dashboard, week strip, pending approvals.\n\n---\norbis-key: core",
+    "dueDate": "2026-09-11",
+    "parent": null,
+    "startDate": "2026-04-27",
+    "status": "Backlog",
+    "subject": "Dashboard",
+    "type": "Epic"
+   }
+  },
+  "core.capacity-fix": {
+   "hash": null,
+   "id": 1792,
+   "remote": {
+    "category": "Dashboard",
+    "description": "**Commits:** `2054688`\n\n---\norbis-key: core.capacity-fix",
+    "dueDate": "2026-06-30",
+    "parent": "core",
+    "startDate": "2026-06-30",
+    "status": "Backlog",
+    "subject": "Leave-capacity double-count fix",
+    "type": "Feature"
+   }
+  },
+  "core.dashboard": {
+   "hash": null,
+   "id": 1790,
+   "remote": {
+    "category": "Dashboard",
+    "description": "**Commits:** `b265a7e`\n\n---\norbis-key: core.dashboard",
+    "dueDate": "2026-04-27",
+    "parent": "core",
+    "startDate": "2026-04-27",
+    "status": "Backlog",
+    "subject": "Dashboard",
+    "type": "Feature"
+   }
+  },
+  "core.pending-approvals": {
+   "hash": null,
+   "id": 1794,
+   "remote": {
+    "category": "Dashboard",
+    "description": "**Commits:** `222aa74`\n\n---\norbis-key: core.pending-approvals",
+    "dueDate": "2026-09-11",
+    "parent": "core",
+    "startDate": "2026-09-11",
+    "status": "Backlog",
+    "subject": "Unified pending-approvals widget",
+    "type": "Feature"
+   }
+  },
+  "core.scope-count": {
+   "hash": null,
+   "id": 1795,
+   "remote": {
+    "category": "Dashboard",
+    "description": "**Commits:** `068d75c`\n\n---\norbis-key: core.scope-count",
+    "dueDate": "2026-09-11",
+    "parent": "core",
+    "startDate": "2026-09-11",
+    "status": "Backlog",
+    "subject": "\"Total in your scope\" matches the Employees page",
+    "type": "Feature"
+   }
+  },
+  "core.team-drilldowns": {
+   "hash": null,
+   "id": 1793,
+   "remote": {
+    "category": "Dashboard",
+    "description": "**Commits:** `f88d205` `304d03a`\n\n---\norbis-key: core.team-drilldowns",
+    "dueDate": "2026-07-21",
+    "parent": "core",
+    "startDate": "2026-07-21",
+    "status": "Backlog",
+    "subject": "Team-tab drill-downs + roster-driven \"Out today\"",
+    "type": "Feature"
+   }
+  },
+  "core.week-strip": {
+   "hash": null,
+   "id": 1791,
+   "remote": {
+    "category": "Dashboard",
+    "description": "**Commits:** `1a29566` `24d6732`\n\n---\norbis-key: core.week-strip",
+    "dueDate": "2026-09-03",
+    "parent": "core",
+    "startDate": "2026-06-30",
+    "status": "Backlog",
+    "subject": "\"This week\" strip + next-shift card",
+    "type": "Feature"
+   }
+  },
+  "documents": {
+   "hash": null,
+   "id": 1679,
+   "remote": {
+    "category": "Documents",
+    "description": "DB-stored letter templates, WeasyPrint PDFs, QR verify, review/approval chain. Spec: docs/VERIDOC_IMPLEMENTATION_PLAN.md\n\n---\norbis-key: documents",
+    "dueDate": "2026-09-01",
+    "parent": null,
+    "startDate": "2026-05-22",
+    "status": "Backlog",
+    "subject": "HR documents & verification",
+    "type": "Epic"
+   }
+  },
+  "documents.ckeditor5": {
+   "hash": null,
+   "id": 1802,
+   "remote": {
+    "category": "Documents",
+    "description": "**Commits:** `96a40f6`\n\n---\norbis-key: documents.ckeditor5",
+    "dueDate": "2026-07-21",
+    "parent": "documents",
+    "startDate": "2026-07-21",
+    "status": "Backlog",
+    "subject": "CKEditor 4 \u2192 django-ckeditor-5",
+    "type": "Feature"
+   }
+  },
+  "documents.letters": {
+   "hash": null,
+   "id": 1799,
+   "remote": {
+    "category": "Documents",
+    "description": "**Commits:** `3706cf7`\n\n---\norbis-key: documents.letters",
+    "dueDate": "2026-05-22",
+    "parent": "documents",
+    "startDate": "2026-05-22",
+    "status": "Backlog",
+    "subject": "HR letter generation",
+    "type": "Feature"
+   }
+  },
+  "documents.pdf-design": {
+   "hash": null,
+   "id": 1803,
+   "remote": {
+    "category": "Documents",
+    "description": "**Commits:** `adf6385`\n\n---\norbis-key: documents.pdf-design",
+    "dueDate": "2026-07-30",
+    "parent": "documents",
+    "startDate": "2026-07-30",
+    "status": "Backlog",
+    "subject": "PDF design refresh",
+    "type": "Feature"
+   }
+  },
+  "documents.salary-cert": {
+   "hash": null,
+   "id": 1804,
+   "remote": {
+    "category": "Documents",
+    "description": "**Commits:** `489fd02` `a29f378`\n\n---\norbis-key: documents.salary-cert",
+    "dueDate": "2026-09-01",
+    "parent": "documents",
+    "startDate": "2026-09-01",
+    "status": "Backlog",
+    "subject": "Salary certificate",
+    "type": "Feature"
+   }
+  },
+  "documents.veridoc": {
+   "hash": null,
+   "id": 1800,
+   "remote": {
+    "category": "Documents",
+    "description": "Spec / code: docs/VERIDOC_IMPLEMENTATION_PLAN.md\n\n**Commits:** `d8894c9`\n\n---\norbis-key: documents.veridoc",
+    "dueDate": "2026-06-10",
+    "parent": "documents",
+    "startDate": "2026-06-10",
+    "status": "Backlog",
+    "subject": "Document verification features (Veridoc port)",
+    "type": "Feature"
+   }
+  },
+  "documents.verify-hardening": {
+   "hash": null,
+   "id": 1801,
+   "remote": {
+    "category": "Documents",
+    "description": "**Commits:** `f069fc7` `65a2014`\n\n---\norbis-key: documents.verify-hardening",
+    "dueDate": "2026-07-21",
+    "parent": "documents",
+    "startDate": "2026-07-21",
+    "status": "Backlog",
+    "subject": "Review/approval step guard + hardened public verify page",
+    "type": "Feature"
+   }
+  },
+  "dynamic_menu": {
+   "hash": null,
+   "id": 1678,
+   "remote": {
+    "category": "Menu & access",
+    "description": "MainMenu/SubMenu with direct M2M to groups, ProtectedView.\n\n---\norbis-key: dynamic_menu",
+    "dueDate": "2026-09-15",
+    "parent": null,
+    "startDate": "2026-04-24",
+    "status": "Backlog",
+    "subject": "Dynamic menu & page access",
+    "type": "Epic"
+   }
+  },
+  "dynamic_menu.htmx-403": {
+   "hash": null,
+   "id": 1798,
+   "remote": {
+    "category": "Menu & access",
+    "description": "**Commits:** `c836cd8`\n\n---\norbis-key: dynamic_menu.htmx-403",
+    "dueDate": "2026-09-15",
+    "parent": "dynamic_menu",
+    "startDate": "2026-09-15",
+    "status": "Backlog",
+    "subject": "htmx requests get 403 on access denial",
+    "type": "Feature"
+   }
+  },
+  "dynamic_menu.menu": {
+   "hash": null,
+   "id": 1865,
+   "remote": {
+    "category": "Menu & access",
+    "description": "Built in the initial setup commit 197e7d7 (tracked under Infrastructure).\n\n---\norbis-key: dynamic_menu.menu",
+    "dueDate": "2026-04-24",
+    "parent": "dynamic_menu",
+    "startDate": "2026-04-24",
+    "status": "Backlog",
+    "subject": "Dynamic menu with group access lists",
+    "type": "Feature"
+   }
+  },
+  "dynamic_menu.open-menus": {
+   "hash": null,
+   "id": 1797,
+   "remote": {
+    "category": "Menu & access",
+    "description": "**Commits:** `f15964b`\n\n---\norbis-key: dynamic_menu.open-menus",
+    "dueDate": "2026-09-07",
+    "parent": "dynamic_menu",
+    "startDate": "2026-09-07",
+    "status": "Backlog",
+    "subject": "Main menus open to all staff; managers get the ack queue",
+    "type": "Feature"
+   }
+  },
+  "dynamic_menu.payroll-acl": {
+   "hash": null,
+   "id": 1796,
+   "remote": {
+    "category": "Menu & access",
+    "description": "**Commits:** `0091164`\n\n---\norbis-key: dynamic_menu.payroll-acl",
+    "dueDate": "2026-06-12",
+    "parent": "dynamic_menu",
+    "startDate": "2026-06-12",
+    "status": "Backlog",
+    "subject": "Payroll menu allowed-users list",
+    "type": "Feature"
+   }
+  },
+  "employees": {
+   "hash": null,
+   "id": 1673,
+   "remote": {
+    "category": "Employees",
+    "description": "14 profile-section models, bulk uploaders, Service Book, night-shift consent, org chart. Spec: docs/PLAN.md, docs/LEGACY_60_IMPORT_PLAN.md, docs/NIGHT_SHIFT_CONSENT_PLAN.md\n\n---\norbis-key: employees",
+    "dueDate": "2026-11-03",
+    "parent": null,
+    "startDate": "2026-05-06",
+    "status": "Backlog",
+    "subject": "Employees & HR profile",
+    "type": "Epic"
+   }
+  },
+  "employees.backfill": {
+   "hash": null,
+   "id": 1740,
+   "remote": {
+    "category": "Employees",
+    "description": "**Commits:** `0348994`\n\n---\norbis-key: employees.backfill",
+    "dueDate": "2026-08-31",
+    "parent": "employees",
+    "startDate": "2026-08-31",
+    "status": "Backlog",
+    "subject": "Joining-date and office-location backfill",
+    "type": "Feature"
+   }
+  },
+  "employees.bd-address": {
+   "hash": null,
+   "id": 1734,
+   "remote": {
+    "category": "Employees",
+    "description": "Spec / code: docs/BANGLADESH_LOCATION_DATA.md\n\n**Commits:** `761ce0b` `03bcafa`\n\n---\norbis-key: employees.bd-address",
+    "dueDate": "2026-07-22",
+    "parent": "employees",
+    "startDate": "2026-07-21",
+    "status": "Backlog",
+    "subject": "Bangladesh address reference data",
+    "type": "Feature"
+   }
+  },
+  "employees.bulk-update": {
+   "hash": null,
+   "id": 1736,
+   "remote": {
+    "category": "Employees",
+    "description": "Spec / code: employees/upload.py\n\n**Commits:** `07ebb3b` `5fe32fd` `ca611de` `45ef6d3` `7d0f294` `68d3a45`\n\n---\norbis-key: employees.bulk-update",
+    "dueDate": "2026-11-03",
+    "parent": "employees",
+    "startDate": "2026-08-25",
+    "status": "Backlog",
+    "subject": "Bulk Excel employee update (team, JobInfo, dates, profile sections, probation)",
+    "type": "Feature"
+   }
+  },
+  "employees.downline-edit": {
+   "hash": null,
+   "id": 1730,
+   "remote": {
+    "category": "Employees",
+    "description": "**Commits:** `1538936`\n\n---\norbis-key: employees.downline-edit",
+    "dueDate": "2026-07-16",
+    "parent": "employees",
+    "startDate": "2026-07-16",
+    "status": "Backlog",
+    "subject": "Supervisors edit their downline's basic info",
+    "type": "Feature"
+   }
+  },
+  "employees.education-national": {
+   "hash": null,
+   "id": 1739,
+   "remote": {
+    "category": "Employees",
+    "description": "**Commits:** `05654cc`\n\n---\norbis-key: employees.education-national",
+    "dueDate": "2026-08-27",
+    "parent": "employees",
+    "startDate": "2026-08-27",
+    "status": "Backlog",
+    "subject": "\"National\" education institution category",
+    "type": "Feature"
+   }
+  },
+  "employees.excel-export": {
+   "hash": null,
+   "id": 1735,
+   "remote": {
+    "category": "Employees",
+    "description": "**Commits:** `bfdb30a` `eaf97bd`\n\n---\norbis-key: employees.excel-export",
+    "dueDate": "2026-08-24",
+    "parent": "employees",
+    "startDate": "2026-08-24",
+    "status": "Backlog",
+    "subject": "Employee list Excel export",
+    "type": "Feature"
+   }
+  },
+  "employees.indirect-badge": {
+   "hash": null,
+   "id": 1732,
+   "remote": {
+    "category": "Employees",
+    "description": "**Commits:** `a5c9a63`\n\n---\norbis-key: employees.indirect-badge",
+    "dueDate": "2026-07-17",
+    "parent": "employees",
+    "startDate": "2026-07-17",
+    "status": "Backlog",
+    "subject": "Indirect-report badge",
+    "type": "Feature"
+   }
+  },
+  "employees.legacy-60": {
+   "hash": null,
+   "id": 1745,
+   "remote": {
+    "category": "Employees",
+    "description": "Spec / code: docs/LEGACY_60_IMPORT_PLAN.md\n\n**Commits:** `7fef18f`\n\n---\norbis-key: employees.legacy-60",
+    "dueDate": "2026-10-05",
+    "parent": "employees",
+    "startDate": "2026-10-05",
+    "status": "Backlog",
+    "subject": "Legacy 60-employee import plan + checklist",
+    "type": "Feature"
+   }
+  },
+  "employees.list-cards": {
+   "hash": null,
+   "id": 1747,
+   "remote": {
+    "category": "Employees",
+    "description": "**Commits:** `e639ab1`\n\n---\norbis-key: employees.list-cards",
+    "dueDate": "2026-10-13",
+    "parent": "employees",
+    "startDate": "2026-10-13",
+    "status": "Backlog",
+    "subject": "Employee list cards show team + reports-to",
+    "type": "Feature"
+   }
+  },
+  "employees.list-filters": {
+   "hash": null,
+   "id": 1731,
+   "remote": {
+    "category": "Employees",
+    "description": "Spec / code: accounts/filters.py\n\n**Commits:** `3a276cb` `9f2ca49`\n\n---\norbis-key: employees.list-filters",
+    "dueDate": "2026-07-20",
+    "parent": "employees",
+    "startDate": "2026-07-17",
+    "status": "Backlog",
+    "subject": "Department filter, shared pagination and employee filters",
+    "type": "Feature"
+   }
+  },
+  "employees.night-consent": {
+   "hash": null,
+   "id": 1743,
+   "remote": {
+    "category": "Employees",
+    "description": "Spec / code: docs/NIGHT_SHIFT_CONSENT_PLAN.md\n\n**Commits:** `8007a29`\n\n---\norbis-key: employees.night-consent",
+    "dueDate": "2026-09-14",
+    "parent": "employees",
+    "startDate": "2026-09-14",
+    "status": "Backlog",
+    "subject": "Monthly night-shift consent for female employees",
+    "type": "Feature"
+   }
+  },
+  "employees.org-chart": {
+   "hash": null,
+   "id": 1746,
+   "remote": {
+    "category": "Employees",
+    "description": "Spec / code: docs/PLAN.md \"Org chart\"\n\n**Commits:** `2f239b1`\n\n---\norbis-key: employees.org-chart",
+    "dueDate": "2026-10-12",
+    "parent": "employees",
+    "startDate": "2026-10-12",
+    "status": "Backlog",
+    "subject": "Org chart (live reporting tree)",
+    "type": "Feature"
+   }
+  },
+  "employees.profile-drawer": {
+   "hash": null,
+   "id": 1729,
+   "remote": {
+    "category": "Employees",
+    "description": "Spec / code: docs/PLAN.md\n\n**Commits:** `b8479df` `8d10815` `5be03aa` `c0f98ff`\n\n---\norbis-key: employees.profile-drawer",
+    "dueDate": "2026-07-20",
+    "parent": "employees",
+    "startDate": "2026-05-06",
+    "status": "Backlog",
+    "subject": "Employee profile + htmx section-edit drawer",
+    "type": "Feature"
+   }
+  },
+  "employees.reference-cleanup": {
+   "hash": null,
+   "id": 1741,
+   "remote": {
+    "category": "Employees",
+    "description": "**Commits:** `ea2c769` `6fc1382`\n\n---\norbis-key: employees.reference-cleanup",
+    "dueDate": "2026-10-12",
+    "parent": "employees",
+    "startDate": "2026-09-02",
+    "status": "Backlog",
+    "subject": "Reference-data cleanup (consolidate_job_locations, merge_reference)",
+    "type": "Feature"
+   }
+  },
+  "employees.reports-to-picker": {
+   "hash": null,
+   "id": 1737,
+   "remote": {
+    "category": "Employees",
+    "description": "**Commits:** `34583c0`\n\n---\norbis-key: employees.reports-to-picker",
+    "dueDate": "2026-08-25",
+    "parent": "employees",
+    "startDate": "2026-08-25",
+    "status": "Backlog",
+    "subject": "Searchable Reports-to picker",
+    "type": "Feature"
+   }
+  },
+  "employees.resource-status": {
+   "hash": null,
+   "id": 1738,
+   "remote": {
+    "category": "Employees",
+    "description": "**Commits:** `d30393e`\n\n---\norbis-key: employees.resource-status",
+    "dueDate": "2026-08-25",
+    "parent": "employees",
+    "startDate": "2026-08-25",
+    "status": "Backlog",
+    "subject": "General resource status on JobInfo",
+    "type": "Feature"
+   }
+  },
+  "employees.self-service-switch": {
+   "hash": null,
+   "id": 1744,
+   "remote": {
+    "category": "Employees",
+    "description": "**Commits:** `0746111`\n\n---\norbis-key: employees.self-service-switch",
+    "dueDate": "2026-09-17",
+    "parent": "employees",
+    "startDate": "2026-09-17",
+    "status": "Backlog",
+    "subject": "HR-controlled profile self-service switch",
+    "type": "Feature"
+   }
+  },
+  "employees.service-book": {
+   "hash": null,
+   "id": 1742,
+   "remote": {
+    "category": "Employees",
+    "description": "Spec / code: employees/services.py\n\n**Commits:** `f41e47a` `a0825cd` `1cc3f68` `726cfbb` `6889d8d` `1681232` `77de0d7` `57b915e` `857c9fc` `d66e41e` `c9d7c5e`\n\n---\norbis-key: employees.service-book",
+    "dueDate": "2026-10-07",
+    "parent": "employees",
+    "startDate": "2026-09-10",
+    "status": "Backlog",
+    "subject": "Service Book (Labour Rules 2015 Form-7) with PDF",
+    "type": "Feature"
+   }
+  },
+  "employees.team-admin": {
+   "hash": null,
+   "id": 1733,
+   "remote": {
+    "category": "Employees",
+    "description": "**Commits:** `101c564` `ac1cc5b`\n\n---\norbis-key: employees.team-admin",
+    "dueDate": "2026-09-03",
+    "parent": "employees",
+    "startDate": "2026-07-20",
+    "status": "Backlog",
+    "subject": "Team admin import/export + bulk grant of team managers",
+    "type": "Feature"
+   }
+  },
+  "future": {
+   "hash": null,
+   "id": 1689,
+   "remote": {
+    "category": "Future",
+    "description": "Planned or proposed, not started.\n\n---\norbis-key: future",
+    "dueDate": null,
+    "parent": null,
+    "startDate": null,
+    "status": "Backlog",
+    "subject": "Future features",
+    "type": "Epic"
+   }
+  },
+  "future.ai-assistant": {
+   "hash": null,
+   "id": 1900,
+   "remote": {
+    "category": "Future",
+    "description": "Chat, weekly manager brief, payroll variance explanation, upload assist \u2014 via the logged-in CLI, no API key. Plan written; not built. docs/AI_ASSISTANT_PLAN.md\n\n**Commits:** `710661a`\n\n---\norbis-key: future.ai-assistant",
+    "dueDate": null,
+    "parent": "future",
+    "startDate": null,
+    "status": "Backlog",
+    "subject": "AI assistant (assistant app)",
+    "type": "Feature"
+   }
+  },
+  "future.bell-websocket": {
+   "hash": null,
+   "id": 1901,
+   "remote": {
+    "category": "Future",
+    "description": "Needs an ASGI/nginx/supervisor infra plan first.\n\n---\norbis-key: future.bell-websocket",
+    "dueDate": null,
+    "parent": "future",
+    "startDate": null,
+    "status": "Backlog",
+    "subject": "Notification bell v2 (WebSockets)",
+    "type": "Feature"
+   }
+  },
+  "future.grc": {
+   "hash": null,
+   "id": 1905,
+   "remote": {
+    "category": "Future",
+    "description": "About 6 months out.\n\n---\norbis-key: future.grc",
+    "dueDate": null,
+    "parent": "future",
+    "startDate": null,
+    "status": "Backlog",
+    "subject": "GRC beyond policies (Risk, Compliance, Vendors, Tasks, Reports)",
+    "type": "Feature"
+   }
+  },
+  "future.informational-notifications": {
+   "hash": null,
+   "id": 1902,
+   "remote": {
+    "category": "Future",
+    "description": "\"Your leave was approved\". docs/PLAN.md Notifications\n\n---\norbis-key: future.informational-notifications",
+    "dueDate": null,
+    "parent": "future",
+    "startDate": null,
+    "status": "Backlog",
+    "subject": "Informational notifications with read state",
+    "type": "Feature"
+   }
+  },
+  "future.media-phase3": {
+   "hash": null,
+   "id": 1903,
+   "remote": {
+    "category": "Future",
+    "description": "Read-only DriveObject admin with re-verify, rotate_media_keys. docs/MEDIA_GOOGLE_DRIVE_PLAN.md \u00a75\n\n---\norbis-key: future.media-phase3",
+    "dueDate": null,
+    "parent": "future",
+    "startDate": null,
+    "status": "Backlog",
+    "subject": "Media Phase 3 hardening",
+    "type": "Feature"
+   }
+  },
+  "future.org-chart-print": {
+   "hash": null,
+   "id": 1904,
+   "remote": {
+    "category": "Future",
+    "description": "Deliberately not built; revisit if HR asks.\n\n---\norbis-key: future.org-chart-print",
+    "dueDate": null,
+    "parent": "future",
+    "startDate": null,
+    "status": "Backlog",
+    "subject": "Printable leadership org-chart overview",
+    "type": "Feature"
+   }
+  },
+  "future.rename-tenure": {
+   "hash": null,
+   "id": 1906,
+   "remote": {
+    "category": "Future",
+    "description": "Proposed because \"Orbis\" clashes with a client platform. Not approved \u2014 do not rename yet.\n\n**Blocked on:** Leadership approval\n\n---\norbis-key: future.rename-tenure",
+    "dueDate": null,
+    "parent": "future",
+    "startDate": null,
+    "status": "Backlog",
+    "subject": "Rename Orbis \u2192 Tenure (tenure.sebpo.net)",
+    "type": "Feature"
+   }
+  },
+  "infra": {
+   "hash": null,
+   "id": 1686,
+   "remote": {
+    "category": "Infrastructure",
+    "description": "VPS (gunicorn + supervisor + nginx + MySQL), Celery, TLS, deploy flow, security/perf. Runbook: deploy/README.md\n\n---\norbis-key: infra",
+    "dueDate": "2026-10-29",
+    "parent": null,
+    "startDate": "2026-04-24",
+    "status": "Backlog",
+    "subject": "Infrastructure & deploy",
+    "type": "Epic"
+   }
+  },
+  "infra.bootstrap": {
+   "hash": null,
+   "id": 1705,
+   "remote": {
+    "category": "Infrastructure",
+    "description": "Spec / code: docs/PLAN.md\n\n**Commits:** `e9d3aa6` `197e7d7` `f81ac6c` `776d7e2` `ee93375` `47636ee` `55f5c7a`\n\n---\norbis-key: infra.bootstrap",
+    "dueDate": "2026-09-04",
+    "parent": "infra",
+    "startDate": "2026-04-24",
+    "status": "Backlog",
+    "subject": "Project bootstrap & initial setup",
+    "type": "Feature"
+   }
+  },
+  "infra.celery": {
+   "hash": null,
+   "id": 1710,
+   "remote": {
+    "category": "Infrastructure",
+    "description": "Spec / code: docs/PLAN.md\n\n**Commits:** `2ed67c0` `ad5cdce` `f303781`\n\n---\norbis-key: infra.celery",
+    "dueDate": "2026-09-01",
+    "parent": "infra",
+    "startDate": "2026-07-21",
+    "status": "Backlog",
+    "subject": "Celery + celery-beat replace django-q2; background email/PDF",
+    "type": "Feature"
+   }
+  },
+  "infra.deploy-key": {
+   "hash": null,
+   "id": 1712,
+   "remote": {
+    "category": "Infrastructure",
+    "description": "Spec / code: deploy/README.md\n\n**Commits:** `118f52a` `a313359`\n\n---\norbis-key: infra.deploy-key",
+    "dueDate": "2026-08-31",
+    "parent": "infra",
+    "startDate": "2026-08-31",
+    "status": "Backlog",
+    "subject": "Read-only deploy key + day-to-day deploy flow",
+    "type": "Feature"
+   }
+  },
+  "infra.deploy-prep": {
+   "hash": null,
+   "id": 1706,
+   "remote": {
+    "category": "Infrastructure",
+    "description": "Spec / code: deploy/README.md\n\n**Commits:** `5b3ae81`\n\n---\norbis-key: infra.deploy-prep",
+    "dueDate": "2026-05-05",
+    "parent": "infra",
+    "startDate": "2026-05-05",
+    "status": "Backlog",
+    "subject": "Initial production deploy prep (squashed migrations + seed_orbis)",
+    "type": "Feature"
+   }
+  },
+  "infra.dev-docs": {
+   "hash": null,
+   "id": 1707,
+   "remote": {
+    "category": "Infrastructure",
+    "description": "Spec / code: docs/LOCAL_DEVELOPMENT.md\n\n**Commits:** `c96f800`\n\n---\norbis-key: infra.dev-docs",
+    "dueDate": "2026-06-08",
+    "parent": "infra",
+    "startDate": "2026-06-08",
+    "status": "Backlog",
+    "subject": "Developer onboarding docs",
+    "type": "Feature"
+   }
+  },
+  "infra.docs-upkeep": {
+   "hash": null,
+   "id": 1708,
+   "remote": {
+    "category": "Infrastructure",
+    "description": "Spec / code: docs/PLAN.md\n\n**Commits:** `750b5bb` `d8dd8c1` `a186ec7`\n\n---\norbis-key: infra.docs-upkeep",
+    "dueDate": "2026-09-04",
+    "parent": "infra",
+    "startDate": "2026-05-22",
+    "status": "Backlog",
+    "subject": "Keep PLAN.md / CLAUDE.md in step with shipped work",
+    "type": "Feature"
+   }
+  },
+  "infra.email": {
+   "hash": null,
+   "id": 1714,
+   "remote": {
+    "category": "Infrastructure",
+    "description": "Spec / code: .env.example\n\n**Commits:** `0c64e6c`\n\n---\norbis-key: infra.email",
+    "dueDate": "2026-10-12",
+    "parent": "infra",
+    "startDate": "2026-10-12",
+    "status": "Backlog",
+    "subject": "Outbound email via Google Workspace service mailbox",
+    "type": "Feature"
+   }
+  },
+  "infra.followups": {
+   "hash": null,
+   "id": 1703,
+   "remote": {
+    "category": "Infrastructure",
+    "description": "Deploy steps and server tasks still to do on orbis.sebpo.net. Runbook: deploy/README.md\n\n---\norbis-key: infra.followups",
+    "dueDate": null,
+    "parent": "infra",
+    "startDate": null,
+    "status": "Backlog",
+    "subject": "Production follow-ups",
+    "type": "Epic"
+   }
+  },
+  "infra.followups.dev-key": {
+   "hash": null,
+   "id": 1933,
+   "remote": {
+    "category": "Infrastructure",
+    "description": "Dev still holds the prod PAYROLL_FIELD_KEYS.\n\n**Blocked on:** Deferred\n\n---\norbis-key: infra.followups.dev-key",
+    "dueDate": null,
+    "parent": "infra.followups",
+    "startDate": null,
+    "status": "Backlog",
+    "subject": "Rotate the dev payroll key",
+    "type": "Task"
+   }
+  },
+  "infra.followups.github-pat": {
+   "hash": null,
+   "id": 1929,
+   "remote": {
+    "category": "Infrastructure",
+    "description": "Move veridoc and resumeintel to their own deploy keys first.\n\n---\norbis-key: infra.followups.github-pat",
+    "dueDate": null,
+    "parent": "infra.followups",
+    "startDate": null,
+    "status": "Backlog",
+    "subject": "Revoke the old GitHub PAT",
+    "type": "Task"
+   }
+  },
+  "infra.followups.gunicorn-timeout": {
+   "hash": null,
+   "id": 1932,
+   "remote": {
+    "category": "Infrastructure",
+    "description": "Prod is ~3x slower than dev; heavy exports near 30s.\n\n**Blocked on:** User decision\n\n---\norbis-key: infra.followups.gunicorn-timeout",
+    "dueDate": null,
+    "parent": "infra.followups",
+    "startDate": null,
+    "status": "Backlog",
+    "subject": "Gunicorn --timeout 60",
+    "type": "Task"
+   }
+  },
+  "infra.followups.hsts": {
+   "hash": null,
+   "id": 1927,
+   "remote": {
+    "category": "Infrastructure",
+    "description": "SECURE_HSTS_SECONDS.\n\n---\norbis-key: infra.followups.hsts",
+    "dueDate": null,
+    "parent": "infra.followups",
+    "startDate": null,
+    "status": "Backlog",
+    "subject": "Enable HSTS in stages",
+    "type": "Task"
+   }
+  },
+  "infra.followups.leave-reversal": {
+   "hash": null,
+   "id": 1925,
+   "remote": {
+    "category": "Infrastructure",
+    "description": "Code committed; not run.\n\n**Blocked on:** User review / HR sign-off\n\n---\norbis-key: infra.followups.leave-reversal",
+    "dueDate": null,
+    "parent": "infra.followups",
+    "startDate": null,
+    "status": "Backlog",
+    "subject": "Run the stale leave-debit reversal (26 rows) + 1,900-row backlog",
+    "type": "Task"
+   }
+  },
+  "infra.followups.legacy-60": {
+   "hash": null,
+   "id": 1924,
+   "remote": {
+    "category": "Infrastructure",
+    "description": "docs/LEGACY_60_IMPORT_PLAN.md \u00a75. (per memory \u2014 confirm on prod)\n\n---\norbis-key: infra.followups.legacy-60",
+    "dueDate": null,
+    "parent": "infra.followups",
+    "startDate": null,
+    "status": "Backlog",
+    "subject": "Legacy 60 uploads on prod (profile \u2192 address \u2192 salary \u2192 AL)",
+    "type": "Task"
+   }
+  },
+  "infra.followups.loans-cutover": {
+   "hash": null,
+   "id": 1923,
+   "remote": {
+    "category": "Infrastructure",
+    "description": "Upload Center \"Salary loans (cutover)\" card.\n\n**Blocked on:** Finance sheet\n\n---\norbis-key: infra.followups.loans-cutover",
+    "dueDate": null,
+    "parent": "infra.followups",
+    "startDate": null,
+    "status": "Backlog",
+    "subject": "Salary loans cutover upload (~100 loans)",
+    "type": "Task"
+   }
+  },
+  "infra.followups.media-cleanup": {
+   "hash": null,
+   "id": 1926,
+   "remote": {
+    "category": "Infrastructure",
+    "description": "~/orbis/media + the pre-migration tarball. deploy/README.md \"Media on Google Drive\" step 2.5\n\n---\norbis-key: infra.followups.media-cleanup",
+    "dueDate": null,
+    "parent": "infra.followups",
+    "startDate": null,
+    "status": "Backlog",
+    "subject": "Delete the pre-Drive media copy (overdue since 2026-10-30)",
+    "type": "Task"
+   }
+  },
+  "infra.followups.phase0-leftovers": {
+   "hash": null,
+   "id": 1930,
+   "remote": {
+    "category": "Infrastructure",
+    "description": "Rotate orbis_user password, backup script, clean media/payroll/batches, delete the Drive dump.\n\n---\norbis-key: infra.followups.phase0-leftovers",
+    "dueDate": null,
+    "parent": "infra.followups",
+    "startDate": null,
+    "status": "Backlog",
+    "subject": "Payroll Phase 0 server leftovers",
+    "type": "Task"
+   }
+  },
+  "infra.followups.pre-orbis-deploy": {
+   "hash": null,
+   "id": 1921,
+   "remote": {
+    "category": "Infrastructure",
+    "description": "Runbook docs/PRE_ORBIS_PAYROLL_IMPORT_PLAN.md \u00a74. (per memory \u2014 confirm on prod)\n\n---\norbis-key: infra.followups.pre-orbis-deploy",
+    "dueDate": null,
+    "parent": "infra.followups",
+    "startDate": null,
+    "status": "Backlog",
+    "subject": "Deploy the pre-Orbis months importer (verify state)",
+    "type": "Task"
+   }
+  },
+  "infra.followups.seed-in-deploy": {
+   "hash": null,
+   "id": 1931,
+   "remote": {
+    "category": "Infrastructure",
+    "description": "Decide the two hand-edited prod submenu grants first; fix the seed_org.json \"Human Resources\" collision.\n\n**Blocked on:** Submenu grant decision\n\n---\norbis-key: infra.followups.seed-in-deploy",
+    "dueDate": null,
+    "parent": "infra.followups",
+    "startDate": null,
+    "status": "Backlog",
+    "subject": "Run seeds from update_orbis.sh + fix bare seed_orbis",
+    "type": "Task"
+   }
+  },
+  "infra.followups.tax-cutover": {
+   "hash": null,
+   "id": 1922,
+   "remote": {
+    "category": "Infrastructure",
+    "description": "Set FY2026-27 orbis_live_from, upload Finance's openings, recalculate.\n\n**Blocked on:** Finance data\n\n---\norbis-key: infra.followups.tax-cutover",
+    "dueDate": null,
+    "parent": "infra.followups",
+    "startDate": null,
+    "status": "Backlog",
+    "subject": "Tax true-up cutover on prod",
+    "type": "Task"
+   }
+  },
+  "infra.followups.timely-token": {
+   "hash": null,
+   "id": 1928,
+   "remote": {
+    "category": "Infrastructure",
+    "description": "It travelled in cleartext before TLS.\n\n**Blocked on:** TimeLy team\n\n---\norbis-key: infra.followups.timely-token",
+    "dueDate": null,
+    "parent": "infra.followups",
+    "startDate": null,
+    "status": "Backlog",
+    "subject": "Rotate TIMELY_API_TOKEN",
+    "type": "Task"
+   }
+  },
+  "infra.nginx-upload": {
+   "hash": null,
+   "id": 1715,
+   "remote": {
+    "category": "Infrastructure",
+    "description": "Spec / code: deploy/README.md\n\n**Commits:** `1a70ddf`\n\n---\norbis-key: infra.nginx-upload",
+    "dueDate": "2026-10-29",
+    "parent": "infra",
+    "startDate": "2026-10-29",
+    "status": "Backlog",
+    "subject": "Production nginx upload limit confirmed",
+    "type": "Feature"
+   }
+  },
+  "infra.openproject": {
+   "hash": null,
+   "id": 1907,
+   "remote": {
+    "category": "Infrastructure",
+    "description": "Spec / code: docs/OPENPROJECT.md\n\n---\norbis-key: infra.openproject",
+    "dueDate": "2026-11-03",
+    "parent": "infra",
+    "startDate": "2026-11-03",
+    "status": "Backlog",
+    "subject": "OpenProject tracking \u2014 inventory, Playwright sync, time log",
+    "type": "Feature"
+   }
+  },
+  "infra.planning-support": {
+   "hash": null,
+   "id": 1867,
+   "remote": {
+    "category": "Infrastructure",
+    "description": "Ongoing work that doesn't land as a commit: planning, HR/Finance meetings, UAT support, production operations. Time on days with no commit is logged here.\n\n---\norbis-key: infra.planning-support",
+    "dueDate": null,
+    "parent": "infra",
+    "startDate": "2026-04-24",
+    "status": "Backlog",
+    "subject": "Planning, support & operations",
+    "type": "Task"
+   }
+  },
+  "infra.security-perf": {
+   "hash": null,
+   "id": 1709,
+   "remote": {
+    "category": "Infrastructure",
+    "description": "Spec / code: deploy/README.md\n\n**Commits:** `863f4e2` `e193a97` `36b6036` `4ef945c` `9b17258` `b29b96e` `507ad8d` `426c0c1` `cde2c53`\n\n---\norbis-key: infra.security-perf",
+    "dueDate": "2026-09-07",
+    "parent": "infra",
+    "startDate": "2026-07-20",
+    "status": "Backlog",
+    "subject": "Security & performance hardening sprint",
+    "type": "Feature"
+   }
+  },
+  "infra.seed-orbis": {
+   "hash": null,
+   "id": 1713,
+   "remote": {
+    "category": "Infrastructure",
+    "description": "Spec / code: deploy/README.md\n\n**Commits:** `a2d88a3` `1f18dc0`\n\n---\norbis-key: infra.seed-orbis",
+    "dueDate": "2026-09-21",
+    "parent": "infra",
+    "startDate": "2026-09-07",
+    "status": "Backlog",
+    "subject": "seed_orbis on real org data (MySQL collation rule)",
+    "type": "Feature"
+   }
+  },
+  "infra.tls": {
+   "hash": null,
+   "id": 1711,
+   "remote": {
+    "category": "Infrastructure",
+    "description": "Spec / code: deploy/README.md\n\n**Commits:** `b47d838` `b395964` `497c037`\n\n---\norbis-key: infra.tls",
+    "dueDate": "2026-08-31",
+    "parent": "infra",
+    "startDate": "2026-08-31",
+    "status": "Backlog",
+    "subject": "HTTPS / TLS behind the proxy; deploy README checked against the server",
+    "type": "Feature"
+   }
+  },
+  "leave": {
+   "hash": null,
+   "id": 1675,
+   "remote": {
+    "category": "Leave",
+    "description": "SEBPO Leave Policy v2.0, balance ledger, anniversary AL, CpL, shift summary. Spec: docs/LEAVE_POLICY_IMPLEMENTATION.md\n\n---\norbis-key: leave",
+    "dueDate": "2026-10-30",
+    "parent": null,
+    "startDate": "2026-04-24",
+    "status": "Backlog",
+    "subject": "Leave",
+    "type": "Epic"
+   }
+  },
+  "leave.advance": {
+   "hash": null,
+   "id": 1779,
+   "remote": {
+    "category": "Leave",
+    "description": "**Commits:** `7825b11`\n\n---\norbis-key: leave.advance",
+    "dueDate": "2026-09-10",
+    "parent": "leave",
+    "startDate": "2026-09-10",
+    "status": "Backlog",
+    "subject": "Leave in advance of future entitlement",
+    "type": "Feature"
+   }
+  },
+  "leave.al-anniversary": {
+   "hash": null,
+   "id": 1776,
+   "remote": {
+    "category": "Leave",
+    "description": "Spec / code: docs/LEAVE_POLICY_IMPLEMENTATION.md \u00a75.7\n\n**Commits:** `2b8fed3` `94ced5b` `8f8eead` `5758e7a` `2c00bb3` `12572f5` `17087cf` `6f880cf`\n\n---\norbis-key: leave.al-anniversary",
+    "dueDate": "2026-09-03",
+    "parent": "leave",
+    "startDate": "2026-08-31",
+    "status": "Backlog",
+    "subject": "Annual leave on anniversary cycles, live accrual, auto open/close",
+    "type": "Feature"
+   }
+  },
+  "leave.balance-visibility": {
+   "hash": null,
+   "id": 1777,
+   "remote": {
+    "category": "Leave",
+    "description": "**Commits:** `db5bf75` `674b569`\n\n---\norbis-key: leave.balance-visibility",
+    "dueDate": "2026-09-07",
+    "parent": "leave",
+    "startDate": "2026-09-02",
+    "status": "Backlog",
+    "subject": "Leave balance on profile and on approve/decline",
+    "type": "Feature"
+   }
+  },
+  "leave.calendar": {
+   "hash": null,
+   "id": 1774,
+   "remote": {
+    "category": "Leave",
+    "description": "**Commits:** `9af914f` `c60db24`\n\n---\norbis-key: leave.calendar",
+    "dueDate": "2026-07-09",
+    "parent": "leave",
+    "startDate": "2026-07-09",
+    "status": "Backlog",
+    "subject": "Leave calendar view",
+    "type": "Feature"
+   }
+  },
+  "leave.core": {
+   "hash": null,
+   "id": 1768,
+   "remote": {
+    "category": "Leave",
+    "description": "**Commits:** `c7b33a3` `a20d8c6`\n\n---\norbis-key: leave.core",
+    "dueDate": "2026-04-24",
+    "parent": "leave",
+    "startDate": "2026-04-24",
+    "status": "Backlog",
+    "subject": "Leave apply / approve / decline / cancel",
+    "type": "Feature"
+   }
+  },
+  "leave.cpl": {
+   "hash": null,
+   "id": 1780,
+   "remote": {
+    "category": "Leave",
+    "description": "**Commits:** `387c32a` `6b9c16b` `a58ab18`\n\n---\norbis-key: leave.cpl",
+    "dueDate": "2026-10-01",
+    "parent": "leave",
+    "startDate": "2026-09-14",
+    "status": "Backlog",
+    "subject": "Compensatory leave tracking, carry-forward, year-end rollover",
+    "type": "Feature"
+   }
+  },
+  "leave.direct-reports": {
+   "hash": null,
+   "id": 1782,
+   "remote": {
+    "category": "Leave",
+    "description": "**Commits:** `6a98c20`\n\n---\norbis-key: leave.direct-reports",
+    "dueDate": "2026-10-09",
+    "parent": "leave",
+    "startDate": "2026-10-09",
+    "status": "Backlog",
+    "subject": "\"Direct reports only\" switch",
+    "type": "Feature"
+   }
+  },
+  "leave.double-debit": {
+   "hash": null,
+   "id": 1781,
+   "remote": {
+    "category": "Leave",
+    "description": "**Commits:** `d80d106`\n\n---\norbis-key: leave.double-debit",
+    "dueDate": "2026-09-22",
+    "parent": "leave",
+    "startDate": "2026-09-22",
+    "status": "Backlog",
+    "subject": "Double-debit fix (application vs roster)",
+    "type": "Feature"
+   }
+  },
+  "leave.edit-pending": {
+   "hash": null,
+   "id": 1783,
+   "remote": {
+    "category": "Leave",
+    "description": "**Commits:** `29a8852`\n\n---\norbis-key: leave.edit-pending",
+    "dueDate": "2026-10-19",
+    "parent": "leave",
+    "startDate": "2026-10-19",
+    "status": "Backlog",
+    "subject": "Edit a pending leave application",
+    "type": "Feature"
+   }
+  },
+  "leave.list-filters": {
+   "hash": null,
+   "id": 1778,
+   "remote": {
+    "category": "Leave",
+    "description": "**Commits:** `49b06a4` `1eb7036` `1a689dc`\n\n---\norbis-key: leave.list-filters",
+    "dueDate": "2026-09-07",
+    "parent": "leave",
+    "startDate": "2026-09-07",
+    "status": "Backlog",
+    "subject": "Leave list filter, sort, pagination + Team column",
+    "type": "Feature"
+   }
+  },
+  "leave.menu": {
+   "hash": null,
+   "id": 1773,
+   "remote": {
+    "category": "Leave",
+    "description": "**Commits:** `c8cdf97`\n\n---\norbis-key: leave.menu",
+    "dueDate": "2026-06-30",
+    "parent": "leave",
+    "startDate": "2026-06-30",
+    "status": "Backlog",
+    "subject": "Leave menu section",
+    "type": "Feature"
+   }
+  },
+  "leave.policy-v2": {
+   "hash": null,
+   "id": 1769,
+   "remote": {
+    "category": "Leave",
+    "description": "Spec / code: docs/LEAVE_POLICY_IMPLEMENTATION.md\n\n**Commits:** `cbe47c6` `0eefc2a` `0842cdc` `04cebf9` `e2b3fea` `d631826`\n\n---\norbis-key: leave.policy-v2",
+    "dueDate": "2026-09-17",
+    "parent": "leave",
+    "startDate": "2026-04-27",
+    "status": "Backlog",
+    "subject": "SEBPO Leave Policy v2.0 (sandwich rule, balance ledger, accrual)",
+    "type": "Feature"
+   }
+  },
+  "leave.race-fixes": {
+   "hash": null,
+   "id": 1775,
+   "remote": {
+    "category": "Leave",
+    "description": "**Commits:** `0e10f4a`\n\n---\norbis-key: leave.race-fixes",
+    "dueDate": "2026-07-21",
+    "parent": "leave",
+    "startDate": "2026-07-21",
+    "status": "Backlog",
+    "subject": "Balance race fixes + indexes",
+    "type": "Feature"
+   }
+  },
+  "leave.seed": {
+   "hash": null,
+   "id": 1770,
+   "remote": {
+    "category": "Leave",
+    "description": "**Commits:** `242c774`\n\n---\norbis-key: leave.seed",
+    "dueDate": "2026-04-29",
+    "parent": "leave",
+    "startDate": "2026-04-29",
+    "status": "Backlog",
+    "subject": "seed_leave_policies command",
+    "type": "Feature"
+   }
+  },
+  "leave.shift-summary": {
+   "hash": null,
+   "id": 1772,
+   "remote": {
+    "category": "Leave",
+    "description": "Spec / code: payroll/reports.py\n\n**Commits:** `219215f` `01aa8ae` `b2b5ca2` `26a85df` `98d0b42` `fb4a1a6`\n\n---\norbis-key: leave.shift-summary",
+    "dueDate": "2026-10-30",
+    "parent": "leave",
+    "startDate": "2026-06-30",
+    "status": "Backlog",
+    "subject": "Shift-summary report (scoped, Excel export)",
+    "type": "Feature"
+   }
+  },
+  "leave.summary": {
+   "hash": null,
+   "id": 1771,
+   "remote": {
+    "category": "Leave",
+    "description": "**Commits:** `80c6011`\n\n---\norbis-key: leave.summary",
+    "dueDate": "2026-05-19",
+    "parent": "leave",
+    "startDate": "2026-05-19",
+    "status": "Backlog",
+    "subject": "Leave summary list",
+    "type": "Feature"
+   }
+  },
+  "media_store": {
+   "hash": null,
+   "id": 1684,
+   "remote": {
+    "category": "Media store",
+    "description": "Encrypted blob store on Drive, permission-checked /media/. Spec: docs/MEDIA_GOOGLE_DRIVE_PLAN.md\n\n---\norbis-key: media_store",
+    "dueDate": "2026-10-16",
+    "parent": null,
+    "startDate": "2026-10-12",
+    "status": "Backlog",
+    "subject": "Media on Google Drive",
+    "type": "Epic"
+   }
+  },
+  "media_store.case-sensitive": {
+   "hash": null,
+   "id": 1822,
+   "remote": {
+    "category": "Media store",
+    "description": "**Commits:** `02248fa` `1db630c`\n\n---\norbis-key: media_store.case-sensitive",
+    "dueDate": "2026-10-16",
+    "parent": "media_store",
+    "startDate": "2026-10-16",
+    "status": "Backlog",
+    "subject": "Case-sensitive names + /media/ checked against the owning row",
+    "type": "Feature"
+   }
+  },
+  "media_store.drive": {
+   "hash": null,
+   "id": 1820,
+   "remote": {
+    "category": "Media store",
+    "description": "Spec / code: docs/MEDIA_GOOGLE_DRIVE_PLAN.md\n\n**Commits:** `ee279a0` `a9dda65` `f534b67` `5127b3d`\n\n---\norbis-key: media_store.drive",
+    "dueDate": "2026-10-12",
+    "parent": "media_store",
+    "startDate": "2026-10-12",
+    "status": "Backlog",
+    "subject": "Media on Google Drive as an encrypted blob store",
+    "type": "Feature"
+   }
+  },
+  "media_store.keys-optional": {
+   "hash": null,
+   "id": 1821,
+   "remote": {
+    "category": "Media store",
+    "description": "**Commits:** `e53675d`\n\n---\norbis-key: media_store.keys-optional",
+    "dueDate": "2026-10-12",
+    "parent": "media_store",
+    "startDate": "2026-10-12",
+    "status": "Backlog",
+    "subject": "Encryption keys required only for the Drive backend",
+    "type": "Feature"
+   }
+  },
+  "media_store.prod-flip": {
+   "hash": null,
+   "id": 1824,
+   "remote": {
+    "category": "Media store",
+    "description": "Spec / code: deploy/README.md \"Media on Google Drive\"\n\n**Commits:** `c95943d` `cb3ab35` `8624610`\n\n---\norbis-key: media_store.prod-flip",
+    "dueDate": "2026-10-16",
+    "parent": "media_store",
+    "startDate": "2026-10-16",
+    "status": "Backlog",
+    "subject": "Production flip to Drive (2026-10-16)",
+    "type": "Feature"
+   }
+  },
+  "media_store.resumable": {
+   "hash": null,
+   "id": 1823,
+   "remote": {
+    "category": "Media store",
+    "description": "**Commits:** `e74b5db`\n\n---\norbis-key: media_store.resumable",
+    "dueDate": "2026-10-16",
+    "parent": "media_store",
+    "startDate": "2026-10-16",
+    "status": "Backlog",
+    "subject": "Recover interrupted Drive uploads",
+    "type": "Feature"
+   }
+  },
+  "ms.ai-summit": {
+   "hash": null,
+   "id": 1698,
+   "remote": {
+    "category": null,
+    "date": "2026-11-05",
+    "description": "DCCI AI Summit 2026 (exhibiting) \u2014 2026-11-05.\n\n---\norbis-key: ms.ai-summit",
+    "parent": null,
+    "status": "Backlog",
+    "subject": "DCCI AI Summit 2026 (exhibiting)",
+    "type": "Milestone"
+   }
+  },
+  "ms.celery": {
+   "hash": null,
+   "id": 1692,
+   "remote": {
+    "category": null,
+    "date": "2026-07-21",
+    "description": "Celery replaces django-q2 \u2014 2026-07-21.\n\n---\norbis-key: ms.celery",
+    "parent": null,
+    "status": "Backlog",
+    "subject": "Celery replaces django-q2",
+    "type": "Milestone"
+   }
+  },
+  "ms.directory-api": {
+   "hash": null,
+   "id": 1696,
+   "remote": {
+    "category": null,
+    "date": "2026-10-14",
+    "description": "Directory API phases 1\u20133 \u2014 2026-10-14.\n\n---\norbis-key: ms.directory-api",
+    "parent": null,
+    "status": "Backlog",
+    "subject": "Directory API phases 1\u20133",
+    "type": "Milestone"
+   }
+  },
+  "ms.encryption": {
+   "hash": null,
+   "id": 1695,
+   "remote": {
+    "category": null,
+    "date": "2026-10-05",
+    "description": "Payroll encryption live on production \u2014 2026-10-05.\n\n---\norbis-key: ms.encryption",
+    "parent": null,
+    "status": "Backlog",
+    "subject": "Payroll encryption live on production",
+    "type": "Milestone"
+   }
+  },
+  "ms.https": {
+   "hash": null,
+   "id": 1694,
+   "remote": {
+    "category": null,
+    "date": "2026-08-31",
+    "description": "HTTPS on orbis.sebpo.net \u2014 2026-08-29.\n\n---\norbis-key: ms.https",
+    "parent": null,
+    "status": "Backlog",
+    "subject": "HTTPS on orbis.sebpo.net",
+    "type": "Milestone"
+   }
+  },
+  "ms.media-drive": {
+   "hash": null,
+   "id": 1697,
+   "remote": {
+    "category": null,
+    "date": "2026-10-16",
+    "description": "Media on Google Drive in production \u2014 2026-10-16.\n\n---\norbis-key: ms.media-drive",
+    "parent": null,
+    "status": "Backlog",
+    "subject": "Media on Google Drive in production",
+    "type": "Milestone"
+   }
+  },
+  "ms.mvp": {
+   "hash": null,
+   "id": 1691,
+   "remote": {
+    "category": null,
+    "date": "2026-05-15",
+    "description": "MVP target \u2014 2026-05-15.\n\n---\norbis-key: ms.mvp",
+    "parent": null,
+    "status": "Backlog",
+    "subject": "MVP target",
+    "type": "Milestone"
+   }
+  },
+  "ms.payroll-1-4": {
+   "hash": null,
+   "id": 1693,
+   "remote": {
+    "category": null,
+    "date": "2026-08-24",
+    "description": "Payroll Phases 1\u20134 landed \u2014 2026-08-24.\n\n---\norbis-key: ms.payroll-1-4",
+    "parent": null,
+    "status": "Backlog",
+    "subject": "Payroll Phases 1\u20134 landed",
+    "type": "Milestone"
+   }
+  },
+  "ms.start": {
+   "hash": null,
+   "id": 1690,
+   "remote": {
+    "category": null,
+    "date": "2026-04-24",
+    "description": "Project start \u2014 2026-04-24.\n\n---\norbis-key: ms.start",
+    "parent": null,
+    "status": "Backlog",
+    "subject": "Project start",
+    "type": "Milestone"
+   }
+  },
+  "offboarding": {
+   "hash": null,
+   "id": 1680,
+   "remote": {
+    "category": "Offboarding",
+    "description": "Resignation \u2192 8-step clearance, exit interview, asset return, LWD deactivation.\n\n---\norbis-key: offboarding",
+    "dueDate": "2026-09-07",
+    "parent": null,
+    "startDate": "2026-05-22",
+    "status": "Backlog",
+    "subject": "Offboarding",
+    "type": "Epic"
+   }
+  },
+  "offboarding.active-step": {
+   "hash": null,
+   "id": 1806,
+   "remote": {
+    "category": "Offboarding",
+    "description": "**Commits:** `f29a6a3`\n\n---\norbis-key: offboarding.active-step",
+    "dueDate": "2026-07-21",
+    "parent": "offboarding",
+    "startDate": "2026-07-21",
+    "status": "Backlog",
+    "subject": "Active-step fix on case detail",
+    "type": "Feature"
+   }
+  },
+  "offboarding.clearance": {
+   "hash": null,
+   "id": 1805,
+   "remote": {
+    "category": "Offboarding",
+    "description": "**Commits:** `c41a472` `0c689d5`\n\n---\norbis-key: offboarding.clearance",
+    "dueDate": "2026-06-12",
+    "parent": "offboarding",
+    "startDate": "2026-06-11",
+    "status": "Backlog",
+    "subject": "Clearance levels / pending workflow",
+    "type": "Feature"
+   }
+  },
+  "offboarding.lifecycle": {
+   "hash": null,
+   "id": 1866,
+   "remote": {
+    "category": "Offboarding",
+    "description": "Shipped in commit 3706cf7 together with HR letters (tracked under Documents).\n\n---\norbis-key: offboarding.lifecycle",
+    "dueDate": "2026-05-22",
+    "parent": "offboarding",
+    "startDate": "2026-05-22",
+    "status": "Backlog",
+    "subject": "Offboarding lifecycle (resignation \u2192 clearance)",
+    "type": "Feature"
+   }
+  },
+  "offboarding.skipped-detect": {
+   "hash": null,
+   "id": 1807,
+   "remote": {
+    "category": "Offboarding",
+    "description": "**Commits:** `8cb2266`\n\n---\norbis-key: offboarding.skipped-detect",
+    "dueDate": "2026-09-07",
+    "parent": "offboarding",
+    "startDate": "2026-09-07",
+    "status": "Backlog",
+    "subject": "Detect separations that skipped offboarding",
+    "type": "Feature"
+   }
+  },
+  "payroll": {
+   "hash": null,
+   "id": 1685,
+   "remote": {
+    "category": "Payroll",
+    "description": "Replaces the HR + Finance workbooks: compensation, inputs, engine, register, in-house TDS, loans. Spec: docs/PAYROLL_PLAN.md, docs/PAYROLL_PROCESS.md\n\n---\norbis-key: payroll",
+    "dueDate": "2026-11-03",
+    "parent": null,
+    "startDate": "2026-06-10",
+    "status": "Backlog",
+    "subject": "Payroll",
+    "type": "Epic"
+   }
+  },
+  "payroll.acl": {
+   "hash": null,
+   "id": 1831,
+   "remote": {
+    "category": "Payroll",
+    "description": "**Commits:** `9833e0c` `f1fd097`\n\n---\norbis-key: payroll.acl",
+    "dueDate": "2026-09-07",
+    "parent": "payroll",
+    "startDate": "2026-09-07",
+    "status": "Backlog",
+    "subject": "Payroll view access rules enforced",
+    "type": "Feature"
+   }
+  },
+  "payroll.adops-policy": {
+   "hash": null,
+   "id": 1832,
+   "remote": {
+    "category": "Payroll",
+    "description": "**Commits:** `454e78a`\n\n---\norbis-key: payroll.adops-policy",
+    "dueDate": "2026-09-07",
+    "parent": "payroll",
+    "startDate": "2026-09-07",
+    "status": "Backlog",
+    "subject": "AdOps night-shift / overtime / transport allowance policy",
+    "type": "Feature"
+   }
+  },
+  "payroll.custom-range": {
+   "hash": null,
+   "id": 1837,
+   "remote": {
+    "category": "Payroll",
+    "description": "**Commits:** `9e2cbce`\n\n---\norbis-key: payroll.custom-range",
+    "dueDate": "2026-09-08",
+    "parent": "payroll",
+    "startDate": "2026-09-08",
+    "status": "Backlog",
+    "subject": "Custom from/to dates for a payroll run",
+    "type": "Feature"
+   }
+  },
+  "payroll.dedicated-night": {
+   "hash": null,
+   "id": 1835,
+   "remote": {
+    "category": "Payroll",
+    "description": "**Commits:** `835b22b` `68e13d9` `2c80fa8` `1072294` `a204093`\n\n---\norbis-key: payroll.dedicated-night",
+    "dueDate": "2026-11-03",
+    "parent": "payroll",
+    "startDate": "2026-09-08",
+    "status": "Backlog",
+    "subject": "Dedicated night-shift assignments (admin, bulk, supervisor upkeep, roster sidebar)",
+    "type": "Feature"
+   }
+  },
+  "payroll.dept-assignment": {
+   "hash": null,
+   "id": 1872,
+   "remote": {
+    "category": "Payroll",
+    "description": "Risk 10 in docs/PAYROLL_PLAN.md \u00a712.\n\n---\norbis-key: payroll.dept-assignment",
+    "dueDate": null,
+    "parent": "payroll",
+    "startDate": null,
+    "status": "Backlog",
+    "subject": "Effective-dated DepartmentAssignment (cost-centre history)",
+    "type": "Task"
+   }
+  },
+  "payroll.design-docs": {
+   "hash": null,
+   "id": 1828,
+   "remote": {
+    "category": "Payroll",
+    "description": "Spec / code: docs/PAYROLL_PROCESS.md\n\n**Commits:** `79f55f0` `e955aab`\n\n---\norbis-key: payroll.design-docs",
+    "dueDate": "2026-08-10",
+    "parent": "payroll",
+    "startDate": "2026-08-10",
+    "status": "Backlog",
+    "subject": "Payroll process design + technical plan",
+    "type": "Feature"
+   }
+  },
+  "payroll.downline-scope": {
+   "hash": null,
+   "id": 1827,
+   "remote": {
+    "category": "Payroll",
+    "description": "**Commits:** `5fd8074`\n\n---\norbis-key: payroll.downline-scope",
+    "dueDate": "2026-07-17",
+    "parent": "payroll",
+    "startDate": "2026-07-17",
+    "status": "Backlog",
+    "subject": "Reports limited to the viewer's downline",
+    "type": "Feature"
+   }
+  },
+  "payroll.ds-pay-events": {
+   "hash": null,
+   "id": 1851,
+   "remote": {
+    "category": "Payroll",
+    "description": "**Commits:** `157c203` `2855e51`\n\n---\norbis-key: payroll.ds-pay-events",
+    "dueDate": "2026-09-21",
+    "parent": "payroll",
+    "startDate": "2026-09-21",
+    "status": "Backlog",
+    "subject": "Data Solutions pay events as structured data",
+    "type": "Feature"
+   }
+  },
+  "payroll.eid-coverage": {
+   "hash": null,
+   "id": 1868,
+   "remote": {
+    "category": "Payroll",
+    "description": "EidCoverageWindow(+Entry) \u2014 the only unbuilt Phase 7 piece.\n\n---\norbis-key: payroll.eid-coverage",
+    "dueDate": null,
+    "parent": "payroll",
+    "startDate": null,
+    "status": "Backlog",
+    "subject": "Eid coverage window (Phase 7 remainder)",
+    "type": "Feature"
+   }
+  },
+  "payroll.encryption": {
+   "hash": null,
+   "id": 1853,
+   "remote": {
+    "category": "Payroll",
+    "description": "Spec / code: docs/PAYROLL_DATA_PROTECTION_PLAN.md\n\n**Commits:** `56a72b9` `671edd9` `879f6ae` `fcb5720` `d37f5f9`\n\n---\norbis-key: payroll.encryption",
+    "dueDate": "2026-10-05",
+    "parent": "payroll",
+    "startDate": "2026-10-05",
+    "status": "Backlog",
+    "subject": "Data protection Phases 0\u20131: money encrypted at rest",
+    "type": "Feature"
+   }
+  },
+  "payroll.excel-export": {
+   "hash": null,
+   "id": 1826,
+   "remote": {
+    "category": "Payroll",
+    "description": "**Commits:** `9f9ec94` `de6d5a6` `4da9502`\n\n---\norbis-key: payroll.excel-export",
+    "dueDate": "2026-07-02",
+    "parent": "payroll",
+    "startDate": "2026-07-02",
+    "status": "Backlog",
+    "subject": "Payroll Excel export + support info",
+    "type": "Feature"
+   }
+  },
+  "payroll.filtered-export": {
+   "hash": null,
+   "id": 1849,
+   "remote": {
+    "category": "Payroll",
+    "description": "**Commits:** `f994137` `113f2a4`\n\n---\norbis-key: payroll.filtered-export",
+    "dueDate": "2026-09-18",
+    "parent": "payroll",
+    "startDate": "2026-09-17",
+    "status": "Backlog",
+    "subject": "Filtered Excel export (run detail, overtime list)",
+    "type": "Feature"
+   }
+  },
+  "payroll.first-report": {
+   "hash": null,
+   "id": 1825,
+   "remote": {
+    "category": "Payroll",
+    "description": "**Commits:** `dddaeaf`\n\n---\norbis-key: payroll.first-report",
+    "dueDate": "2026-06-10",
+    "parent": "payroll",
+    "startDate": "2026-06-10",
+    "status": "Backlog",
+    "subject": "First payroll report (no hour calculations)",
+    "type": "Feature"
+   }
+  },
+  "payroll.gh-ot": {
+   "hash": null,
+   "id": 1848,
+   "remote": {
+    "category": "Payroll",
+    "description": "**Commits:** `fceb194` `e2fe9a4`\n\n---\norbis-key: payroll.gh-ot",
+    "dueDate": "2026-09-16",
+    "parent": "payroll",
+    "startDate": "2026-09-16",
+    "status": "Backlog",
+    "subject": "Auto-generated GH overtime from attendance / TTMS",
+    "type": "Feature"
+   }
+  },
+  "payroll.gh-ot-reversal": {
+   "hash": null,
+   "id": 1871,
+   "remote": {
+    "category": "Payroll",
+    "description": "generate_gh_overtime*.py TODOs.\n\n**Blocked on:** A real case to design against\n\n---\norbis-key: payroll.gh-ot-reversal",
+    "dueDate": null,
+    "parent": "payroll",
+    "startDate": null,
+    "status": "Backlog",
+    "subject": "Void generated GH overtime when the qualifying punch goes away",
+    "type": "Task"
+   }
+  },
+  "payroll.gross-history-import": {
+   "hash": null,
+   "id": 1854,
+   "remote": {
+    "category": "Payroll",
+    "description": "**Commits:** `cdc03a8`\n\n---\norbis-key: payroll.gross-history-import",
+    "dueDate": "2026-10-05",
+    "parent": "payroll",
+    "startDate": "2026-10-05",
+    "status": "Backlog",
+    "subject": "Gross-salary history importer (legacy 60)",
+    "type": "Feature"
+   }
+  },
+  "payroll.gross-ot-basis": {
+   "hash": null,
+   "id": 1838,
+   "remote": {
+    "category": "Payroll",
+    "description": "**Commits:** `6f71123`\n\n---\norbis-key: payroll.gross-ot-basis",
+    "dueDate": "2026-09-09",
+    "parent": "payroll",
+    "startDate": "2026-09-09",
+    "status": "Backlog",
+    "subject": "Gross-derived overtime basis (Software, Creative)",
+    "type": "Feature"
+   }
+  },
+  "payroll.gross-register": {
+   "hash": null,
+   "id": 1830,
+   "remote": {
+    "category": "Payroll",
+    "description": "**Commits:** `6c1a1ab`\n\n---\norbis-key: payroll.gross-register",
+    "dueDate": "2026-08-28",
+    "parent": "payroll",
+    "startDate": "2026-08-28",
+    "status": "Backlog",
+    "subject": "Gross-salary register + overtime upload template",
+    "type": "Feature"
+   }
+  },
+  "payroll.loans": {
+   "hash": null,
+   "id": 1857,
+   "remote": {
+    "category": "Payroll",
+    "description": "Spec / code: docs/SALARY_LOAN_PLAN.md\n\n**Commits:** `dea658a`\n\n---\norbis-key: payroll.loans",
+    "dueDate": "2026-10-08",
+    "parent": "payroll",
+    "startDate": "2026-10-08",
+    "status": "Backlog",
+    "subject": "Salary loans",
+    "type": "Feature"
+   }
+  },
+  "payroll.meal": {
+   "hash": null,
+   "id": 1841,
+   "remote": {
+    "category": "Payroll",
+    "description": "**Commits:** `14ac5d0` `2f93e83` `795bbb2`\n\n---\norbis-key: payroll.meal",
+    "dueDate": "2026-09-28",
+    "parent": "payroll",
+    "startDate": "2026-09-09",
+    "status": "Backlog",
+    "subject": "Meal deduction in the engine + report",
+    "type": "Feature"
+   }
+  },
+  "payroll.mid-period": {
+   "hash": null,
+   "id": 1850,
+   "remote": {
+    "category": "Payroll",
+    "description": "**Commits:** `6b8dded`\n\n---\norbis-key: payroll.mid-period",
+    "dueDate": "2026-09-21",
+    "parent": "payroll",
+    "startDate": "2026-09-21",
+    "status": "Backlog",
+    "subject": "Mid-period salary changes paid per segment",
+    "type": "Feature"
+   }
+  },
+  "payroll.module": {
+   "hash": null,
+   "id": 1829,
+   "remote": {
+    "category": "Payroll",
+    "description": "Spec / code: docs/PAYROLL_PLAN.md\n\n**Commits:** `65e3bbb`\n\n---\norbis-key: payroll.module",
+    "dueDate": "2026-08-24",
+    "parent": "payroll",
+    "startDate": "2026-08-24",
+    "status": "Backlog",
+    "subject": "Phases 1\u20134: compensation, rates, calculation engine, in-house tax",
+    "type": "Feature"
+   }
+  },
+  "payroll.money-format": {
+   "hash": null,
+   "id": 1855,
+   "remote": {
+    "category": "Payroll",
+    "description": "Spec / code: docs/MONEY_FORMAT_PLAN.md\n\n**Commits:** `4740da0`\n\n---\norbis-key: payroll.money-format",
+    "dueDate": "2026-10-05",
+    "parent": "payroll",
+    "startDate": "2026-10-05",
+    "status": "Backlog",
+    "subject": "Whole-taka money formatting everywhere",
+    "type": "Feature"
+   }
+  },
+  "payroll.night-confirmation": {
+   "hash": null,
+   "id": 1864,
+   "remote": {
+    "category": "Payroll",
+    "description": "**Commits:** `20b32dc`\n\n---\norbis-key: payroll.night-confirmation",
+    "dueDate": "2026-11-03",
+    "parent": "payroll",
+    "startDate": "2026-11-03",
+    "status": "Backlog",
+    "subject": "Digital Advertising night allowance starts at confirmation",
+    "type": "Feature"
+   }
+  },
+  "payroll.night-perf": {
+   "hash": null,
+   "id": 1861,
+   "remote": {
+    "category": "Payroll",
+    "description": "**Commits:** `17d729f`\n\n---\norbis-key: payroll.night-perf",
+    "dueDate": "2026-10-14",
+    "parent": "payroll",
+    "startDate": "2026-10-14",
+    "status": "Backlog",
+    "subject": "Faster night-shift classification",
+    "type": "Feature"
+   }
+  },
+  "payroll.night-stale": {
+   "hash": null,
+   "id": 1870,
+   "remote": {
+    "category": "Payroll",
+    "description": "dedicated_night_changed_since_calculation, like the overtime one.\n\n---\norbis-key: payroll.night-stale",
+    "dueDate": null,
+    "parent": "payroll",
+    "startDate": null,
+    "status": "Backlog",
+    "subject": "Stale-run warning when a dedicated night window changes",
+    "type": "Task"
+   }
+  },
+  "payroll.notes": {
+   "hash": null,
+   "id": 1842,
+   "remote": {
+    "category": "Payroll",
+    "description": "**Commits:** `2c07ced` `6795c90`\n\n---\norbis-key: payroll.notes",
+    "dueDate": "2026-09-16",
+    "parent": "payroll",
+    "startDate": "2026-09-10",
+    "status": "Backlog",
+    "subject": "Role-gated runs + Supervisor/HR/Finance notes",
+    "type": "Feature"
+   }
+  },
+  "payroll.ot-chain": {
+   "hash": null,
+   "id": 1862,
+   "remote": {
+    "category": "Payroll",
+    "description": "Spec / code: docs/OVERTIME_APPROVAL_CHAIN_PLAN.md\n\n**Commits:** `fd5d5be`\n\n---\norbis-key: payroll.ot-chain",
+    "dueDate": "2026-10-19",
+    "parent": "payroll",
+    "startDate": "2026-10-19",
+    "status": "Backlog",
+    "subject": "Overtime review \u2192 approve chain",
+    "type": "Feature"
+   }
+  },
+  "payroll.ot-split": {
+   "hash": null,
+   "id": 1834,
+   "remote": {
+    "category": "Payroll",
+    "description": "**Commits:** `0e9d5f4`\n\n---\norbis-key: payroll.ot-split",
+    "dueDate": "2026-09-08",
+    "parent": "payroll",
+    "startDate": "2026-09-08",
+    "status": "Backlog",
+    "subject": "Overtime column split by overtime type",
+    "type": "Feature"
+   }
+  },
+  "payroll.overtime-window": {
+   "hash": null,
+   "id": 1844,
+   "remote": {
+    "category": "Payroll",
+    "description": "**Commits:** `6cc9825` `7cbd114` `299bdb0`\n\n---\norbis-key: payroll.overtime-window",
+    "dueDate": "2026-09-15",
+    "parent": "payroll",
+    "startDate": "2026-09-15",
+    "status": "Backlog",
+    "subject": "Overtime screens + input window / lock",
+    "type": "Feature"
+   }
+  },
+  "payroll.payrate-import": {
+   "hash": null,
+   "id": 1846,
+   "remote": {
+    "category": "Payroll",
+    "description": "**Commits:** `4db62fe`\n\n---\norbis-key: payroll.payrate-import",
+    "dueDate": "2026-09-16",
+    "parent": "payroll",
+    "startDate": "2026-09-16",
+    "status": "Backlog",
+    "subject": "PayRate import / export",
+    "type": "Feature"
+   }
+  },
+  "payroll.phase5": {
+   "hash": null,
+   "id": 1699,
+   "remote": {
+    "category": "Payroll",
+    "description": "Waiting on formal HR/Finance sign-off of docs/PAYROLL_PROCESS.md \u00a714. Spec: docs/PAYROLL_PLAN.md \u00a79\n\n---\norbis-key: payroll.phase5",
+    "dueDate": null,
+    "parent": "payroll",
+    "startDate": null,
+    "status": "Backlog",
+    "subject": "Payroll Phase 5 \u2014 approval, payslips, payouts",
+    "type": "Epic"
+   }
+  },
+  "payroll.phase5.approval-chain": {
+   "hash": null,
+   "id": 1908,
+   "remote": {
+    "category": "Payroll",
+    "description": "PayrollApprovalConfig, PayrollRunApproval, PayrollRunDepartmentReview; lock/paid/reversal run states. docs/PAYROLL_PLAN.md \u00a77, \u00a79\n\n**Blocked on:** HR/Finance sign-off of PAYROLL_PROCESS.md \u00a714\n\n---\norbis-key: payroll.phase5.approval-chain",
+    "dueDate": null,
+    "parent": "payroll.phase5",
+    "startDate": null,
+    "status": "Backlog",
+    "subject": "Payroll run approval chain (Department Review \u2192 HR \u2192 Finance)",
+    "type": "Feature"
+   }
+  },
+  "payroll.phase5.bank-advice": {
+   "hash": null,
+   "id": 1910,
+   "remote": {
+    "category": "Payroll",
+    "description": "BankAdvice(+Line), bank.py. docs/PAYROLL_PLAN.md \u00a74, \u00a79\n\n**Blocked on:** HR/Finance sign-off\n\n---\norbis-key: payroll.phase5.bank-advice",
+    "dueDate": null,
+    "parent": "payroll.phase5",
+    "startDate": null,
+    "status": "Backlog",
+    "subject": "Bank advice (Bank Asia, EBL, Modhumoti formats)",
+    "type": "Feature"
+   }
+  },
+  "payroll.phase5.cash-payouts": {
+   "hash": null,
+   "id": 1911,
+   "remote": {
+    "category": "Payroll",
+    "description": "CashChequeDisbursement, bKash/Nagad account type, signed disbursement sheet upload (Q23, Q30, Q31).\n\n**Blocked on:** HR/Finance sign-off\n\n---\norbis-key: payroll.phase5.cash-payouts",
+    "dueDate": null,
+    "parent": "payroll.phase5",
+    "startDate": null,
+    "status": "Backlog",
+    "subject": "Cash / cheque / mobile-wallet payouts",
+    "type": "Feature"
+   }
+  },
+  "payroll.phase5.export-audit": {
+   "hash": null,
+   "id": 1912,
+   "remote": {
+    "category": "Payroll",
+    "description": "PayrollExportAudit logs every Finance download (Q20).\n\n**Blocked on:** HR/Finance sign-off\n\n---\norbis-key: payroll.phase5.export-audit",
+    "dueDate": null,
+    "parent": "payroll.phase5",
+    "startDate": null,
+    "status": "Backlog",
+    "subject": "Payroll export audit",
+    "type": "Feature"
+   }
+  },
+  "payroll.phase5.payslips": {
+   "hash": null,
+   "id": 1909,
+   "remote": {
+    "category": "Payroll",
+    "description": "payslip.py, ~50 per task, retention plan for old PDFs. docs/PAYROLL_PLAN.md \u00a79, \u00a712\n\n**Blocked on:** HR/Finance sign-off\n\n---\norbis-key: payroll.phase5.payslips",
+    "dueDate": null,
+    "parent": "payroll.phase5",
+    "startDate": null,
+    "status": "Backlog",
+    "subject": "Payslips (WeasyPrint, chunked Celery)",
+    "type": "Feature"
+   }
+  },
+  "payroll.phase6": {
+   "hash": null,
+   "id": 1700,
+   "remote": {
+    "category": "Payroll",
+    "description": "Spec: docs/PAYROLL_PLAN.md \u00a79\n\n---\norbis-key: payroll.phase6",
+    "dueDate": null,
+    "parent": "payroll",
+    "startDate": null,
+    "status": "Backlog",
+    "subject": "Payroll Phase 6 \u2014 settlement & off-cycle runs",
+    "type": "Epic"
+   }
+  },
+  "payroll.phase6.encashment": {
+   "hash": null,
+   "id": 1915,
+   "remote": {
+    "category": "Payroll",
+    "description": "EncashmentRequest.paid_in_run.\n\n**Blocked on:** Finance Q22 (encashment rate)\n\n---\norbis-key: payroll.phase6.encashment",
+    "dueDate": null,
+    "parent": "payroll.phase6",
+    "startDate": null,
+    "status": "Backlog",
+    "subject": "Leave encashment paid through payroll",
+    "type": "Feature"
+   }
+  },
+  "payroll.phase6.festival-bonus": {
+   "hash": null,
+   "id": 1914,
+   "remote": {
+    "category": "Payroll",
+    "description": "Two Eids, 50% of gross, staff with >180 days' service.\n\n**Blocked on:** HR/Finance sign-off\n\n---\norbis-key: payroll.phase6.festival-bonus",
+    "dueDate": null,
+    "parent": "payroll.phase6",
+    "startDate": null,
+    "status": "Backlog",
+    "subject": "Festival bonus off-cycle run",
+    "type": "Feature"
+   }
+  },
+  "payroll.phase6.final-settlement": {
+   "hash": null,
+   "id": 1913,
+   "remote": {
+    "category": "Payroll",
+    "description": "FinalSettlement (no gratuity), link from offboarding. Manual HR step today.\n\n**Blocked on:** HR/Finance sign-off\n\n---\norbis-key: payroll.phase6.final-settlement",
+    "dueDate": null,
+    "parent": "payroll.phase6",
+    "startDate": null,
+    "status": "Backlog",
+    "subject": "Final settlement (incl. AL payout at separation)",
+    "type": "Feature"
+   }
+  },
+  "payroll.phase6.gl-split": {
+   "hash": null,
+   "id": 1917,
+   "remote": {
+    "category": "Payroll",
+    "description": "Basic 50 / Housing 25 / Medical 5 / Conveyance 10 / Other (Q29).\n\n**Blocked on:** Deferred by decision\n\n---\norbis-key: payroll.phase6.gl-split",
+    "dueDate": null,
+    "parent": "payroll.phase6",
+    "startDate": null,
+    "status": "Backlog",
+    "subject": "Statutory GL salary split",
+    "type": "Feature"
+   }
+  },
+  "payroll.phase6.service-benefit": {
+   "hash": null,
+   "id": 1916,
+   "remote": {
+    "category": "Payroll",
+    "description": "Confirmed real, deliberately deferred (Q32).\n\n**Blocked on:** Deferred by decision\n\n---\norbis-key: payroll.phase6.service-benefit",
+    "dueDate": null,
+    "parent": "payroll.phase6",
+    "startDate": null,
+    "status": "Backlog",
+    "subject": "Service benefit (long-service award)",
+    "type": "Feature"
+   }
+  },
+  "payroll.pre-orbis-months": {
+   "hash": null,
+   "id": 1858,
+   "remote": {
+    "category": "Payroll",
+    "description": "Spec / code: docs/PRE_ORBIS_PAYROLL_IMPORT_PLAN.md\n\n**Commits:** `09b5e95` `d990fe3` `694d12e` `ebcd6c3`\n\n---\norbis-key: payroll.pre-orbis-months",
+    "dueDate": "2026-10-09",
+    "parent": "payroll",
+    "startDate": "2026-10-08",
+    "status": "Backlog",
+    "subject": "Pre-Orbis payroll months importer + tax challans",
+    "type": "Feature"
+   }
+  },
+  "payroll.protection": {
+   "hash": null,
+   "id": 1702,
+   "remote": {
+    "category": "Payroll",
+    "description": "Spec: docs/PAYROLL_DATA_PROTECTION_PLAN.md \u00a75, \u00a77\n\n---\norbis-key: payroll.protection",
+    "dueDate": null,
+    "parent": "payroll",
+    "startDate": null,
+    "status": "Backlog",
+    "subject": "Payroll data protection \u2014 later phases",
+    "type": "Epic"
+   }
+  },
+  "payroll.protection.phase2": {
+   "hash": null,
+   "id": 1919,
+   "remote": {
+    "category": "Payroll",
+    "description": "Strip figures from control-check messages and audit JSON, delete applied batch files, currency-figure lint, no-amount-printed test.\n\n**Blocked on:** Deferred by user\n\n---\norbis-key: payroll.protection.phase2",
+    "dueDate": null,
+    "parent": "payroll.protection",
+    "startDate": null,
+    "status": "Backlog",
+    "subject": "Encryption Phase 2 \u2014 side channels",
+    "type": "Feature"
+   }
+  },
+  "payroll.protection.phase3": {
+   "hash": null,
+   "id": 1920,
+   "remote": {
+    "category": "Payroll",
+    "description": "Optional.\n\n**Blocked on:** Timing open\n\n---\norbis-key: payroll.protection.phase3",
+    "dueDate": null,
+    "parent": "payroll.protection",
+    "startDate": null,
+    "status": "Backlog",
+    "subject": "Encryption Phase 3 \u2014 visibility + hardening",
+    "type": "Feature"
+   }
+  },
+  "payroll.rate-seeding": {
+   "hash": null,
+   "id": 1836,
+   "remote": {
+    "category": "Payroll",
+    "description": "**Commits:** `82fd57f` `0e105f7` `d7894cf` `4b1c1d8`\n\n---\norbis-key: payroll.rate-seeding",
+    "dueDate": "2026-09-09",
+    "parent": "payroll",
+    "startDate": "2026-09-08",
+    "status": "Backlog",
+    "subject": "Department / team rate seeding (night, OT, transport, GH OT)",
+    "type": "Feature"
+   }
+  },
+  "payroll.reconciliation": {
+   "hash": null,
+   "id": 1873,
+   "remote": {
+    "category": "Payroll",
+    "description": "Two consecutive months with zero unexplained net-pay difference before go-live. docs/PAYROLL_PROCESS.md \u00a713\n\n**Blocked on:** HR/Finance\n\n---\norbis-key: payroll.reconciliation",
+    "dueDate": null,
+    "parent": "payroll",
+    "startDate": null,
+    "status": "Backlog",
+    "subject": "Pre-cutover reconciliation (2 clean months)",
+    "type": "Task"
+   }
+  },
+  "payroll.register-breakdown": {
+   "hash": null,
+   "id": 1840,
+   "remote": {
+    "category": "Payroll",
+    "description": "**Commits:** `ada2f1f` `9b0e27c`\n\n---\norbis-key: payroll.register-breakdown",
+    "dueDate": "2026-09-09",
+    "parent": "payroll",
+    "startDate": "2026-09-09",
+    "status": "Backlog",
+    "subject": "Register breakdown: earnings, deductions, totals",
+    "type": "Feature"
+   }
+  },
+  "payroll.report-population": {
+   "hash": null,
+   "id": 1863,
+   "remote": {
+    "category": "Payroll",
+    "description": "**Commits:** `48049ad`\n\n---\norbis-key: payroll.report-population",
+    "dueDate": "2026-11-02",
+    "parent": "payroll",
+    "startDate": "2026-11-02",
+    "status": "Backlog",
+    "subject": "Report uses the engine's employee population",
+    "type": "Feature"
+   }
+  },
+  "payroll.report-search": {
+   "hash": null,
+   "id": 1843,
+   "remote": {
+    "category": "Payroll",
+    "description": "**Commits:** `6f2ed84`\n\n---\norbis-key: payroll.report-search",
+    "dueDate": "2026-09-14",
+    "parent": "payroll",
+    "startDate": "2026-09-14",
+    "status": "Backlog",
+    "subject": "Employee search in the payroll report",
+    "type": "Feature"
+   }
+  },
+  "payroll.resigned-pay": {
+   "hash": null,
+   "id": 1833,
+   "remote": {
+    "category": "Payroll",
+    "description": "**Commits:** `032da61`\n\n---\norbis-key: payroll.resigned-pay",
+    "dueDate": "2026-09-08",
+    "parent": "payroll",
+    "startDate": "2026-09-08",
+    "status": "Backlog",
+    "subject": "Pay resigned employees for days actually worked",
+    "type": "Feature"
+   }
+  },
+  "payroll.runs-stats": {
+   "hash": null,
+   "id": 1845,
+   "remote": {
+    "category": "Payroll",
+    "description": "**Commits:** `5df0375`\n\n---\norbis-key: payroll.runs-stats",
+    "dueDate": "2026-09-16",
+    "parent": "payroll",
+    "startDate": "2026-09-16",
+    "status": "Backlog",
+    "subject": "Runs list shows non-monetary stats",
+    "type": "Feature"
+   }
+  },
+  "payroll.salary-adjustment": {
+   "hash": null,
+   "id": 1859,
+   "remote": {
+    "category": "Payroll",
+    "description": "Spec / code: docs/SALARY_ADJUSTMENT_PLAN.md\n\n**Commits:** `22b9740`\n\n---\norbis-key: payroll.salary-adjustment",
+    "dueDate": "2026-10-09",
+    "parent": "payroll",
+    "startDate": "2026-10-09",
+    "status": "Backlog",
+    "subject": "Derived salary adjustments, TDS by challan, Revise-salary drawer",
+    "type": "Feature"
+   }
+  },
+  "payroll.support-paging": {
+   "hash": null,
+   "id": 1860,
+   "remote": {
+    "category": "Payroll",
+    "description": "**Commits:** `acd66e3`\n\n---\norbis-key: payroll.support-paging",
+    "dueDate": "2026-10-13",
+    "parent": "payroll",
+    "startDate": "2026-10-13",
+    "status": "Backlog",
+    "subject": "Support info loads page by page",
+    "type": "Feature"
+   }
+  },
+  "payroll.tax-decl-seed": {
+   "hash": null,
+   "id": 1839,
+   "remote": {
+    "category": "Payroll",
+    "description": "**Commits:** `9e4d0fb`\n\n---\norbis-key: payroll.tax-decl-seed",
+    "dueDate": "2026-09-09",
+    "parent": "payroll",
+    "startDate": "2026-09-09",
+    "status": "Backlog",
+    "subject": "seed_tax_declarations",
+    "type": "Feature"
+   }
+  },
+  "payroll.tax-trueup": {
+   "hash": null,
+   "id": 1856,
+   "remote": {
+    "category": "Payroll",
+    "description": "Spec / code: docs/TAX_CALCULATION_TRUEUP_PLAN.md\n\n**Commits:** `f59f2ad`\n\n---\norbis-key: payroll.tax-trueup",
+    "dueDate": "2026-10-08",
+    "parent": "payroll",
+    "startDate": "2026-10-08",
+    "status": "Backlog",
+    "subject": "Tax declaration rework + year-to-date TDS true-up",
+    "type": "Feature"
+   }
+  },
+  "payroll.taxcert": {
+   "hash": null,
+   "id": 1701,
+   "remote": {
+    "category": "Payroll",
+    "description": "Spec: docs/TAX_CERTIFICATE_PLAN.md \u2014 waiting on Finance answers Q67\u2013Q76\n\n---\norbis-key: payroll.taxcert",
+    "dueDate": null,
+    "parent": "payroll",
+    "startDate": null,
+    "status": "Backlog",
+    "subject": "Tax certificate",
+    "type": "Epic"
+   }
+  },
+  "payroll.taxcert.build": {
+   "hash": null,
+   "id": 1918,
+   "remote": {
+    "category": "Payroll",
+    "description": "TaxChallanMember, TaxCertificateIssue, context builder, PDF and pages.\n\n**Blocked on:** Finance Q67\u2013Q76\n\n---\norbis-key: payroll.taxcert.build",
+    "dueDate": null,
+    "parent": "payroll.taxcert",
+    "startDate": null,
+    "status": "Backlog",
+    "subject": "Tax certificate pieces A + B",
+    "type": "Feature"
+   }
+  },
+  "payroll.team-ot-rate": {
+   "hash": null,
+   "id": 1847,
+   "remote": {
+    "category": "Payroll",
+    "description": "**Commits:** `9644f72`\n\n---\norbis-key: payroll.team-ot-rate",
+    "dueDate": "2026-09-16",
+    "parent": "payroll",
+    "startDate": "2026-09-16",
+    "status": "Backlog",
+    "subject": "Team-specific overtime rates",
+    "type": "Feature"
+   }
+  },
+  "payroll.trueup-drawer": {
+   "hash": null,
+   "id": 1869,
+   "remote": {
+    "category": "Payroll",
+    "description": "Left as a follow-up in docs/TAX_CALCULATION_TRUEUP_PLAN.md; the TDS line's calc_note carries the figures meanwhile.\n\n---\norbis-key: payroll.trueup-drawer",
+    "dueDate": null,
+    "parent": "payroll",
+    "startDate": null,
+    "status": "Backlog",
+    "subject": "Per-employee tax true-up drawer + export columns",
+    "type": "Task"
+   }
+  },
+  "payroll.upload-center": {
+   "hash": null,
+   "id": 1852,
+   "remote": {
+    "category": "Payroll",
+    "description": "**Commits:** `24724ed`\n\n---\norbis-key: payroll.upload-center",
+    "dueDate": "2026-09-21",
+    "parent": "payroll",
+    "startDate": "2026-09-21",
+    "status": "Backlog",
+    "subject": "Upload Center, Go Live, day-count Test Salary",
+    "type": "Feature"
+   }
+  },
+  "policies": {
+   "hash": null,
+   "id": 1681,
+   "remote": {
+    "category": "Policies",
+    "description": "PDF policy distribution + employee sign-off. Spec: docs/POLICY_MODULE_PLAN.md\n\n---\norbis-key: policies",
+    "dueDate": "2026-10-29",
+    "parent": null,
+    "startDate": "2026-06-24",
+    "status": "Backlog",
+    "subject": "Policies (GRC slice 1)",
+    "type": "Epic"
+   }
+  },
+  "policies.canvas": {
+   "hash": null,
+   "id": 1810,
+   "remote": {
+    "category": "Policies",
+    "description": "**Commits:** `b8e906b` `dadaa53`\n\n---\norbis-key: policies.canvas",
+    "dueDate": "2026-08-04",
+    "parent": "policies",
+    "startDate": "2026-08-04",
+    "status": "Backlog",
+    "subject": "Canvas PDF reader with no download",
+    "type": "Feature"
+   }
+  },
+  "policies.deterrence": {
+   "hash": null,
+   "id": 1812,
+   "remote": {
+    "category": "Policies",
+    "description": "**Commits:** `4838aad` `b0cb8f4`\n\n---\norbis-key: policies.deterrence",
+    "dueDate": "2026-09-18",
+    "parent": "policies",
+    "startDate": "2026-09-18",
+    "status": "Backlog",
+    "subject": "Print / screenshot deterrence",
+    "type": "Feature"
+   }
+  },
+  "policies.module": {
+   "hash": null,
+   "id": 1808,
+   "remote": {
+    "category": "Policies",
+    "description": "Spec / code: docs/POLICY_MODULE_PLAN.md\n\n**Commits:** `b520cb3` `f123a9d`\n\n---\norbis-key: policies.module",
+    "dueDate": "2026-06-24",
+    "parent": "policies",
+    "startDate": "2026-06-24",
+    "status": "Backlog",
+    "subject": "Policy Acknowledgement module",
+    "type": "Feature"
+   }
+  },
+  "policies.pdf-cap": {
+   "hash": null,
+   "id": 1815,
+   "remote": {
+    "category": "Policies",
+    "description": "**Commits:** `823d794`\n\n---\norbis-key: policies.pdf-cap",
+    "dueDate": "2026-10-29",
+    "parent": "policies",
+    "startDate": "2026-10-29",
+    "status": "Backlog",
+    "subject": "PDF size cap follows MEDIA_MAX_UPLOAD_BYTES",
+    "type": "Feature"
+   }
+  },
+  "policies.picker": {
+   "hash": null,
+   "id": 1809,
+   "remote": {
+    "category": "Policies",
+    "description": "**Commits:** `708b7fd` `87d57c4`\n\n---\norbis-key: policies.picker",
+    "dueDate": "2026-07-31",
+    "parent": "policies",
+    "startDate": "2026-07-31",
+    "status": "Backlog",
+    "subject": "Searchable adherent picker + department targeting",
+    "type": "Feature"
+   }
+  },
+  "policies.publish-split": {
+   "hash": null,
+   "id": 1811,
+   "remote": {
+    "category": "Policies",
+    "description": "**Commits:** `5436202` `7c727c8`\n\n---\norbis-key: policies.publish-split",
+    "dueDate": "2026-10-28",
+    "parent": "policies",
+    "startDate": "2026-09-18",
+    "status": "Backlog",
+    "subject": "Publish split into Activate / Circulate",
+    "type": "Feature"
+   }
+  },
+  "policies.retired-reset": {
+   "hash": null,
+   "id": 1814,
+   "remote": {
+    "category": "Policies",
+    "description": "**Commits:** `d03e450`\n\n---\norbis-key: policies.retired-reset",
+    "dueDate": "2026-10-28",
+    "parent": "policies",
+    "startDate": "2026-10-28",
+    "status": "Backlog",
+    "subject": "Retired policies: reset signing data",
+    "type": "Feature"
+   }
+  },
+  "policies.targeting-preview": {
+   "hash": null,
+   "id": 1813,
+   "remote": {
+    "category": "Policies",
+    "description": "**Commits:** `9731d2d`\n\n---\norbis-key: policies.targeting-preview",
+    "dueDate": "2026-10-28",
+    "parent": "policies",
+    "startDate": "2026-10-28",
+    "status": "Backlog",
+    "subject": "Targeting preview before circulation",
+    "type": "Feature"
+   }
+  },
+  "questions": {
+   "hash": null,
+   "id": 1687,
+   "remote": {
+    "category": null,
+    "description": "Decisions Orbis is waiting on. Tracked in docs/PAYROLL_PROCESS.md \u00a712 and the plan docs.\n\n---\norbis-key: questions",
+    "dueDate": null,
+    "parent": null,
+    "startDate": null,
+    "status": "Backlog",
+    "subject": "Open business questions (HR/Finance)",
+    "type": "Epic"
+   }
+  },
+  "questions.dsdd-q4": {
+   "hash": null,
+   "id": 1885,
+   "remote": {
+    "category": null,
+    "description": "docs/DSDD_PAYROLL_AUTOMATION_PLAN.md \u00a75\n\n**Blocked on:** HR/Finance\n\n---\norbis-key: questions.dsdd-q4",
+    "dueDate": null,
+    "parent": "questions",
+    "startDate": null,
+    "status": "Backlog",
+    "subject": "DSDD Q4: SLA pay rules",
+    "type": "Task"
+   }
+  },
+  "questions.dsdd-q6": {
+   "hash": null,
+   "id": 1886,
+   "remote": {
+    "category": null,
+    "description": "docs/DSDD_PAYROLL_AUTOMATION_PLAN.md \u00a75\n\n**Blocked on:** HR\n\n---\norbis-key: questions.dsdd-q6",
+    "dueDate": null,
+    "parent": "questions",
+    "startDate": null,
+    "status": "Backlog",
+    "subject": "DSDD Q6: temporary suspension pay",
+    "type": "Task"
+   }
+  },
+  "questions.escalation": {
+   "hash": null,
+   "id": 1891,
+   "remote": {
+    "category": null,
+    "description": "Untouched for N days \u2192 next manager. docs/PLAN.md Notifications\n\n**Blocked on:** HR\n\n---\norbis-key: questions.escalation",
+    "dueDate": null,
+    "parent": "questions",
+    "startDate": null,
+    "status": "Backlog",
+    "subject": "Notification escalation rule",
+    "type": "Task"
+   }
+  },
+  "questions.legacy-60": {
+   "hash": null,
+   "id": 1889,
+   "remote": {
+    "category": null,
+    "description": "Salary start dates, unmatched union/ward texts, designation/department differences, police stations. docs/LEGACY_60_IMPORT_PLAN.md \u00a76\n\n**Blocked on:** HR\n\n---\norbis-key: questions.legacy-60",
+    "dueDate": null,
+    "parent": "questions",
+    "startDate": null,
+    "status": "Backlog",
+    "subject": "Legacy 60 data follow-ups for HR",
+    "type": "Task"
+   }
+  },
+  "questions.legacy-rest": {
+   "hash": null,
+   "id": 1890,
+   "remote": {
+    "category": null,
+    "description": "Reuses the three importers.\n\n**Blocked on:** HR data\n\n---\norbis-key: questions.legacy-rest",
+    "dueDate": null,
+    "parent": "questions",
+    "startDate": null,
+    "status": "Backlog",
+    "subject": "Import the remaining ~1,400 legacy employees",
+    "type": "Task"
+   }
+  },
+  "questions.q22": {
+   "hash": null,
+   "id": 1880,
+   "remote": {
+    "category": null,
+    "description": "docs/PAYROLL_PROCESS.md \u00a712\n\n**Blocked on:** Finance\n\n---\norbis-key: questions.q22",
+    "dueDate": null,
+    "parent": "questions",
+    "startDate": null,
+    "status": "Backlog",
+    "subject": "Q22: leave encashment rate (\u00f730 or \u00f726)",
+    "type": "Task"
+   }
+  },
+  "questions.q33": {
+   "hash": null,
+   "id": 1887,
+   "remote": {
+    "category": null,
+    "description": "docs/PAYROLL_PROCESS.md \u00a712\n\n**Blocked on:** HR/Finance\n\n---\norbis-key: questions.q33",
+    "dueDate": null,
+    "parent": "questions",
+    "startDate": null,
+    "status": "Backlog",
+    "subject": "Q33: legacy leave-balance cutover scope and source",
+    "type": "Task"
+   }
+  },
+  "questions.q35": {
+   "hash": null,
+   "id": 1881,
+   "remote": {
+    "category": null,
+    "description": "docs/PAYROLL_PROCESS.md \u00a712\n\n**Blocked on:** HR\n\n---\norbis-key: questions.q35",
+    "dueDate": null,
+    "parent": "questions",
+    "startDate": null,
+    "status": "Backlog",
+    "subject": "Q35: third AdOps OT rate (300 Tk) \u2014 live or dormant?",
+    "type": "Task"
+   }
+  },
+  "questions.q42": {
+   "hash": null,
+   "id": 1883,
+   "remote": {
+    "category": null,
+    "description": "docs/PAYROLL_PROCESS.md \u00a712\n\n**Blocked on:** Finance\n\n---\norbis-key: questions.q42",
+    "dueDate": null,
+    "parent": "questions",
+    "startDate": null,
+    "status": "Backlog",
+    "subject": "Q42: lower minimum-tax floor for non-Dhaka staff?",
+    "type": "Task"
+   }
+  },
+  "questions.q49": {
+   "hash": null,
+   "id": 1882,
+   "remote": {
+    "category": null,
+    "description": "Calculates as zero with a warning until answered.\n\n**Blocked on:** Finance\n\n---\norbis-key: questions.q49",
+    "dueDate": null,
+    "parent": "questions",
+    "startDate": null,
+    "status": "Backlog",
+    "subject": "Q49: Special OT rate for Software/Creative",
+    "type": "Task"
+   }
+  },
+  "questions.q67-76": {
+   "hash": null,
+   "id": 1884,
+   "remote": {
+    "category": null,
+    "description": "docs/TAX_CERTIFICATE_PLAN.md \u00a79\n\n**Blocked on:** Finance\n\n---\norbis-key: questions.q67-76",
+    "dueDate": null,
+    "parent": "questions",
+    "startDate": null,
+    "status": "Backlog",
+    "subject": "Q67\u2013Q76: tax certificate questions",
+    "type": "Task"
+   }
+  },
+  "questions.risk7": {
+   "hash": null,
+   "id": 1888,
+   "remote": {
+    "category": null,
+    "description": "docs/PAYROLL_PLAN.md \u00a712\n\n**Blocked on:** Decision\n\n---\norbis-key: questions.risk7",
+    "dueDate": null,
+    "parent": "questions",
+    "startDate": null,
+    "status": "Backlog",
+    "subject": "Risk 7: do department additional managers see salary?",
+    "type": "Task"
+   }
+  },
+  "roster": {
+   "hash": null,
+   "id": 1674,
+   "remote": {
+    "category": "Roster",
+    "description": "ShiftType/Shift/Roster grid, uploads, APIs for TimeLy/dsndd, weekly email, shift change requests. Spec: docs/PLAN.md, docs/SHIFT_CHANGE_REQUEST_PLAN.md, docs/TIMELY_API.md\n\n---\norbis-key: roster",
+    "dueDate": "2026-11-03",
+    "parent": null,
+    "startDate": "2026-04-29",
+    "status": "Backlog",
+    "subject": "Roster",
+    "type": "Epic"
+   }
+  },
+  "roster.attr-dept-scope": {
+   "hash": null,
+   "id": 1760,
+   "remote": {
+    "category": "Roster",
+    "description": "**Commits:** `e6a7056` `fdac1b5`\n\n---\norbis-key: roster.attr-dept-scope",
+    "dueDate": "2026-09-01",
+    "parent": "roster",
+    "startDate": "2026-08-27",
+    "status": "Backlog",
+    "subject": "Shift attributes limited by department",
+    "type": "Feature"
+   }
+  },
+  "roster.backfills": {
+   "hash": null,
+   "id": 1761,
+   "remote": {
+    "category": "Roster",
+    "description": "**Commits:** `86e9388` `ca0966b` `b3b27bf`\n\n---\norbis-key: roster.backfills",
+    "dueDate": "2026-08-31",
+    "parent": "roster",
+    "startDate": "2026-08-27",
+    "status": "Backlog",
+    "subject": "Historical roster backfills (AdOps, Data Solutions)",
+    "type": "Feature"
+   }
+  },
+  "roster.dsndd-api": {
+   "hash": null,
+   "id": 1757,
+   "remote": {
+    "category": "Roster",
+    "description": "Spec / code: docs/DSNDD_INTEGRATION.md\n\n**Commits:** `68bfd84` `141fb66`\n\n---\norbis-key: roster.dsndd-api",
+    "dueDate": "2026-08-18",
+    "parent": "roster",
+    "startDate": "2026-07-27",
+    "status": "Backlog",
+    "subject": "External write API for dsndd + shift change audit log",
+    "type": "Feature"
+   }
+  },
+  "roster.dsndd-phase2": {
+   "hash": null,
+   "id": 1877,
+   "remote": {
+    "category": "Roster",
+    "description": "Drop dsndd's local ShiftType, OrbisClient, push on live edits, reconcile beat task. docs/DSNDD_INTEGRATION.md\n\n---\norbis-key: roster.dsndd-phase2",
+    "dueDate": null,
+    "parent": "roster",
+    "startDate": null,
+    "status": "Backlog",
+    "subject": "dsndd integration Phase 2",
+    "type": "Feature"
+   }
+  },
+  "roster.export": {
+   "hash": null,
+   "id": 1754,
+   "remote": {
+    "category": "Roster",
+    "description": "**Commits:** `075fdb2` `ae595e0`\n\n---\norbis-key: roster.export",
+    "dueDate": "2026-10-30",
+    "parent": "roster",
+    "startDate": "2026-07-20",
+    "status": "Backlog",
+    "subject": "Roster Excel export (grid and flat sheet)",
+    "type": "Feature"
+   }
+  },
+  "roster.grid": {
+   "hash": null,
+   "id": 1748,
+   "remote": {
+    "category": "Roster",
+    "description": "Spec / code: docs/PLAN.md\n\n**Commits:** `a71104c` `78864c0` `586f9cb` `fcc43ed` `0f32ff1` `9b33b81` `6612355` `8679f95` `128d641`\n\n---\norbis-key: roster.grid",
+    "dueDate": "2026-04-29",
+    "parent": "roster",
+    "startDate": "2026-04-29",
+    "status": "Backlog",
+    "subject": "Roster grid with htmx cell editing + per-day work location",
+    "type": "Feature"
+   }
+  },
+  "roster.grid-perf": {
+   "hash": null,
+   "id": 1756,
+   "remote": {
+    "category": "Roster",
+    "description": "**Commits:** `3144c40`\n\n---\norbis-key: roster.grid-perf",
+    "dueDate": "2026-07-21",
+    "parent": "roster",
+    "startDate": "2026-07-21",
+    "status": "Backlog",
+    "subject": "Grid query-scaling regression test",
+    "type": "Feature"
+   }
+  },
+  "roster.joining-guard": {
+   "hash": null,
+   "id": 1764,
+   "remote": {
+    "category": "Roster",
+    "description": "**Commits:** `58d0a7e` `c8a9971` `398de67`\n\n---\norbis-key: roster.joining-guard",
+    "dueDate": "2026-09-17",
+    "parent": "roster",
+    "startDate": "2026-09-17",
+    "status": "Backlog",
+    "subject": "Joining-date guard, audit and purge",
+    "type": "Feature"
+   }
+  },
+  "roster.list-view": {
+   "hash": null,
+   "id": 1758,
+   "remote": {
+    "category": "Roster",
+    "description": "**Commits:** `31410fd` `7dc843d` `40b8b3c` `6f6efa9` `81359c6` `b3cefca` `7d51fcc` `61ea806`\n\n---\norbis-key: roster.list-view",
+    "dueDate": "2026-09-07",
+    "parent": "roster",
+    "startDate": "2026-08-19",
+    "status": "Backlog",
+    "subject": "Flat/list view, filters popover, shift guide, sort order",
+    "type": "Feature"
+   }
+  },
+  "roster.lwd-purge": {
+   "hash": null,
+   "id": 1763,
+   "remote": {
+    "category": "Roster",
+    "description": "**Commits:** `ac0ce83` `bd6e5ec`\n\n---\norbis-key: roster.lwd-purge",
+    "dueDate": "2026-09-11",
+    "parent": "roster",
+    "startDate": "2026-09-11",
+    "status": "Backlog",
+    "subject": "Last-working-date shift purge + search for separated staff",
+    "type": "Feature"
+   }
+  },
+  "roster.org-wide-flat": {
+   "hash": null,
+   "id": 1767,
+   "remote": {
+    "category": "Roster",
+    "description": "**Commits:** `a277404`\n\n---\norbis-key: roster.org-wide-flat",
+    "dueDate": "2026-11-02",
+    "parent": "roster",
+    "startDate": "2026-11-02",
+    "status": "Backlog",
+    "subject": "Company-wide flat view for HR",
+    "type": "Feature"
+   }
+  },
+  "roster.personal": {
+   "hash": null,
+   "id": 1759,
+   "remote": {
+    "category": "Roster",
+    "description": "**Commits:** `b730aa2`\n\n---\norbis-key: roster.personal",
+    "dueDate": "2026-08-27",
+    "parent": "roster",
+    "startDate": "2026-08-27",
+    "status": "Backlog",
+    "subject": "Read-only personal roster for every employee",
+    "type": "Feature"
+   }
+  },
+  "roster.seed": {
+   "hash": null,
+   "id": 1750,
+   "remote": {
+    "category": "Roster",
+    "description": "**Commits:** `26a1700` `e1aaa06` `9a86fdb`\n\n---\norbis-key: roster.seed",
+    "dueDate": "2026-05-06",
+    "parent": "roster",
+    "startDate": "2026-05-05",
+    "status": "Backlog",
+    "subject": "Seed shifts, LEAVE shift types, default new-user pattern",
+    "type": "Feature"
+   }
+  },
+  "roster.self-edit": {
+   "hash": null,
+   "id": 1762,
+   "remote": {
+    "category": "Roster",
+    "description": "**Commits:** `68145de` `7011ae8`\n\n---\norbis-key: roster.self-edit",
+    "dueDate": "2026-09-03",
+    "parent": "roster",
+    "startDate": "2026-09-01",
+    "status": "Backlog",
+    "subject": "Team-lead-and-above roster self-edit",
+    "type": "Feature"
+   }
+  },
+  "roster.shift-change": {
+   "hash": null,
+   "id": 1766,
+   "remote": {
+    "category": "Roster",
+    "description": "Spec / code: docs/SHIFT_CHANGE_REQUEST_PLAN.md\n\n**Commits:** `6899c1b` `55b4608` `2823f7c`\n\n---\norbis-key: roster.shift-change",
+    "dueDate": "2026-11-03",
+    "parent": "roster",
+    "startDate": "2026-10-01",
+    "status": "Backlog",
+    "subject": "Shift change requests with approval (dept head inside night windows)",
+    "type": "Feature"
+   }
+  },
+  "roster.shift-commands": {
+   "hash": null,
+   "id": 1749,
+   "remote": {
+    "category": "Roster",
+    "description": "**Commits:** `ca458a9` `db80836` `7ca7c44` `afc68f5`\n\n---\norbis-key: roster.shift-commands",
+    "dueDate": "2026-04-29",
+    "parent": "roster",
+    "startDate": "2026-04-29",
+    "status": "Backlog",
+    "subject": "Shift type / attribute management commands",
+    "type": "Feature"
+   }
+  },
+  "roster.single-employee": {
+   "hash": null,
+   "id": 1753,
+   "remote": {
+    "category": "Roster",
+    "description": "**Commits:** `42d1981` `8f89cea`\n\n---\norbis-key: roster.single-employee",
+    "dueDate": "2026-06-30",
+    "parent": "roster",
+    "startDate": "2026-06-30",
+    "status": "Backlog",
+    "subject": "Single-employee grid + leave shifts shown in the grid",
+    "type": "Feature"
+   }
+  },
+  "roster.timely-api": {
+   "hash": null,
+   "id": 1751,
+   "remote": {
+    "category": "Roster",
+    "description": "Spec / code: docs/TIMELY_API.md\n\n**Commits:** `0f6fc31` `e9038de`\n\n---\norbis-key: roster.timely-api",
+    "dueDate": "2026-05-06",
+    "parent": "roster",
+    "startDate": "2026-05-06",
+    "status": "Backlog",
+    "subject": "TimeLy-shaped roster API",
+    "type": "Feature"
+   }
+  },
+  "roster.toasts": {
+   "hash": null,
+   "id": 1755,
+   "remote": {
+    "category": "Roster",
+    "description": "**Commits:** `63ef9b6`\n\n---\norbis-key: roster.toasts",
+    "dueDate": "2026-07-20",
+    "parent": "roster",
+    "startDate": "2026-07-20",
+    "status": "Backlog",
+    "subject": "Cell-save toasts + visible permission denials",
+    "type": "Feature"
+   }
+  },
+  "roster.upload": {
+   "hash": null,
+   "id": 1752,
+   "remote": {
+    "category": "Roster",
+    "description": "**Commits:** `7f0176e` `7d825b8` `76fc0dd` `ea19719`\n\n---\norbis-key: roster.upload",
+    "dueDate": "2026-09-01",
+    "parent": "roster",
+    "startDate": "2026-05-13",
+    "status": "Backlog",
+    "subject": "Roster Excel upload (approved-leave protection + override)",
+    "type": "Feature"
+   }
+  },
+  "roster.weekly-email": {
+   "hash": null,
+   "id": 1765,
+   "remote": {
+    "category": "Roster",
+    "description": "Spec / code: docs/PLAN.md \"Weekly team roster email\"\n\n**Commits:** `3784a94`\n\n---\norbis-key: roster.weekly-email",
+    "dueDate": "2026-09-25",
+    "parent": "roster",
+    "startDate": "2026-09-25",
+    "status": "Backlog",
+    "subject": "Weekly team roster email (Friday)",
+    "type": "Feature"
+   }
+  },
+  "scheduler": {
+   "hash": null,
+   "id": 1682,
+   "remote": {
+    "category": "Scheduler",
+    "description": "PeriodicTask rows managed from the admin, run monitoring. Spec: docs/SCHEDULER_ADMIN_PLAN.md\n\n---\norbis-key: scheduler",
+    "dueDate": "2026-10-30",
+    "parent": null,
+    "startDate": "2026-09-29",
+    "status": "Backlog",
+    "subject": "Scheduler (celery-beat in DB)",
+    "type": "Epic"
+   }
+  },
+  "scheduler.db-beat": {
+   "hash": null,
+   "id": 1816,
+   "remote": {
+    "category": "Scheduler",
+    "description": "Spec / code: docs/SCHEDULER_ADMIN_PLAN.md\n\n**Commits:** `8f56a57` `b6890a3`\n\n---\norbis-key: scheduler.db-beat",
+    "dueDate": "2026-09-29",
+    "parent": "scheduler",
+    "startDate": "2026-09-29",
+    "status": "Backlog",
+    "subject": "Beat schedule stored in the database, managed in the admin",
+    "type": "Feature"
+   }
+  },
+  "scheduler.jan15": {
+   "hash": null,
+   "id": 1817,
+   "remote": {
+    "category": "Scheduler",
+    "description": "**Commits:** `4e9d26c`\n\n---\norbis-key: scheduler.jan15",
+    "dueDate": "2026-10-01",
+    "parent": "scheduler",
+    "startDate": "2026-10-01",
+    "status": "Backlog",
+    "subject": "Jan-15 year-end rollover catch-up",
+    "type": "Feature"
+   }
+  },
+  "scheduler.run-with-args": {
+   "hash": null,
+   "id": 1818,
+   "remote": {
+    "category": "Scheduler",
+    "description": "**Commits:** `1211b61`\n\n---\norbis-key: scheduler.run-with-args",
+    "dueDate": "2026-10-30",
+    "parent": "scheduler",
+    "startDate": "2026-10-30",
+    "status": "Backlog",
+    "subject": "\"Run once with arguments\" in the admin",
+    "type": "Feature"
+   }
+  },
+  "techdebt": {
+   "hash": null,
+   "id": 1688,
+   "remote": {
+    "category": null,
+    "description": "Known issues not yet fixed.\n\n---\norbis-key: techdebt",
+    "dueDate": null,
+    "parent": null,
+    "startDate": null,
+    "status": "Backlog",
+    "subject": "Tech debt & known test failures",
+    "type": "Epic"
+   }
+  },
+  "techdebt.alias-maps": {
+   "hash": null,
+   "id": 1897,
+   "remote": {
+    "category": null,
+    "description": "Add a test that every LEAVE ShiftType has a policy (risk 2).\n\n---\norbis-key: techdebt.alias-maps",
+    "dueDate": null,
+    "parent": "techdebt",
+    "startDate": null,
+    "status": "Backlog",
+    "subject": "Retire LWP/NIG/CUST alias maps in payroll/reports.py",
+    "type": "Task"
+   }
+  },
+  "techdebt.flaky-ot-test": {
+   "hash": null,
+   "id": 1895,
+   "remote": {
+    "category": null,
+    "description": "pk % 7 work-date collision.\n\n---\norbis-key: techdebt.flaky-ot-test",
+    "dueDate": null,
+    "parent": "techdebt",
+    "startDate": null,
+    "status": "Backlog",
+    "subject": "Flaky OvertimeReviewChainTests approve test (~40%)",
+    "type": "Bug"
+   }
+  },
+  "techdebt.partial-unique": {
+   "hash": null,
+   "id": 1898,
+   "remote": {
+    "category": null,
+    "description": "clean() + select_for_update (risk 4).\n\n---\norbis-key: techdebt.partial-unique",
+    "dueDate": null,
+    "parent": "techdebt",
+    "startDate": null,
+    "status": "Backlog",
+    "subject": "MySQL partial-unique mirrors for Phase 5 models",
+    "type": "Task"
+   }
+  },
+  "techdebt.pre-join-display": {
+   "hash": null,
+   "id": 1896,
+   "remote": {
+    "category": null,
+    "description": "today_status_buckets / _resolve_shifts.\n\n---\norbis-key: techdebt.pre-join-display",
+    "dueDate": null,
+    "parent": "techdebt",
+    "startDate": null,
+    "status": "Backlog",
+    "subject": "Shift label shown for dates before joining",
+    "type": "Bug"
+   }
+  },
+  "techdebt.query-budget-tests": {
+   "hash": null,
+   "id": 1893,
+   "remote": {
+    "category": null,
+    "description": "Upload 16 vs 12, external shift batch 26 vs 20.\n\n---\norbis-key: techdebt.query-budget-tests",
+    "dueDate": null,
+    "parent": "techdebt",
+    "startDate": null,
+    "status": "Backlog",
+    "subject": "2 roster query-budget test failures",
+    "type": "Bug"
+   }
+  },
+  "techdebt.shift-change-form-test": {
+   "hash": null,
+   "id": 1894,
+   "remote": {
+    "category": null,
+    "description": "FormTests.test_shift_only_and_location_only_are_valid.\n\n---\norbis-key: techdebt.shift-change-form-test",
+    "dueDate": null,
+    "parent": "techdebt",
+    "startDate": null,
+    "status": "Backlog",
+    "subject": "Date-dependent shift-change form test",
+    "type": "Bug"
+   }
+  },
+  "techdebt.team-package-tests": {
+   "hash": null,
+   "id": 1892,
+   "remote": {
+    "category": null,
+    "description": "SQLite unique TeamAssignment in the test helper.\n\n---\norbis-key: techdebt.team-package-tests",
+    "dueDate": null,
+    "parent": "techdebt",
+    "startDate": null,
+    "status": "Backlog",
+    "subject": "7 failing SalaryProposalTests (tests_team_package)",
+    "type": "Bug"
+   }
+  },
+  "techdebt.veridoc-gaps": {
+   "hash": null,
+   "id": 1899,
+   "remote": {
+    "category": null,
+    "description": "Action-workflow subsystem, workflow tests, verify/PDF fallback validation, ProtectedView coverage. docs/VERIDOC_IMPLEMENTATION_PLAN.md\n\n---\norbis-key: techdebt.veridoc-gaps",
+    "dueDate": null,
+    "parent": "techdebt",
+    "startDate": null,
+    "status": "Backlog",
+    "subject": "Veridoc gaps",
+    "type": "Task"
+   }
+  },
+  "theme": {
+   "hash": null,
+   "id": 1661,
+   "remote": {
+    "category": "UI & theme",
+    "description": "Tailwind + Timely tokens, icon-rail sidebar, drawers, toasts, notification bell, branding.\n\n---\norbis-key: theme",
+    "dueDate": "2026-10-30",
+    "parent": null,
+    "startDate": "2026-05-22",
+    "status": "Backlog",
+    "subject": "UI shell & theme",
+    "type": "Epic"
+   }
+  },
+  "theme.avatar": {
+   "hash": null,
+   "id": 1664,
+   "remote": {
+    "category": "UI & theme",
+    "description": "**Commits:** `47e0ae6`\n\n---\norbis-key: theme.avatar",
+    "dueDate": "2026-07-20",
+    "parent": "theme",
+    "startDate": "2026-07-20",
+    "status": "Backlog",
+    "subject": "Topbar profile picture with initials fallback",
+    "type": "Feature"
+   }
+  },
+  "theme.bell": {
+   "hash": null,
+   "id": 1669,
+   "remote": {
+    "category": "UI & theme",
+    "description": "Spec / code: docs/PLAN.md \"Notifications\"\n\n**Commits:** `381830c`\n\n---\norbis-key: theme.bell",
+    "dueDate": "2026-10-16",
+    "parent": "theme",
+    "startDate": "2026-10-16",
+    "status": "Backlog",
+    "subject": "Topbar notification bell + \"Direct reports only\" on approval lists",
+    "type": "Feature"
+   }
+  },
+  "theme.branding": {
+   "hash": null,
+   "id": 1670,
+   "remote": {
+    "category": "UI & theme",
+    "description": "**Commits:** `3082d54` `bb7c338` `962eed6` `947d50f`\n\n---\norbis-key: theme.branding",
+    "dueDate": "2026-10-30",
+    "parent": "theme",
+    "startDate": "2026-10-19",
+    "status": "Backlog",
+    "subject": "Orbis branding (logo, favicon, login wordmark)",
+    "type": "Feature"
+   }
+  },
+  "theme.credits": {
+   "hash": null,
+   "id": 1671,
+   "remote": {
+    "category": "UI & theme",
+    "description": "**Commits:** `54211dc` `77a1c25` `cce1d76`\n\n---\norbis-key: theme.credits",
+    "dueDate": "2026-10-30",
+    "parent": "theme",
+    "startDate": "2026-10-30",
+    "status": "Backlog",
+    "subject": "Copyright footer + Project Credits page",
+    "type": "Feature"
+   }
+  },
+  "theme.density": {
+   "hash": null,
+   "id": 1667,
+   "remote": {
+    "category": "UI & theme",
+    "description": "**Commits:** `efca882` `7e24749`\n\n---\norbis-key: theme.density",
+    "dueDate": "2026-09-07",
+    "parent": "theme",
+    "startDate": "2026-09-07",
+    "status": "Backlog",
+    "subject": "Tighter table density",
+    "type": "Feature"
+   }
+  },
+  "theme.drawer-shell": {
+   "hash": null,
+   "id": 1666,
+   "remote": {
+    "category": "UI & theme",
+    "description": "**Commits:** `e727222` `a3b5400` `0dd7841`\n\n---\norbis-key: theme.drawer-shell",
+    "dueDate": "2026-09-07",
+    "parent": "theme",
+    "startDate": "2026-09-07",
+    "status": "Backlog",
+    "subject": "Shared drawer shell + department\u2192team cascade",
+    "type": "Feature"
+   }
+  },
+  "theme.flatpickr": {
+   "hash": null,
+   "id": 1665,
+   "remote": {
+    "category": "UI & theme",
+    "description": "**Commits:** `b5448fd`\n\n---\norbis-key: theme.flatpickr",
+    "dueDate": "2026-09-07",
+    "parent": "theme",
+    "startDate": "2026-09-07",
+    "status": "Backlog",
+    "subject": "Flatpickr for every date input",
+    "type": "Feature"
+   }
+  },
+  "theme.sidebar": {
+   "hash": null,
+   "id": 1663,
+   "remote": {
+    "category": "UI & theme",
+    "description": "**Commits:** `e9976f8`\n\n---\norbis-key: theme.sidebar",
+    "dueDate": "2026-05-22",
+    "parent": "theme",
+    "startDate": "2026-05-22",
+    "status": "Backlog",
+    "subject": "Icon-rail sidebar with hover flyouts + mobile drawer",
+    "type": "Feature"
+   }
+  },
+  "theme.toasts": {
+   "hash": null,
+   "id": 1668,
+   "remote": {
+    "category": "UI & theme",
+    "description": "**Commits:** `6e20a4d`\n\n---\norbis-key: theme.toasts",
+    "dueDate": "2026-09-15",
+    "parent": "theme",
+    "startDate": "2026-09-15",
+    "status": "Backlog",
+    "subject": "Messages shown as toasts",
+    "type": "Feature"
+   }
+  }
+ }
+}

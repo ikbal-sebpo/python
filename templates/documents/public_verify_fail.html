@@ -1,0 +1,14 @@
+{% extends "documents/_public_base.html" %}
+{% block title %}Verification failed · Orbis{% endblock %}
+
+{% block content %}
+<div class="bg-white rounded-lg shadow p-8 border border-bg-soft text-center">
+  <div class="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center text-red-700 text-2xl mx-auto mb-4">!</div>
+  <h1 class="text-2xl font-semibold mb-2">Document not verified</h1>
+  <p class="text-text-soft">
+    This reference does not correspond to a verified document. It may have
+    been cancelled, superseded, or is not yet issued.
+  </p>
+  <p class="text-xs text-text-soft mt-6 font-mono">Reference: {{ ref }}</p>
+</div>
+{% endblock %}

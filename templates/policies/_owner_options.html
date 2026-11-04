@@ -1,0 +1,10 @@
+{% comment %}
+    Rendered by PolicyOwnerOptionsView (htmx GET), swapped into the Owner
+    <select>'s innerHTML (#id_owner) when the Department select changes — see
+    policies/forms.py::PolicyForm for the hx-* attrs on the department field.
+{% endcomment %}
+{% for u in owners %}
+    <option value="{{ u.pk }}">{{ u.get_full_name|default:u.email }}{% if u.employee_id %} · {{ u.employee_id }}{% endif %}</option>
+{% empty %}
+    <option value="" disabled selected>No active employees in this department</option>
+{% endfor %}

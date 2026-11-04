@@ -1,0 +1,30 @@
+[
+    {"model": "roster.holiday", "pk": 1, "fields": {
+        "date": "2026-02-21", "name": "International Mother Language Day", "is_active": true,
+        "added_at": "2026-04-24T00:00:00Z", "updated_at": "2026-04-24T00:00:00Z"
+    }},
+    {"model": "roster.holiday", "pk": 2, "fields": {
+        "date": "2026-03-17", "name": "Shiekh Mujib's Birthday / Children's Day", "is_active": true,
+        "added_at": "2026-04-24T00:00:00Z", "updated_at": "2026-04-24T00:00:00Z"
+    }},
+    {"model": "roster.holiday", "pk": 3, "fields": {
+        "date": "2026-03-26", "name": "Independence Day", "is_active": true,
+        "added_at": "2026-04-24T00:00:00Z", "updated_at": "2026-04-24T00:00:00Z"
+    }},
+    {"model": "roster.holiday", "pk": 4, "fields": {
+        "date": "2026-04-14", "name": "Bengali New Year (Pohela Boishakh)", "is_active": true,
+        "added_at": "2026-04-24T00:00:00Z", "updated_at": "2026-04-24T00:00:00Z"
+    }},
+    {"model": "roster.holiday", "pk": 5, "fields": {
+        "date": "2026-05-01", "name": "May Day", "is_active": true,
+        "added_at": "2026-04-24T00:00:00Z", "updated_at": "2026-04-24T00:00:00Z"
+    }},
+    {"model": "roster.holiday", "pk": 6, "fields": {
+        "date": "2026-12-16", "name": "Victory Day", "is_active": true,
+        "added_at": "2026-04-24T00:00:00Z", "updated_at": "2026-04-24T00:00:00Z"
+    }},
+    {"model": "roster.holiday", "pk": 7, "fields": {
+        "date": "2026-12-25", "name": "Christmas Day", "is_active": true,
+        "added_at": "2026-04-24T00:00:00Z", "updated_at": "2026-04-24T00:00:00Z"
+    }}
+]

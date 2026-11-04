@@ -1,0 +1,55 @@
+{# The topbar bell's dropdown body — core.views.notification_bell, polled by #}
+{# htmx (partials/_notification_bell.html). Derived "waiting on you" items, #}
+{# no stored notifications: see core/approvals.py. #}
+<div data-bell-total="{{ bell.total }}" data-bell-signature="{{ bell.signature }}">
+    <div class="flex items-center justify-between px-4 py-3 border-b border-bg-soft dark:border-white/10">
+        <span class="text-sm font-semibold text-text-main dark:text-white">Waiting on you</span>
+        {% if bell.total %}
+            <span class="badge badge-danger">{{ bell.total }} pending</span>
+        {% endif %}
+    </div>
+
+    {% if bell.sections %}
+        <div class="max-h-[min(28rem,70vh)] overflow-y-auto">
+            {% for section in bell.sections %}
+                <div class="px-4 pt-3 pb-1 flex items-center justify-between">
+                    <span class="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wide text-text-mute dark:text-white/50">
+                        <i data-lucide="{{ section.icon }}" class="w-3.5 h-3.5"></i>{{ section.label }}
+                    </span>
+                    <span class="text-[11px] font-medium text-text-mute dark:text-white/50">{{ section.count }}</span>
+                </div>
+                <ul>
+                    {% for item in section.items %}
+                        <li>
+                            <a href="{{ item.url }}"
+                               class="flex items-start gap-3 px-4 py-2 hover:bg-bg-soft dark:hover:bg-white/5">
+                                <span class="mt-1.5 w-2 h-2 rounded-full bg-brand-accent shrink-0"></span>
+                                <span class="min-w-0 flex-1">
+                                    <span class="block truncate text-sm font-medium text-text-main dark:text-white">{{ item.employee.display_name }}</span>
+                                    <span class="block truncate text-xs text-text-soft dark:text-white/60">{{ item.summary }}</span>
+                                </span>
+                                <span class="shrink-0 text-[11px] text-text-mute dark:text-white/40 whitespace-nowrap"
+                                      title="Submitted {{ item.submitted_at|date:'d M Y, H:i' }}">{{ item.submitted_at|timesince }} ago</span>
+                            </a>
+                        </li>
+                    {% endfor %}
+                </ul>
+                <a href="{{ section.url }}"
+                   class="block px-4 pt-1 pb-3 text-xs font-medium text-brand dark:text-brand-accent hover:underline">
+                    {% if section.more %}View all {{ section.count }}{% else %}Open {{ section.label|lower }}{% endif %} →
+                </a>
+                {% if not forloop.last %}<div class="border-t border-bg-soft dark:border-white/10"></div>{% endif %}
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="px-4 py-8 text-center">
+            <i data-lucide="check-circle-2" class="mx-auto w-6 h-6 text-brand-accent"></i>
+            <p class="mt-2 text-sm text-text-soft dark:text-white/60">You're all caught up.</p>
+        </div>
+    {% endif %}
+</div>
+
+{# Out-of-band: the count on the bell itself, outside the (closed) dropdown. #}
+<span id="notification-bell-badge" hx-swap-oob="true"
+      class="{% if bell.total %}absolute -top-0.5 -right-0.5 min-w-[1.125rem] h-[1.125rem] px-1 rounded-full bg-red-600 text-white text-[10px] font-semibold leading-[1.125rem] text-center ring-2 ring-bg-card dark:ring-brand-navy{% else %}hidden{% endif %}"
+      aria-hidden="true">{% if bell.total > 9 %}9+{% elif bell.total %}{{ bell.total }}{% endif %}</span>

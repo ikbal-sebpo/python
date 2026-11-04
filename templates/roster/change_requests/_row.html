@@ -1,0 +1,59 @@
+{% comment %}
+    Context:
+      row                 ShiftChangeRequest
+      current_user_pk     UUID — decides self-cancel vs approve
+      oob                 True on out-of-band replace after an htmx action
+      show_actions        whether to render the inline approve/decline form
+      user_can_edit_all   HR / Admins / superuser — inline approve shows on own rows too
+      row.can_decide      set by ShiftChangeListView (can_act_on_shift_change)
+      row.needs_head      date sits in a dedicated night shift window — the
+                          department head decides (roster/night_window.py)
+{% endcomment %}
+<tr id="shift-change-row-{{ row.pk }}"
+    {% if oob %}hx-swap-oob="true"{% endif %}>
+    <td class="whitespace-nowrap">
+        <a href="{% url 'shift_change_detail' row.pk %}" class="font-medium text-brand hover:underline dark:text-brand-accent">
+            {{ row.employee.display_name }}
+        </a>
+        {% if row.employee.employee_id %}
+            <span class="ml-1.5 text-xs text-text-mute" title="Employee ID">· {{ row.employee.employee_id }}</span>
+        {% endif %}
+    </td>
+    <td class="whitespace-nowrap">{{ row.employee.team|default:"—" }}</td>
+    <td class="whitespace-nowrap tabular-nums">{{ row.date|date:"Y-m-d" }} <span class="text-xs text-text-mute">{{ row.date|date:"D" }}</span></td>
+    <td class="whitespace-nowrap">
+        <span class="{% if row.shift_changed %}line-through text-text-mute{% endif %}">{{ row.original_label|default:"Unscheduled" }}</span>
+        <span class="ml-1 {% if row.location_changed %}opacity-50{% endif %}">{% include "roster/change_requests/_location_badge.html" with code=row.original_location %}</span>
+        {% if not row.original_was_concrete and row.original_label %}
+            <span class="ml-1 text-[10px] uppercase tracking-wide text-text-mute" title="From the weekly pattern — no roster row existed for this date">pattern</span>
+        {% endif %}
+    </td>
+    <td class="whitespace-nowrap">
+        <span class="{% if row.shift_changed %}font-semibold{% endif %}">{{ row.requested_label }}</span>
+        <span class="ml-1">{% include "roster/change_requests/_location_badge.html" with code=row.requested_location %}</span>
+    </td>
+    <td>
+        {% if row.status == 'PENDING' %}
+            <span class="badge badge-info"><i data-lucide="clock" class="w-3 h-3"></i>Pending</span>
+        {% elif row.status == 'APPROVED' %}
+            <span class="badge badge-success"><i data-lucide="check" class="w-3 h-3"></i>Approved</span>
+        {% elif row.status == 'DECLINED' %}
+            <span class="badge" style="background:rgba(239,68,68,.15); color:#dc2626;"><i data-lucide="x" class="w-3 h-3"></i>Declined</span>
+        {% else %}
+            <span class="badge badge-muted"><i data-lucide="slash" class="w-3 h-3"></i>Cancelled</span>
+        {% endif %}
+    </td>
+    <td class="text-xs text-text-soft dark:text-white/60 whitespace-nowrap">{{ row.applied_at|date:"Y-m-d H:i" }}</td>
+    <td class="text-right whitespace-nowrap">
+        {% if show_actions and row.status == 'PENDING' and row.can_decide %}
+            {% include "roster/change_requests/_row_actions.html" with row=row %}
+        {% elif show_actions and row.status == 'PENDING' and row.needs_head and row.employee_id != current_user_pk %}
+            <span class="badge badge-warning mr-2" title="Dedicated night shift window — only the department head can approve this">
+                <i data-lucide="moon" class="w-3 h-3"></i>Needs department head
+            </span>
+            <a href="{% url 'shift_change_detail' row.pk %}" class="text-xs text-brand hover:underline dark:text-brand-accent">Details</a>
+        {% else %}
+            <a href="{% url 'shift_change_detail' row.pk %}" class="text-xs text-brand hover:underline dark:text-brand-accent">Details</a>
+        {% endif %}
+    </td>
+</tr>

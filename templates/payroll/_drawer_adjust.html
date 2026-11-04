@@ -1,0 +1,106 @@
+{% comment %}
+    Drawer body for editing one employee's engine INPUTS for this run's
+    period — TDSEntry + VariablePayEntry rows. Never the computed register
+    row, which is deleted and rebuilt on every Recalculate.
+{% endcomment %}
+<div class="drawer-body space-y-5">
+    {% if form.non_field_errors %}
+        <div class="rounded border border-red-200 bg-red-50 text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-300 px-3 py-2 text-sm">
+            {{ form.non_field_errors|striptags }}
+        </div>
+    {% endif %}
+
+    {% if saved %}
+        <div class="rounded border border-emerald-300 bg-emerald-50 text-emerald-800 dark:border-emerald-700/50 dark:bg-emerald-900/20 dark:text-emerald-200 px-3 py-2 text-sm">
+            Saved. Click <span class="font-medium">Recalculate</span> on the run to see it applied.
+        </div>
+    {% endif %}
+
+    <p class="text-xs text-text-mute dark:text-white/50">
+        {{ employee.get_full_name|default:employee.email }} · {{ run.period }}.
+        These update the engine's real inputs, not the register directly — click
+        <span class="font-medium">Recalculate</span> on the run afterward to see them applied.
+    </p>
+
+    {% if calculated_lines %}
+    <div>
+        <h3 class="text-xs font-semibold uppercase tracking-wider text-text-mute mb-2">Calculated lines (last calculate)</h3>
+        <table class="table-simple min-w-full text-sm">
+            <thead><tr><th class="text-left">Line</th><th class="text-right">Amount</th></tr></thead>
+            <tbody>
+                {% for line in calculated_lines %}
+                    <tr>
+                        <td>
+                            <div>{{ line.component_name }}{% if line.component_kind == "DEDUCTION" %} <span class="text-xs text-text-mute">(deduction)</span>{% endif %}</div>
+                            {% if line.component_code == "SALARY_ADJUSTMENT" and run_employee.inputs_json.salary_adjustment.explanation %}
+                                <ol class="text-xs text-text-soft dark:text-white/60 mt-1 list-decimal pl-4 space-y-0.5">
+                                    {% for step in run_employee.inputs_json.salary_adjustment.explanation %}<li>{{ step }}</li>{% endfor %}
+                                </ol>
+                            {% elif line.calc_note %}<div class="text-xs text-text-mute dark:text-white/50 mt-0.5">{{ line.calc_note }}</div>{% endif %}
+                        </td>
+                        <td class="text-right tabular-nums whitespace-nowrap align-top">{{ line.amount|taka }}</td>
+                    </tr>
+                {% endfor %}
+                <tr class="font-semibold">
+                    <td>Net pay</td>
+                    <td class="text-right tabular-nums">{{ run_employee.net_pay|taka }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+
+    <div>
+        <h3 class="text-xs font-semibold uppercase tracking-wider text-text-mute mb-2">Bonus / incentive / deductions on record</h3>
+        {% if variable_entries %}
+            <ul class="space-y-2">
+                {% for entry in variable_entries %}
+                    {% include "payroll/_variable_entry_row.html" %}
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p class="text-sm text-text-mute italic">None yet.</p>
+        {% endif %}
+    </div>
+
+    <form method="post" id="adjust-form" action="{{ action_url }}"
+          hx-post="{{ action_url }}"
+          hx-target="#drawer-body"
+          hx-swap="innerHTML"
+          class="flex flex-col gap-5">
+        {% csrf_token %}
+
+        <div>
+            <h3 class="text-xs font-semibold uppercase tracking-wider text-text-mute mb-2">Tax (TDS)</h3>
+            <p class="text-xs text-text-mute dark:text-white/50 mb-2">
+                {% if has_tds_override %}
+                    A manual override is on record — shown below, editable.
+                {% elif calculated_tax is not None %}
+                    Showing this run's calculated tax ({{ calculated_tax|taka }}) — change it to set a manual override.
+                {% else %}
+                    Not calculated yet — leave blank, or set an amount to override once it is.
+                {% endif %}
+            </p>
+            <div class="grid grid-cols-1 gap-3">
+                {% include "accounts/_field.html" with field=form.tds_amount %}
+                {% include "accounts/_field.html" with field=form.tds_note %}
+            </div>
+        </div>
+
+        <div>
+            <h3 class="text-xs font-semibold uppercase tracking-wider text-text-mute mb-2">Add bonus / incentive / deduction</h3>
+            <div class="grid grid-cols-1 gap-3">
+                {% include "accounts/_field.html" with field=form.variable_component %}
+                {% include "accounts/_field.html" with field=form.variable_amount %}
+                {% include "accounts/_field.html" with field=form.variable_reason %}
+            </div>
+        </div>
+    </form>
+</div>
+
+<div class="drawer-footer justify-end">
+    <button type="button" class="btn-secondary" @click="close()">Close</button>
+    <button type="submit" form="adjust-form" class="btn-primary">
+        <i data-lucide="save" class="w-4 h-4"></i><span>Save</span>
+    </button>
+</div>

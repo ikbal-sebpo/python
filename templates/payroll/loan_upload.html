@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block title %}Upload salary loans · Orbis{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <h1 class="text-xl font-semibold">Upload salary loans (cutover)</h1>
+    <p class="text-sm text-text-soft dark:text-white/60 mt-1">
+        Restricted to Payroll Admins. For the loans that were already being repaid when Orbis took over payroll:
+        one row per approved loan with Finance's recovered-to-date figure. Rows land <span class="font-medium">active</span>
+        and are deducted from the first deduction month onwards. New loans are recorded one at a time on the
+        <a href="{% url 'payroll_loan_list' %}" class="text-brand hover:underline dark:text-brand-accent">Loans</a> page.
+    </p>
+</div>
+
+<div class="card mb-4">
+    <h2 class="text-sm font-semibold mb-3">1. Download a template</h2>
+    <a href="{% url 'payroll_loan_upload_template' %}" class="btn-secondary">
+        <i data-lucide="file-spreadsheet" class="w-4 h-4"></i><span>Excel template</span>
+    </a>
+</div>
+
+<div class="card mb-4">
+    <h2 class="text-sm font-semibold mb-2">2. File format</h2>
+    <div class="overflow-x-auto">
+        <table class="table-simple text-sm mb-2">
+            <thead><tr><th>Employee ID</th><th>File reference</th><th>Approved on</th><th>Principal</th><th>Instalments</th><th>Instalment amount</th><th>Disbursed on</th><th>First deduction month</th><th>Recovered before Orbis</th><th>Note</th></tr></thead>
+            <tbody>
+                <tr><td>104</td><td>HR/21092026/01</td><td>2026-09-21</td><td>50000</td><td>10</td><td>5000</td><td>2026-09-25</td><td>2026-10</td><td>5000</td><td>Medical expenses</td></tr>
+            </tbody>
+        </table>
+    </div>
+    <ul class="text-sm text-text-soft dark:text-white/70 list-disc pl-5 space-y-1">
+        <li><span class="font-medium">File reference</span> must be unique; a reference already in Orbis is <em>corrected</em>
+            (recovered-before-Orbis and note only), never duplicated.</li>
+        <li><span class="font-medium">Instalment amount</span> blank = principal ÷ instalments, rounded up to the taka.</li>
+        <li><span class="font-medium">First deduction month</span> is the payroll named for that month (2026-10 = Sep 16 – Oct 15);
+            blank = the payroll after the disbursement month (disbursed 3 Mar → 2026-04, i.e. Mar 16 – Apr 15).</li>
+        <li><span class="font-medium">Recovered before Orbis</span> — Finance's total already deducted; 0 if nothing yet.</li>
+        <li>The scanned file note can't come through a sheet — attach it later from the Loans page (rows show "no document" until then).</li>
+    </ul>
+</div>
+
+<div class="card mb-4">
+    <h2 class="text-sm font-semibold mb-3">3. Upload your filled file</h2>
+    <form id="loan-upload-form" method="post" enctype="multipart/form-data"
+          hx-post="{% url 'payroll_loan_upload' %}" hx-encoding="multipart/form-data"
+          hx-target="#upload-result" hx-swap="innerHTML" hx-indicator="#upload-spinner"
+          class="flex flex-wrap items-end gap-3">
+        {% csrf_token %}
+        <input type="file" name="file" accept=".xlsx,.csv" required class="form-input w-auto max-w-xs">
+        <button type="submit" name="action" value="preview" class="btn-secondary">
+            <i data-lucide="eye" class="w-4 h-4"></i><span>Preview only</span>
+        </button>
+        <button type="submit" name="action" value="apply" class="btn-primary">
+            <i data-lucide="upload-cloud" class="w-4 h-4"></i><span>Upload</span>
+        </button>
+        <span id="upload-spinner" class="htmx-indicator inline-flex items-center gap-1 text-xs text-text-mute">
+            <i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i>Working…
+        </span>
+    </form>
+    <p class="text-xs text-text-mute mt-2">After uploading, recalculate the open payroll run so the Loan column picks the instalments up.</p>
+</div>
+
+<div id="upload-result">
+    {% if report or inline_error %}
+        {% include "payroll/_loan_upload_report.html" with report=report parsed_preview=parsed_preview preview=preview aborted=aborted inline_error=inline_error %}
+    {% endif %}
+</div>
+
+<script>
+    document.body.addEventListener('htmx:afterSwap', function () {
+        if (window.lucide && typeof window.lucide.createIcons === 'function') { window.lucide.createIcons(); }
+    });
+</script>
+{% endblock %}

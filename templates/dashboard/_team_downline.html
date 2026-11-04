@@ -1,0 +1,22 @@
+{% comment %}htmx modal body: full recursive team of one direct report.{% endcomment %}
+<div class="text-xs text-text-mute mb-2">
+    {{ members|length }} member{{ members|length|pluralize }} under {{ target.display_name }}
+</div>
+{% for emp in members %}
+    <a href="{% url 'employee_detail' emp.pk %}"
+       class="flex items-center justify-between py-2 border-b border-bg-soft/50 dark:border-white/5 last:border-0 hover:bg-bg-soft/40 dark:hover:bg-white/5 px-2 rounded">
+        <div class="text-sm min-w-0">
+            <div class="font-medium truncate">{{ emp.display_name }}</div>
+            <div class="text-xs text-text-mute truncate">
+                {{ emp.designation.name|default:"—" }}{% if emp.department %} · {{ emp.department.name }}{% endif %}
+            </div>
+        </div>
+        {% if emp.job_info.reports_to and emp.job_info.reports_to != target %}
+            <div class="text-xs text-text-mute whitespace-nowrap shrink-0 ml-3">
+                → {{ emp.job_info.reports_to.display_name }}
+            </div>
+        {% endif %}
+    </a>
+{% empty %}
+    <div class="text-sm text-text-mute italic py-4">No one reports to {{ target.display_name }}.</div>
+{% endfor %}

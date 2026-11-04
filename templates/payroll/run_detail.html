@@ -1,0 +1,379 @@
+{% extends "base.html" %}
+{% load menu_extras %}
+{% block title %}{{ page_title }} · Orbis{% endblock %}
+
+{% block content %}
+<div x-data="{
+        drawer: false,
+        drawerTitle: '',
+        open(title) { this.drawerTitle = title || ''; this.drawer = true; },
+        close() {
+            this.drawer = false;
+            this.drawerTitle = '';
+            const body = document.getElementById('drawer-body');
+            if (body) body.innerHTML = '';
+        },
+     }"
+     x-on:orbis:drawer-close.window="close()"
+     x-on:keydown.escape.window="close()"
+     class="page-fill">
+    <div class="card shrink-0 space-y-3">
+        <div class="flex flex-wrap items-center gap-3">
+            <form method="get" class="flex flex-1 flex-wrap items-center gap-2 min-w-0">
+                <input type="hidden" name="tab" value="{{ tab }}">
+                <select id="run-detail-department" name="department" class="form-input w-44" onchange="this.form.submit()">
+                    {% if can_pick_all_departments %}<option value="">All departments</option>{% endif %}
+                    {% for d in departments %}
+                        <option value="{{ d.pk }}" {% if selected_department_id|stringformat:'s' == d.pk|stringformat:'s' %}selected{% endif %}>{{ d.name }}</option>
+                    {% endfor %}
+                </select>
+                <select id="run-detail-team" name="team" class="form-input w-44" onchange="this.form.submit()"
+                        data-team-for="run-detail-department">
+                    <option value="">All teams</option>
+                    {% for t in teams %}
+                        <option value="{{ t.pk }}"
+                                data-department="{{ t.department_id|default_if_none:'' }}"
+                                {% if selected_team_id|stringformat:'s' == t.pk|stringformat:'s' %}selected{% endif %}>{{ t.name }}</option>
+                    {% endfor %}
+                </select>
+                <div class="relative min-w-[200px] flex-1 max-w-xs">
+                    <i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-text-mute"></i>
+                    <input type="text" name="q" value="{{ q }}"
+                           placeholder="Search name, email, or ID" class="form-input pl-9 w-full">
+                </div>
+                <button type="submit" class="btn-secondary shrink-0">Apply</button>
+                <button type="submit" name="export" value="xlsx" class="btn-secondary shrink-0">
+                    <i data-lucide="download" class="w-4 h-4"></i><span>Export Excel</span>
+                </button>
+            </form>
+
+            <div class="flex items-center gap-2 shrink-0 ml-auto">
+                {% if can_manage_calc %}
+                    {% if run.status == "INPUTS_OPEN" %}
+                        <form method="post"><input type="hidden" name="action" value="lock">{% csrf_token %}
+                            <button type="submit" class="btn-primary"><i data-lucide="lock" class="w-4 h-4"></i><span>Lock inputs</span></button>
+                        </form>
+                    {% elif run.status == "INPUTS_LOCKED" %}
+                        <form method="post"><input type="hidden" name="action" value="reopen">{% csrf_token %}
+                            <button type="submit" class="btn-secondary"><i data-lucide="lock-open" class="w-4 h-4"></i><span>Reopen inputs</span></button>
+                        </form>
+                        <form method="post"><input type="hidden" name="action" value="calculate">{% csrf_token %}
+                            <button type="submit" class="btn-primary"><i data-lucide="calculator" class="w-4 h-4"></i><span>Calculate</span></button>
+                        </form>
+                        {% include "payroll/_run_adjustment_button.html" %}
+                    {% elif run.status == "CALCULATED" %}
+                        <form method="post"><input type="hidden" name="action" value="reopen">{% csrf_token %}
+                            <button type="submit" class="btn-secondary"><i data-lucide="lock-open" class="w-4 h-4"></i><span>Reopen inputs</span></button>
+                        </form>
+                        <form method="post"><input type="hidden" name="action" value="calculate">{% csrf_token %}
+                            <button type="submit" class="btn-secondary"><i data-lucide="refresh-cw" class="w-4 h-4"></i><span>Recalculate</span></button>
+                        </form>
+                        {% include "payroll/_run_adjustment_button.html" %}
+                        {% if can_see_money %}
+                            <a href="{% url 'payroll_run_export' run.pk %}" class="btn-primary">
+                                <i data-lucide="download" class="w-4 h-4"></i><span>Export register</span>
+                            </a>
+                        {% endif %}
+                    {% endif %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    {% comment %} The silent-non-payment guard (Q55): overtime approved after the last Calculate is NOT in the figures below, and nothing else on this page would say so. Computed live, so it is accurate even though PayrollControlCheck rows are only regenerated by Calculate itself. {% endcomment %}
+    {% if run.overtime_changed_since_calculation %}
+        <div class="card shrink-0 mb-3 border-l-4 border-amber-500">
+            <div class="flex items-start gap-2 text-sm">
+                <i data-lucide="alert-triangle" class="w-4 h-4 mt-0.5 text-amber-500 shrink-0"></i>
+                <div>
+                    <span class="font-medium">Overtime changed since this run was calculated.</span>
+                    The figures below are out of date — recalculate so the change is actually paid.
+                </div>
+            </div>
+        </div>
+    {% endif %}
+    {% if run.pending_overtime_count %}
+        <div class="card shrink-0 mb-3 border-l-4 border-amber-500">
+            <div class="flex items-start gap-2 text-sm">
+                <i data-lucide="clock" class="w-4 h-4 mt-0.5 text-amber-500 shrink-0"></i>
+                <div>
+                    <span class="font-medium">
+                        {{ run.pending_overtime_count }} overtime entr{{ run.pending_overtime_count|pluralize:"y,ies" }}
+                        filed for this period {{ run.pending_overtime_count|pluralize:"is,are" }} awaiting review or approval
+                    </span>
+                    and {{ run.pending_overtime_count|pluralize:"is,are" }} <em>not</em> included below.
+                    <a href="{% url 'payroll_overtime_list' %}?status=PENDING"
+                       class="text-brand hover:underline dark:text-brand-accent">See them</a>,
+                    then recalculate once they are approved if they should be paid.
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
+    <div class="flex items-center gap-2 shrink-0 border-b border-bg-soft dark:border-white/10">
+        <a href="?{% qs_replace tab='support_info' page=None %}"
+           title="Org info + Supervisor/HR/Finance notes — available at any run status, not just after Calculate"
+           class="px-3 py-2 text-sm font-medium border-b-2 -mb-px {% if tab == 'support_info' %}border-brand text-brand dark:text-brand-accent{% else %}border-transparent text-text-mute hover:text-text-main dark:hover:text-white{% endif %}">
+            Support Info &amp; Notes
+        </a>
+        <a href="?{% qs_replace tab='exceptions' page=None %}"
+           class="px-3 py-2 text-sm font-medium border-b-2 -mb-px {% if tab == 'exceptions' %}border-brand text-brand dark:text-brand-accent{% else %}border-transparent text-text-mute hover:text-text-main dark:hover:text-white{% endif %}">
+            Exceptions ({{ exceptions_total }})
+        </a>
+        {% if can_manage_calc %}
+        <a href="?{% qs_replace tab='calculated' page=None %}"
+           class="px-3 py-2 text-sm font-medium border-b-2 -mb-px {% if tab == 'calculated' %}border-brand text-brand dark:text-brand-accent{% else %}border-transparent text-text-mute hover:text-text-main dark:hover:text-white{% endif %}">
+            Calculated ({{ calculated_total }})
+        </a>
+        {% endif %}
+        {% if tab == "calculated" %}
+        <div class="group relative ml-auto mb-1">
+            <button type="button" class="btn-secondary !h-8 !px-2" aria-label="About the totals row">
+                <i data-lucide="info" class="w-4 h-4"></i>
+            </button>
+            <div class="absolute right-0 top-full z-30 hidden w-[min(24rem,calc(100vw-3rem))] pt-2 group-hover:block group-focus-within:block">
+                <div class="menu-panel p-3 text-sm text-text-soft dark:text-white/70">
+                    The <span class="font-medium">Total</span> row matches the active filter (department / team / search) — every matching row, not just this page. <span class="font-medium">Additions</span> (Night duty, Overtime, Transport) sum to Gross; <span class="font-medium">Deductions</span> columns appear one per type actually in use this run (Meal, Disciplinary, …) and sum to the Deductions total. Gross, Deductions, Tax and Net are independent rollups, not a further sum of the columns beside them.
+                </div>
+            </div>
+        </div>
+        {% elif tab == "support_info" %}
+        <div class="flex items-center gap-2 ml-auto mb-1">
+            {% if can_bulk_upload_notes %}
+                <a href="{% url 'payroll_run_notes_upload' run.pk %}" class="btn-secondary !h-8">
+                    <i data-lucide="upload-cloud" class="w-4 h-4"></i><span>Upload notes</span>
+                </a>
+            {% endif %}
+            <div class="group relative">
+                <button type="button" class="btn-secondary !h-8 !px-2" aria-label="About Support Info & Notes">
+                    <i data-lucide="info" class="w-4 h-4"></i>
+                </button>
+                <div class="absolute right-0 top-full z-30 hidden w-[min(24rem,calc(100vw-3rem))] pt-2 group-hover:block group-focus-within:block">
+                    <div class="menu-panel p-3 text-sm text-text-soft dark:text-white/70">
+                        Once this run has been calculated, this matches the Calculated tab's employee list exactly (Payroll Admins see it with money, everyone else without). Before that first calculation, it shows every active employee in scope, so Supervisors and HR can review and note before Finance calculates.
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    {% if tab == "calculated" %}
+        <div class="card p-0 table-scroll">
+            <table class="table-simple table-sticky min-w-full text-sm">
+                <thead>
+                    <tr>
+                        <th class="text-left" rowspan="2">Emp ID</th>
+                        <th class="text-left" rowspan="2">Name</th>
+                        <th class="text-left" rowspan="2">Department</th>
+                        <th class="text-right" rowspan="2">Payable days</th>
+                        <th class="text-right" rowspan="2">Night days</th>
+                        {% if can_see_money %}
+                        <th class="text-right" rowspan="2">Salary</th>
+                        <th class="text-center" colspan="{{ addition_column_count }}">Additions</th>
+                        <th class="text-right" rowspan="2">Gross</th>
+                        <th class="text-center" colspan="{{ deduction_column_count }}">Deductions</th>
+                        <th class="text-right" rowspan="2">Tax</th>
+                        <th class="text-right" rowspan="2">Net pay</th>
+                        {% endif %}
+                        <th class="text-left" rowspan="2" title="Engine-generated calculation warnings — not a free-text note. See the Support Info &amp; Notes tab for Supervisor/HR/Finance notes.">Warnings</th>
+                    </tr>
+                    {% if can_see_money %}
+                    <tr>
+                        <th class="text-right">Night duty</th>
+                        <th class="text-right">Overtime</th>
+                        <th class="text-right">Transport</th>
+                        {% for c in extra_earning_components %}
+                            <th class="text-right">{{ c.short_name|default:c.name }}</th>
+                        {% endfor %}
+                        <th class="text-right">Meal</th>
+                        {% for c in extra_deduction_components %}
+                            <th class="text-right">{{ c.short_name|default:c.name }}</th>
+                        {% endfor %}
+                        <th class="text-right">Total</th>
+                    </tr>
+                    {% endif %}
+                    <tr class="bg-bg-soft/40 dark:bg-white/[0.04] font-semibold">
+                        <td class="text-left" colspan="5">Total ({{ calculated_total }})</td>
+                        {% if can_see_money %}
+                        <td class="text-right tabular-nums">{{ salary_amount|taka }}</td>
+                        <td class="text-right tabular-nums">{{ night_amount|taka }}</td>
+                        <td class="text-right tabular-nums">{{ ot_amount|taka }}</td>
+                        <td class="text-right tabular-nums">{{ transport_amount|taka }}</td>
+                        {% for amount in extra_earning_totals %}
+                            <td class="text-right tabular-nums">{{ amount|taka }}</td>
+                        {% endfor %}
+                        <td class="text-right tabular-nums">{{ filtered_gross_total|taka }}</td>
+                        <td class="text-right tabular-nums">{{ meal_amount|taka }}</td>
+                        {% for amount in extra_deduction_totals %}
+                            <td class="text-right tabular-nums">{{ amount|taka }}</td>
+                        {% endfor %}
+                        <td class="text-right tabular-nums">{{ filtered_deductions_total|taka }}</td>
+                        <td class="text-right tabular-nums">{{ filtered_tax_total|taka }}</td>
+                        <td class="text-right tabular-nums">{{ filtered_net_total|taka }}</td>
+                        {% endif %}
+                        <td></td>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for re in rows %}
+                        <tr>
+                            <td class="tabular-nums">
+                                {% if can_see_money %}
+                                <button type="button"
+                                        class="text-brand hover:underline dark:text-brand-accent"
+                                        hx-get="{% url 'payroll_run_employee_adjust' run.pk re.employee_id %}"
+                                        hx-target="#drawer-body"
+                                        hx-swap="innerHTML"
+                                        @click="open('Adjust inputs — {{ re.full_name|escapejs }}')">
+                                    {{ re.employee_code|default:"—" }}
+                                </button>
+                                {% else %}
+                                    {{ re.employee_code|default:"—" }}
+                                {% endif %}
+                            </td>
+                            <td class="font-medium whitespace-nowrap">{{ re.full_name }}</td>
+                            <td class="whitespace-nowrap">{{ re.department_name|default:"—" }}</td>
+                            <td class="text-right tabular-nums">{{ re.payable_days }}</td>
+                            <td class="text-right tabular-nums">{{ re.night_shift_count }}</td>
+                            {% if can_see_money %}
+                            <td class="text-right tabular-nums">{{ re.salary_amount|taka }}</td>
+                            <td class="text-right tabular-nums {% if not re.night_amount %}text-text-mute{% endif %}">{{ re.night_amount|taka }}</td>
+                            <td class="text-right tabular-nums {% if not re.ot_amount %}text-text-mute{% endif %}">{{ re.ot_amount|taka }}</td>
+                            <td class="text-right tabular-nums {% if not re.transport_amount %}text-text-mute{% endif %}">{{ re.transport_amount|taka }}</td>
+                            {% for amount in re.extra_earning_amounts %}
+                                <td class="text-right tabular-nums {% if not amount %}text-text-mute{% endif %}">{{ amount|taka }}</td>
+                            {% endfor %}
+                            <td class="text-right tabular-nums">{{ re.gross_earnings|taka }}</td>
+                            <td class="text-right tabular-nums {% if not re.meal_amount %}text-text-mute{% endif %}">{{ re.meal_amount|taka }}</td>
+                            {% for amount in re.extra_deduction_amounts %}
+                                <td class="text-right tabular-nums {% if not amount %}text-text-mute{% endif %}">{{ amount|taka }}</td>
+                            {% endfor %}
+                            <td class="text-right tabular-nums">{{ re.total_deductions|taka }}</td>
+                            <td class="text-right tabular-nums">{{ re.tax_deducted|taka }}</td>
+                            <td class="text-right tabular-nums font-semibold">{{ re.net_pay|taka }}</td>
+                            {% endif %}
+                            <td class="text-xs">
+                                {% for w in re.calc_warnings %}<div>{{ w }}</div>{% endfor %}
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr><td colspan="{{ total_column_count }}" class="text-center italic text-text-mute py-4">Nothing calculated yet.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% elif tab == "exceptions" %}
+        <div class="card p-0 table-scroll">
+            <table class="table-simple table-sticky min-w-full text-sm">
+                <thead>
+                    <tr>
+                        <th class="text-left">Employee</th>
+                        <th class="text-left">Severity</th>
+                        <th class="text-left">Check</th>
+                        <th class="text-left">Message</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for check in rows %}
+                        <tr>
+                            <td class="whitespace-nowrap">{{ check.employee|default:"—" }}</td>
+                            <td><span class="badge {% if check.severity == 'BLOCKING' %}badge-info{% else %}badge-muted{% endif %}">{{ check.get_severity_display }}</span></td>
+                            <td>{{ check.check_code }}</td>
+                            <td>{{ check.message }}</td>
+                        </tr>
+                    {% empty %}
+                        <tr><td colspan="4" class="text-center italic text-text-mute py-4">No exceptions.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        {% if meal_counts_unavailable %}
+            <div class="px-3 py-2 rounded border border-amber-300 bg-amber-50 text-amber-800 dark:border-amber-700/50 dark:bg-amber-900/20 dark:text-amber-200 text-sm shrink-0">
+                The meals system couldn't be reached — the Meal column below is showing 0 for everyone, not actual counts.
+            </div>
+        {% endif %}
+        <div class="card p-0 table-scroll">
+            <table class="table-sticky min-w-full text-sm">
+                <thead>
+                    <tr class="text-text-mute text-xs uppercase tracking-wider border-b border-bg-soft dark:border-white/10">
+                        <th class="px-2 py-2 text-left">Emp ID</th>
+                        <th class="px-2 py-2 text-left">Name</th>
+                        <th class="px-2 py-2 text-left">Designation</th>
+                        <th class="px-2 py-2 text-left">Department</th>
+                        <th class="px-2 py-2 text-left">Team</th>
+                        <th class="px-2 py-2 text-left">Resource Status</th>
+                        <th class="px-2 py-2 text-left">Billing Status</th>
+                        <th class="px-2 py-2 text-left">Joining Date</th>
+                        <th class="px-2 py-2 text-left">Job Location</th>
+                        <th class="px-2 py-2 text-left">Work Location</th>
+                        <th class="px-2 py-2 text-right">AL</th>
+                        <th class="px-2 py-2 text-right">CL</th>
+                        <th class="px-2 py-2 text-right">SL</th>
+                        <th class="px-2 py-2 text-right">MTL</th>
+                        <th class="px-2 py-2 text-right">GH</th>
+                        <th class="px-2 py-2 text-right">CPL</th>
+                        <th class="px-2 py-2 text-right">HDL</th>
+                        <th class="px-2 py-2 text-right">LWP</th>
+                        <th class="px-2 py-2 text-right" title="Ordinary night-crossing shift, no active Dedicated assignment">Night Reg.</th>
+                        <th class="px-2 py-2 text-right" title="CUST shift, not covered by an active Dedicated assignment">Night Custom</th>
+                        <th class="px-2 py-2 text-right" title="Approved Dedicated Night Shift assignment active on the shift date">Night Ded.</th>
+                        <th class="px-2 py-2 text-right text-text-mute" title="Night shifts worked before the employee's confirmation date — no night allowance until confirmed, so these are not paid">Trainee nights (unpaid)</th>
+                        <th class="px-2 py-2 text-right" title="CUST shift-days worked from office (not WFH)">Transport</th>
+                        {% for ot_type in support_info_ot_types %}
+                            <th class="px-2 py-2 text-right" title="Approved {{ ot_type.name }} hours in the window">{{ ot_type.name }} (hrs)</th>
+                        {% endfor %}
+                        <th class="px-2 py-2 text-right" title="Total meals from the meals system in the window">Meal</th>
+                        <th class="px-2 py-2 text-left">Supervisor Note</th>
+                        <th class="px-2 py-2 text-left">HR Note</th>
+                        <th class="px-2 py-2 text-left">Finance Note</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in rows %}
+                        <tr class="border-b border-bg-soft/50 dark:border-white/5 hover:bg-bg-soft/40 dark:hover:bg-white/5">
+                            <td class="px-2 py-1.5 tabular-nums">{{ row.employee_id|default:"—" }}</td>
+                            <td class="px-2 py-1.5 font-medium whitespace-nowrap">{{ row.name }}</td>
+                            <td class="px-2 py-1.5 text-text-mute whitespace-nowrap">{{ row.designation|default:"—" }}</td>
+                            <td class="px-2 py-1.5 text-text-mute whitespace-nowrap">{{ row.department|default:"—" }}</td>
+                            <td class="px-2 py-1.5 text-text-mute whitespace-nowrap">{{ row.team|default:"—" }}</td>
+                            <td class="px-2 py-1.5 text-text-mute whitespace-nowrap">{{ row.resource_status|default:"—" }}</td>
+                            <td class="px-2 py-1.5 text-text-mute whitespace-nowrap">{{ row.billing_status|default:"—" }}</td>
+                            <td class="px-2 py-1.5 text-text-mute whitespace-nowrap">{{ row.joining_date|date:"Y-m-d"|default:"—" }}</td>
+                            <td class="px-2 py-1.5 text-text-mute whitespace-nowrap">{{ row.job_location|default:"—" }}</td>
+                            <td class="px-2 py-1.5 text-text-mute whitespace-nowrap">{{ row.work_location|default:"—" }}</td>
+                            <td class="px-2 py-1.5 text-right tabular-nums bg-bg-soft/30 dark:bg-white/5">{{ row.counts.AL }}</td>
+                            <td class="px-2 py-1.5 text-right tabular-nums bg-bg-soft/30 dark:bg-white/5">{{ row.counts.CL }}</td>
+                            <td class="px-2 py-1.5 text-right tabular-nums bg-bg-soft/30 dark:bg-white/5">{{ row.counts.SL }}</td>
+                            <td class="px-2 py-1.5 text-right tabular-nums bg-bg-soft/30 dark:bg-white/5">{{ row.counts.MTL }}</td>
+                            <td class="px-2 py-1.5 text-right tabular-nums bg-bg-soft/30 dark:bg-white/5">{{ row.counts.FL }}</td>
+                            <td class="px-2 py-1.5 text-right tabular-nums bg-bg-soft/30 dark:bg-white/5">{{ row.counts.CPL }}</td>
+                            <td class="px-2 py-1.5 text-right tabular-nums bg-bg-soft/30 dark:bg-white/5">{{ row.counts.HDL }}</td>
+                            <td class="px-2 py-1.5 text-right tabular-nums bg-bg-soft/30 dark:bg-white/5">{{ row.counts.LWP }}</td>
+                            <td class="px-2 py-1.5 text-right tabular-nums bg-brand-gold/10 font-semibold">{{ row.counts.NIGHT_REGULAR }}</td>
+                            <td class="px-2 py-1.5 text-right tabular-nums bg-brand-gold/10 font-semibold">{{ row.counts.NIGHT_CUSTOM }}</td>
+                            <td class="px-2 py-1.5 text-right tabular-nums bg-brand-gold/10 font-semibold">{{ row.counts.NIGHT_DEDICATED }}</td>
+                            <td class="px-2 py-1.5 text-right tabular-nums text-text-mute">{{ row.counts.NIGHT_UNPAID|default:"" }}</td>
+                            <td class="px-2 py-1.5 text-right tabular-nums bg-brand-gold/10 font-semibold">{{ row.counts.TRANSPORT }}</td>
+                            {% for ot_hours in row.ot_by_type %}
+                                <td class="px-2 py-1.5 text-right tabular-nums bg-brand-gold/10 font-semibold">{{ ot_hours }}</td>
+                            {% endfor %}
+                            <td class="px-2 py-1.5 text-right tabular-nums bg-bg-soft/30 dark:bg-white/5">{{ row.meal_count }}</td>
+                            {% include "payroll/_support_info_note_cell.html" with note=row.notes.SUPERVISOR role="SUPERVISOR" role_label="supervisor" run=run row=row %}
+                            {% include "payroll/_support_info_note_cell.html" with note=row.notes.HR role="HR" role_label="HR" run=run row=row %}
+                            {% include "payroll/_support_info_note_cell.html" with note=row.notes.FINANCE role="FINANCE" role_label="finance" run=run row=row %}
+                        </tr>
+                    {% empty %}
+                        <tr><td colspan="{{ support_info_ot_types|length|add:27 }}" class="px-3 py-4 text-center italic text-text-mute">No employees with a working day in this period, matching the current filters.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% endif %}
+
+    {% include "partials/_pagination.html" %}
+
+    {% include "partials/_drawer_shell.html" %}
+</div>
+{% endblock %}

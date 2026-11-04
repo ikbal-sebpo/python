@@ -1,0 +1,12 @@
+Hello {{ recipient.first_name|default:recipient.email }},
+
+A new document request needs your review.
+
+Employee:       {{ request_obj.employee.display_name }}
+Document type:  {{ request_obj.document_type.display_name }}
+Submitted at:   {{ request_obj.applied_at|date:"Y-m-d H:i" }}
+Review step:    {{ review.order }}
+
+Open the review queue in Orbis to take action.
+
+— Orbis

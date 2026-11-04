@@ -1,0 +1,2752 @@
+# Orbis → OpenProject inventory (source of truth for tools/openproject/sync.py).
+# One entry per work package. `key` is permanent — never rename or reuse one.
+# `commits` (short hashes) drive Gantt dates and the time-log split; every
+# non-merge commit must belong to exactly one entry (sync.py --check-commits).
+# Docs: docs/OPENPROJECT.md
+
+- key: accounts
+  type: Epic
+  subject: Accounts, SSO & access control
+  category: accounts
+  description: 'CustomUser, Microsoft Entra SSO, scope-based access control, onboarding, Directory API. Spec: docs/PLAN.md,
+    docs/DIRECTORY_API_PLAN.md'
+  start: '2026-04-27'
+  finish: '2026-11-01'
+  status: In progress
+- key: employees
+  type: Epic
+  subject: Employees & HR profile
+  category: employees
+  description: '14 profile-section models, bulk uploaders, Service Book, night-shift consent, org chart. Spec: docs/PLAN.md,
+    docs/LEGACY_60_IMPORT_PLAN.md, docs/NIGHT_SHIFT_CONSENT_PLAN.md'
+  start: '2026-05-06'
+  finish: '2026-11-03'
+  status: Closed
+- key: roster
+  type: Epic
+  subject: Roster
+  category: roster
+  description: 'ShiftType/Shift/Roster grid, uploads, APIs for TimeLy/dsndd, weekly email, shift change requests.
+    Spec: docs/PLAN.md, docs/SHIFT_CHANGE_REQUEST_PLAN.md, docs/TIMELY_API.md'
+  start: '2026-04-29'
+  finish: '2026-11-03'
+  status: In progress
+- key: leave
+  type: Epic
+  subject: Leave
+  category: leave
+  description: 'SEBPO Leave Policy v2.0, balance ledger, anniversary AL, CpL, shift summary. Spec: docs/LEAVE_POLICY_IMPLEMENTATION.md'
+  start: '2026-04-24'
+  finish: '2026-10-30'
+  status: Closed
+- key: attendance
+  type: Epic
+  subject: Timesheet (attendance)
+  category: attendance
+  description: 'TimeLy presence overlay, local punch history, corrections, range modes and exports. Spec: docs/PLAN.md
+    "Three modes"'
+  start: '2026-05-06'
+  finish: '2026-11-02'
+  status: In progress
+- key: core
+  type: Epic
+  subject: Dashboard
+  category: core
+  description: My/Team dashboard, week strip, pending approvals.
+  start: '2026-04-27'
+  finish: '2026-09-11'
+  status: Closed
+- key: dynamic_menu
+  type: Epic
+  subject: Dynamic menu & page access
+  category: dynamic_menu
+  description: MainMenu/SubMenu with direct M2M to groups, ProtectedView.
+  start: '2026-04-24'
+  finish: '2026-09-15'
+  status: Closed
+- key: theme
+  type: Epic
+  subject: UI shell & theme
+  category: theme
+  description: Tailwind + Timely tokens, icon-rail sidebar, drawers, toasts, notification bell, branding.
+  start: '2026-05-22'
+  finish: '2026-10-30'
+  status: Closed
+- key: documents
+  type: Epic
+  subject: HR documents & verification
+  category: documents
+  description: 'DB-stored letter templates, WeasyPrint PDFs, QR verify, review/approval chain. Spec: docs/VERIDOC_IMPLEMENTATION_PLAN.md'
+  start: '2026-05-22'
+  finish: '2026-09-01'
+  status: Closed
+- key: offboarding
+  type: Epic
+  subject: Offboarding
+  category: offboarding
+  description: Resignation → 8-step clearance, exit interview, asset return, LWD deactivation.
+  start: '2026-05-22'
+  finish: '2026-09-05'
+  status: Closed
+- key: policies
+  type: Epic
+  subject: Policies (GRC slice 1)
+  category: policies
+  description: 'PDF policy distribution + employee sign-off. Spec: docs/POLICY_MODULE_PLAN.md'
+  start: '2026-06-24'
+  finish: '2026-10-29'
+  status: Closed
+- key: scheduler
+  type: Epic
+  subject: Scheduler (celery-beat in DB)
+  category: scheduler
+  description: 'PeriodicTask rows managed from the admin, run monitoring. Spec: docs/SCHEDULER_ADMIN_PLAN.md'
+  start: '2026-09-29'
+  finish: '2026-10-30'
+  status: Closed
+- key: audit
+  type: Epic
+  subject: Access log
+  category: audit
+  description: 'Who accessed which data or page. Spec: docs/ACCESS_LOG_PLAN.md'
+  start: '2026-10-09'
+  finish: '2026-10-09'
+  status: Closed
+- key: media_store
+  type: Epic
+  subject: Media on Google Drive
+  category: media_store
+  description: 'Encrypted blob store on Drive, permission-checked /media/. Spec: docs/MEDIA_GOOGLE_DRIVE_PLAN.md'
+  start: '2026-10-10'
+  finish: '2026-10-16'
+  status: Closed
+- key: payroll
+  type: Epic
+  subject: Payroll
+  category: payroll
+  description: 'Replaces the HR + Finance workbooks: compensation, inputs, engine, register, in-house TDS, loans.
+    Spec: docs/PAYROLL_PLAN.md, docs/PAYROLL_PROCESS.md'
+  start: '2026-06-10'
+  finish: '2026-11-03'
+  status: In progress
+- key: infra
+  type: Epic
+  subject: Infrastructure & deploy
+  category: infra
+  description: 'VPS (gunicorn + supervisor + nginx + MySQL), Celery, TLS, deploy flow, security/perf. Runbook: deploy/README.md'
+  start: '2026-04-24'
+  finish: '2026-10-29'
+  status: In progress
+- key: questions
+  type: Epic
+  subject: Open business questions (HR/Finance)
+  description: Decisions Orbis is waiting on. Tracked in docs/PAYROLL_PROCESS.md §12 and the plan docs.
+  status: On hold
+- key: techdebt
+  type: Epic
+  subject: Tech debt & known test failures
+  description: Known issues not yet fixed.
+  status: New
+- key: future
+  type: Epic
+  subject: Future features
+  description: Planned or proposed, not started.
+  status: New
+  category: future
+- key: payroll.phase5
+  type: Epic
+  parent: payroll
+  subject: Payroll Phase 5 — approval, payslips, payouts
+  status: On hold
+  category: payroll
+  description: 'Waiting on formal HR/Finance sign-off of docs/PAYROLL_PROCESS.md §14. Spec: docs/PAYROLL_PLAN.md
+    §9'
+- key: payroll.phase6
+  type: Epic
+  parent: payroll
+  subject: Payroll Phase 6 — settlement & off-cycle runs
+  status: On hold
+  category: payroll
+  description: 'Spec: docs/PAYROLL_PLAN.md §9'
+- key: payroll.taxcert
+  type: Epic
+  parent: payroll
+  subject: Tax certificate
+  status: On hold
+  category: payroll
+  description: 'Spec: docs/TAX_CERTIFICATE_PLAN.md — waiting on Finance answers Q67–Q76'
+- key: payroll.protection
+  type: Epic
+  parent: payroll
+  subject: Payroll data protection — later phases
+  status: On hold
+  category: payroll
+  description: 'Spec: docs/PAYROLL_DATA_PROTECTION_PLAN.md §5, §7'
+- key: infra.followups
+  type: Epic
+  parent: infra
+  subject: Production follow-ups
+  status: In progress
+  category: infra
+  description: 'Deploy steps and server tasks still to do on orbis.sebpo.net. Runbook: deploy/README.md'
+- key: accounts.directory-switchover
+  type: Epic
+  parent: accounts
+  subject: Directory API switch-over
+  status: In progress
+  category: accounts
+  description: Move TimeLy and dsndd from env tokens to ApiClient tokens. docs/DIRECTORY_API_PLAN.md §13
+- key: ms.start
+  type: Milestone
+  subject: Project start
+  status: Closed
+  start: '2026-04-24'
+  finish: '2026-04-24'
+  description: Project start — 2026-04-24.
+- key: ms.mvp
+  type: Milestone
+  subject: MVP target
+  status: Closed
+  start: '2026-05-15'
+  finish: '2026-05-15'
+  description: MVP target — 2026-05-15.
+- key: ms.celery
+  type: Milestone
+  subject: Celery replaces django-q2
+  status: Closed
+  start: '2026-07-21'
+  finish: '2026-07-21'
+  description: Celery replaces django-q2 — 2026-07-21.
+- key: ms.payroll-1-4
+  type: Milestone
+  subject: Payroll Phases 1–4 landed
+  status: Closed
+  start: '2026-08-24'
+  finish: '2026-08-24'
+  description: Payroll Phases 1–4 landed — 2026-08-24.
+- key: ms.https
+  type: Milestone
+  subject: HTTPS on orbis.sebpo.net
+  status: Closed
+  start: '2026-08-29'
+  finish: '2026-08-29'
+  description: HTTPS on orbis.sebpo.net — 2026-08-29.
+- key: ms.encryption
+  type: Milestone
+  subject: Payroll encryption live on production
+  status: Closed
+  start: '2026-10-05'
+  finish: '2026-10-05'
+  description: Payroll encryption live on production — 2026-10-05.
+- key: ms.directory-api
+  type: Milestone
+  subject: Directory API phases 1–3
+  status: Closed
+  start: '2026-10-14'
+  finish: '2026-10-14'
+  description: Directory API phases 1–3 — 2026-10-14.
+- key: ms.media-drive
+  type: Milestone
+  subject: Media on Google Drive in production
+  status: Closed
+  start: '2026-10-16'
+  finish: '2026-10-16'
+  description: Media on Google Drive in production — 2026-10-16.
+- key: ms.ai-summit
+  type: Milestone
+  subject: DCCI AI Summit 2026 (exhibiting)
+  status: New
+  start: '2026-11-05'
+  finish: '2026-11-05'
+  description: DCCI AI Summit 2026 (exhibiting) — 2026-11-05.
+- key: infra.bootstrap
+  type: Feature
+  parent: infra
+  subject: Project bootstrap & initial setup
+  status: Closed
+  start: '2026-04-24'
+  finish: '2026-09-04'
+  category: infra
+  description: 'Spec / code: docs/PLAN.md'
+  commits:
+  - e9d3aa6
+  - 197e7d7
+  - f81ac6c
+  - 776d7e2
+  - ee93375
+  - 47636ee
+  - 55f5c7a
+- key: infra.deploy-prep
+  type: Feature
+  parent: infra
+  subject: Initial production deploy prep (squashed migrations + seed_orbis)
+  status: Closed
+  start: '2026-05-05'
+  finish: '2026-05-05'
+  category: infra
+  description: 'Spec / code: deploy/README.md'
+  commits:
+  - 5b3ae81
+- key: infra.dev-docs
+  type: Feature
+  parent: infra
+  subject: Developer onboarding docs
+  status: Closed
+  start: '2026-06-08'
+  finish: '2026-06-08'
+  category: infra
+  description: 'Spec / code: docs/LOCAL_DEVELOPMENT.md'
+  commits:
+  - c96f800
+- key: infra.docs-upkeep
+  type: Feature
+  parent: infra
+  subject: Keep PLAN.md / CLAUDE.md in step with shipped work
+  status: Closed
+  start: '2026-05-22'
+  finish: '2026-09-04'
+  category: infra
+  description: 'Spec / code: docs/PLAN.md'
+  commits:
+  - 750b5bb
+  - d8dd8c1
+  - a186ec7
+- key: infra.security-perf
+  type: Feature
+  parent: infra
+  subject: Security & performance hardening sprint
+  status: Closed
+  start: '2026-07-20'
+  finish: '2026-09-06'
+  category: infra
+  description: 'Spec / code: deploy/README.md'
+  commits:
+  - 863f4e2
+  - e193a97
+  - 36b6036
+  - 4ef945c
+  - 9b17258
+  - b29b96e
+  - 507ad8d
+  - 426c0c1
+  - cde2c53
+- key: infra.celery
+  type: Feature
+  parent: infra
+  subject: Celery + celery-beat replace django-q2; background email/PDF
+  status: Closed
+  start: '2026-07-21'
+  finish: '2026-09-01'
+  category: infra
+  description: 'Spec / code: docs/PLAN.md'
+  commits:
+  - 2ed67c0
+  - ad5cdce
+  - f303781
+- key: infra.tls
+  type: Feature
+  parent: infra
+  subject: HTTPS / TLS behind the proxy; deploy README checked against the server
+  status: Closed
+  start: '2026-08-29'
+  finish: '2026-08-29'
+  category: infra
+  description: 'Spec / code: deploy/README.md'
+  commits:
+  - b47d838
+  - b395964
+  - 497c037
+- key: infra.deploy-key
+  type: Feature
+  parent: infra
+  subject: Read-only deploy key + day-to-day deploy flow
+  status: Closed
+  start: '2026-08-31'
+  finish: '2026-08-31'
+  category: infra
+  description: 'Spec / code: deploy/README.md'
+  commits:
+  - 118f52a
+  - a313359
+- key: infra.seed-orbis
+  type: Feature
+  parent: infra
+  subject: seed_orbis on real org data (MySQL collation rule)
+  status: Closed
+  start: '2026-09-05'
+  finish: '2026-09-19'
+  category: infra
+  description: 'Spec / code: deploy/README.md'
+  commits:
+  - a2d88a3
+  - 1f18dc0
+- key: infra.email
+  type: Feature
+  parent: infra
+  subject: Outbound email via Google Workspace service mailbox
+  status: Closed
+  start: '2026-10-10'
+  finish: '2026-10-10'
+  category: infra
+  description: 'Spec / code: .env.example'
+  commits:
+  - 0c64e6c
+- key: infra.nginx-upload
+  type: Feature
+  parent: infra
+  subject: Production nginx upload limit confirmed
+  status: Closed
+  start: '2026-10-29'
+  finish: '2026-10-29'
+  category: infra
+  description: 'Spec / code: deploy/README.md'
+  commits:
+  - 1a70ddf
+- key: accounts.sso
+  type: Feature
+  parent: accounts
+  subject: Microsoft Entra SSO login
+  status: Closed
+  start: '2026-04-27'
+  finish: '2026-04-29'
+  category: accounts
+  description: 'Spec / code: docs/PLAN.md'
+  commits:
+  - 9ac0570
+  - 494dc25
+  - 402e310
+  - 9a16d96
+  - 2ad9859
+- key: accounts.sso-jit
+  type: Feature
+  parent: accounts
+  subject: SSO just-in-time provisioning + preprovision command
+  status: Closed
+  start: '2026-04-29'
+  finish: '2026-08-27'
+  category: accounts
+  commits:
+  - 0a475cf
+  - f3c3c24
+  - 1eb4162
+- key: accounts.hierarchy-acl
+  type: Feature
+  parent: accounts
+  subject: Hierarchy-based access control
+  status: Closed
+  start: '2026-04-27'
+  finish: '2026-04-27'
+  category: accounts
+  description: 'Spec / code: accounts/permissions.py'
+  commits:
+  - 5c0066a
+- key: accounts.import-org-chart
+  type: Feature
+  parent: accounts
+  subject: import_org_chart management command
+  status: Closed
+  start: '2026-04-29'
+  finish: '2026-08-27'
+  category: accounts
+  commits:
+  - 3e9578b
+  - 74ca8e2
+- key: accounts.account-cleanup
+  type: Feature
+  parent: accounts
+  subject: Drop change-password; superuser-only admin link; My profile entry
+  status: Closed
+  start: '2026-04-29'
+  finish: '2026-04-29'
+  category: accounts
+  commits:
+  - 16166be
+  - b32186c
+- key: accounts.user-admins
+  type: Feature
+  parent: accounts
+  subject: '"User Admins" group + scope-limited user edit'
+  status: Closed
+  start: '2026-07-20'
+  finish: '2026-09-02'
+  category: accounts
+  commits:
+  - 2f48418
+  - 555ca37
+  - 697f228
+  - 81e79fa
+- key: accounts.scope-grants
+  type: Feature
+  parent: accounts
+  subject: Department-wide, department-head and team-level access grants
+  status: Closed
+  start: '2026-07-24'
+  finish: '2026-09-16'
+  category: accounts
+  description: 'Spec / code: docs/PLAN.md'
+  commits:
+  - 7fd7c95
+  - 037302f
+  - 702c9a2
+  - 990286f
+  - 05a0392
+  - 8f209f1
+- key: accounts.admin-picker
+  type: Feature
+  parent: accounts
+  subject: Admin people-picker shows name + employee ID
+  status: Closed
+  start: '2026-07-24'
+  finish: '2026-07-24'
+  category: accounts
+  commits:
+  - 1a1baf0
+- key: accounts.sso-only
+  type: Feature
+  parent: accounts
+  subject: SSO-only sign-in; stop AAD resync after first login
+  status: Closed
+  start: '2026-08-27'
+  finish: '2026-10-19'
+  category: accounts
+  commits:
+  - bc6b216
+  - 0419eac
+  - 029a86b
+- key: accounts.bulk-onboarding
+  type: Feature
+  parent: accounts
+  subject: Bulk new-joiner onboarding (auto ID/email/password, NID, notice period, rehire flag)
+  status: Closed
+  start: '2026-08-31'
+  finish: '2026-08-31'
+  category: accounts
+  description: 'Spec / code: accounts/upload.py'
+  commits:
+  - 37e45fd
+  - a3a2ec9
+  - 3fde139
+- key: accounts.user-search
+  type: Feature
+  parent: accounts
+  subject: 'User admin: find deactivated users, filter by group'
+  status: Closed
+  start: '2026-10-01'
+  finish: '2026-11-01'
+  category: accounts
+  commits:
+  - 1734bdd
+  - 689a530
+- key: accounts.exact-search
+  type: Feature
+  parent: accounts
+  subject: Exact-match employee ID / email search everywhere
+  status: Closed
+  start: '2026-09-13'
+  finish: '2026-10-30'
+  category: accounts
+  description: 'Spec / code: accounts/filters.py'
+  commits:
+  - 017d52b
+  - 787b0fa
+- key: accounts.directory-api
+  type: Feature
+  parent: accounts
+  subject: Directory API phases 1–3 + in-app developer docs
+  status: Closed
+  start: '2026-10-14'
+  finish: '2026-10-14'
+  category: accounts
+  description: 'Spec / code: docs/DIRECTORY_API_PLAN.md'
+  commits:
+  - b1e9015
+  - 01c39ca
+  - b87da65
+  - b1e22ad
+- key: employees.profile-drawer
+  type: Feature
+  parent: employees
+  subject: Employee profile + htmx section-edit drawer
+  status: Closed
+  start: '2026-05-06'
+  finish: '2026-07-20'
+  category: employees
+  description: 'Spec / code: docs/PLAN.md'
+  commits:
+  - b8479df
+  - 8d10815
+  - 5be03aa
+  - c0f98ff
+- key: employees.downline-edit
+  type: Feature
+  parent: employees
+  subject: Supervisors edit their downline's basic info
+  status: Closed
+  start: '2026-07-16'
+  finish: '2026-07-16'
+  category: employees
+  commits:
+  - '1538936'
+- key: employees.list-filters
+  type: Feature
+  parent: employees
+  subject: Department filter, shared pagination and employee filters
+  status: Closed
+  start: '2026-07-17'
+  finish: '2026-07-20'
+  category: employees
+  description: 'Spec / code: accounts/filters.py'
+  commits:
+  - 3a276cb
+  - 9f2ca49
+- key: employees.indirect-badge
+  type: Feature
+  parent: employees
+  subject: Indirect-report badge
+  status: Closed
+  start: '2026-07-17'
+  finish: '2026-07-17'
+  category: employees
+  commits:
+  - a5c9a63
+- key: employees.team-admin
+  type: Feature
+  parent: employees
+  subject: Team admin import/export + bulk grant of team managers
+  status: Closed
+  start: '2026-07-20'
+  finish: '2026-09-03'
+  category: employees
+  commits:
+  - 101c564
+  - ac1cc5b
+- key: employees.bd-address
+  type: Feature
+  parent: employees
+  subject: Bangladesh address reference data
+  status: Closed
+  start: '2026-07-21'
+  finish: '2026-07-22'
+  category: employees
+  description: 'Spec / code: docs/BANGLADESH_LOCATION_DATA.md'
+  commits:
+  - 761ce0b
+  - 03bcafa
+- key: employees.excel-export
+  type: Feature
+  parent: employees
+  subject: Employee list Excel export
+  status: Closed
+  start: '2026-08-24'
+  finish: '2026-08-24'
+  category: employees
+  commits:
+  - bfdb30a
+  - eaf97bd
+- key: employees.bulk-update
+  type: Feature
+  parent: employees
+  subject: Bulk Excel employee update (team, JobInfo, dates, profile sections, probation)
+  status: Closed
+  start: '2026-08-25'
+  finish: '2026-11-03'
+  category: employees
+  description: 'Spec / code: employees/upload.py'
+  commits:
+  - 07ebb3b
+  - 5fe32fd
+  - ca611de
+  - 45ef6d3
+  - 7d0f294
+  - 68d3a45
+- key: employees.reports-to-picker
+  type: Feature
+  parent: employees
+  subject: Searchable Reports-to picker
+  status: Closed
+  start: '2026-08-25'
+  finish: '2026-08-25'
+  category: employees
+  commits:
+  - 34583c0
+- key: employees.resource-status
+  type: Feature
+  parent: employees
+  subject: General resource status on JobInfo
+  status: Closed
+  start: '2026-08-25'
+  finish: '2026-08-25'
+  category: employees
+  commits:
+  - d30393e
+- key: employees.education-national
+  type: Feature
+  parent: employees
+  subject: '"National" education institution category'
+  status: Closed
+  start: '2026-08-27'
+  finish: '2026-08-27'
+  category: employees
+  commits:
+  - 05654cc
+- key: employees.backfill
+  type: Feature
+  parent: employees
+  subject: Joining-date and office-location backfill
+  status: Closed
+  start: '2026-08-29'
+  finish: '2026-08-29'
+  category: employees
+  commits:
+  - 0348994
+- key: employees.reference-cleanup
+  type: Feature
+  parent: employees
+  subject: Reference-data cleanup (consolidate_job_locations, merge_reference)
+  status: Closed
+  start: '2026-09-02'
+  finish: '2026-10-10'
+  category: employees
+  commits:
+  - ea2c769
+  - 6fc1382
+- key: employees.service-book
+  type: Feature
+  parent: employees
+  subject: Service Book (Labour Rules 2015 Form-7) with PDF
+  status: Closed
+  start: '2026-09-10'
+  finish: '2026-10-07'
+  category: employees
+  description: 'Spec / code: employees/services.py'
+  commits:
+  - f41e47a
+  - a0825cd
+  - 1cc3f68
+  - 726cfbb
+  - 6889d8d
+  - '1681232'
+  - 77de0d7
+  - 57b915e
+  - 857c9fc
+  - d66e41e
+  - c9d7c5e
+- key: employees.night-consent
+  type: Feature
+  parent: employees
+  subject: Monthly night-shift consent for female employees
+  status: Closed
+  start: '2026-09-13'
+  finish: '2026-09-13'
+  category: employees
+  description: 'Spec / code: docs/NIGHT_SHIFT_CONSENT_PLAN.md'
+  commits:
+  - 8007a29
+- key: employees.self-service-switch
+  type: Feature
+  parent: employees
+  subject: HR-controlled profile self-service switch
+  status: Closed
+  start: '2026-09-17'
+  finish: '2026-09-17'
+  category: employees
+  commits:
+  - '0746111'
+- key: employees.legacy-60
+  type: Feature
+  parent: employees
+  subject: Legacy 60-employee import plan + checklist
+  status: Closed
+  start: '2026-10-05'
+  finish: '2026-10-05'
+  category: employees
+  description: 'Spec / code: docs/LEGACY_60_IMPORT_PLAN.md'
+  commits:
+  - 7fef18f
+- key: employees.org-chart
+  type: Feature
+  parent: employees
+  subject: Org chart (live reporting tree)
+  status: Closed
+  start: '2026-10-11'
+  finish: '2026-10-11'
+  category: employees
+  description: 'Spec / code: docs/PLAN.md "Org chart"'
+  commits:
+  - 2f239b1
+- key: employees.list-cards
+  type: Feature
+  parent: employees
+  subject: Employee list cards show team + reports-to
+  status: Closed
+  start: '2026-10-13'
+  finish: '2026-10-13'
+  category: employees
+  commits:
+  - e639ab1
+- key: roster.grid
+  type: Feature
+  parent: roster
+  subject: Roster grid with htmx cell editing + per-day work location
+  status: Closed
+  start: '2026-04-29'
+  finish: '2026-04-29'
+  category: roster
+  description: 'Spec / code: docs/PLAN.md'
+  commits:
+  - a71104c
+  - 78864c0
+  - 586f9cb
+  - fcc43ed
+  - 0f32ff1
+  - 9b33b81
+  - '6612355'
+  - 8679f95
+  - 128d641
+- key: roster.shift-commands
+  type: Feature
+  parent: roster
+  subject: Shift type / attribute management commands
+  status: Closed
+  start: '2026-04-29'
+  finish: '2026-04-29'
+  category: roster
+  commits:
+  - ca458a9
+  - db80836
+  - 7ca7c44
+  - afc68f5
+- key: roster.seed
+  type: Feature
+  parent: roster
+  subject: Seed shifts, LEAVE shift types, default new-user pattern
+  status: Closed
+  start: '2026-05-05'
+  finish: '2026-05-06'
+  category: roster
+  commits:
+  - 26a1700
+  - e1aaa06
+  - 9a86fdb
+- key: roster.timely-api
+  type: Feature
+  parent: roster
+  subject: TimeLy-shaped roster API
+  status: Closed
+  start: '2026-05-06'
+  finish: '2026-05-06'
+  category: roster
+  description: 'Spec / code: docs/TIMELY_API.md'
+  commits:
+  - 0f6fc31
+  - e9038de
+- key: roster.upload
+  type: Feature
+  parent: roster
+  subject: Roster Excel upload (approved-leave protection + override)
+  status: Closed
+  start: '2026-05-13'
+  finish: '2026-09-01'
+  category: roster
+  commits:
+  - 7f0176e
+  - 7d825b8
+  - 76fc0dd
+  - ea19719
+  - 33c4076
+  - 7818098
+- key: roster.single-employee
+  type: Feature
+  parent: roster
+  subject: Single-employee grid + leave shifts shown in the grid
+  status: Closed
+  start: '2026-06-30'
+  finish: '2026-06-30'
+  category: roster
+  commits:
+  - 42d1981
+  - 8f89cea
+- key: roster.export
+  type: Feature
+  parent: roster
+  subject: Roster Excel export (grid and flat sheet)
+  status: Closed
+  start: '2026-07-20'
+  finish: '2026-10-30'
+  category: roster
+  commits:
+  - 075fdb2
+  - ae595e0
+- key: roster.toasts
+  type: Feature
+  parent: roster
+  subject: Cell-save toasts + visible permission denials
+  status: Closed
+  start: '2026-07-20'
+  finish: '2026-07-20'
+  category: roster
+  commits:
+  - 63ef9b6
+- key: roster.grid-perf
+  type: Feature
+  parent: roster
+  subject: Grid query-scaling regression test
+  status: Closed
+  start: '2026-07-21'
+  finish: '2026-07-21'
+  category: roster
+  commits:
+  - 3144c40
+- key: roster.dsndd-api
+  type: Feature
+  parent: roster
+  subject: External write API for dsndd + shift change audit log
+  status: Closed
+  start: '2026-07-27'
+  finish: '2026-08-18'
+  category: roster
+  description: 'Spec / code: docs/DSNDD_INTEGRATION.md'
+  commits:
+  - 68bfd84
+  - 141fb66
+- key: roster.list-view
+  type: Feature
+  parent: roster
+  subject: Flat/list view, filters popover, shift guide, sort order
+  status: Closed
+  start: '2026-08-19'
+  finish: '2026-09-06'
+  category: roster
+  commits:
+  - 31410fd
+  - 7dc843d
+  - 40b8b3c
+  - 6f6efa9
+  - 81359c6
+  - b3cefca
+  - 7d51fcc
+  - 61ea806
+- key: roster.personal
+  type: Feature
+  parent: roster
+  subject: Read-only personal roster for every employee
+  status: Closed
+  start: '2026-08-27'
+  finish: '2026-08-27'
+  category: roster
+  commits:
+  - b730aa2
+- key: roster.attr-dept-scope
+  type: Feature
+  parent: roster
+  subject: Shift attributes limited by department
+  status: Closed
+  start: '2026-08-27'
+  finish: '2026-09-01'
+  category: roster
+  commits:
+  - e6a7056
+  - fdac1b5
+- key: roster.backfills
+  type: Feature
+  parent: roster
+  subject: Historical roster backfills (AdOps, Data Solutions)
+  status: Closed
+  start: '2026-08-27'
+  finish: '2026-08-29'
+  category: roster
+  commits:
+  - 86e9388
+  - ca0966b
+  - b3b27bf
+- key: roster.self-edit
+  type: Feature
+  parent: roster
+  subject: Team-lead-and-above roster self-edit
+  status: Closed
+  start: '2026-09-01'
+  finish: '2026-09-03'
+  category: roster
+  commits:
+  - 68145de
+  - 7011ae8
+- key: roster.lwd-purge
+  type: Feature
+  parent: roster
+  subject: Last-working-date shift purge + search for separated staff
+  status: Closed
+  start: '2026-09-11'
+  finish: '2026-09-11'
+  category: roster
+  commits:
+  - ac0ce83
+  - bd6e5ec
+- key: roster.joining-guard
+  type: Feature
+  parent: roster
+  subject: Joining-date guard, audit and purge
+  status: Closed
+  start: '2026-09-17'
+  finish: '2026-09-17'
+  category: roster
+  commits:
+  - 58d0a7e
+  - c8a9971
+  - 398de67
+- key: roster.weekly-email
+  type: Feature
+  parent: roster
+  subject: Weekly team roster email (Friday)
+  status: Closed
+  start: '2026-09-25'
+  finish: '2026-09-25'
+  category: roster
+  description: 'Spec / code: docs/PLAN.md "Weekly team roster email"'
+  commits:
+  - 3784a94
+- key: roster.shift-change
+  type: Feature
+  parent: roster
+  subject: Shift change requests with approval (dept head inside night windows)
+  status: Closed
+  start: '2026-10-01'
+  finish: '2026-11-03'
+  category: roster
+  description: 'Spec / code: docs/SHIFT_CHANGE_REQUEST_PLAN.md'
+  commits:
+  - 6899c1b
+  - 55b4608
+  - 2823f7c
+- key: roster.org-wide-flat
+  type: Feature
+  parent: roster
+  subject: Company-wide flat view for HR
+  status: Closed
+  start: '2026-11-02'
+  finish: '2026-11-02'
+  category: roster
+  commits:
+  - a277404
+- key: leave.core
+  type: Feature
+  parent: leave
+  subject: Leave apply / approve / decline / cancel
+  status: Closed
+  start: '2026-04-24'
+  finish: '2026-04-24'
+  category: leave
+  commits:
+  - c7b33a3
+  - a20d8c6
+- key: leave.policy-v2
+  type: Feature
+  parent: leave
+  subject: SEBPO Leave Policy v2.0 (sandwich rule, balance ledger, accrual)
+  status: Closed
+  start: '2026-04-27'
+  finish: '2026-09-17'
+  category: leave
+  description: 'Spec / code: docs/LEAVE_POLICY_IMPLEMENTATION.md'
+  commits:
+  - cbe47c6
+  - 0eefc2a
+  - 0842cdc
+  - 04cebf9
+  - e2b3fea
+  - d631826
+- key: leave.seed
+  type: Feature
+  parent: leave
+  subject: seed_leave_policies command
+  status: Closed
+  start: '2026-04-29'
+  finish: '2026-04-29'
+  category: leave
+  commits:
+  - 242c774
+- key: leave.summary
+  type: Feature
+  parent: leave
+  subject: Leave summary list
+  status: Closed
+  start: '2026-05-19'
+  finish: '2026-05-19'
+  category: leave
+  commits:
+  - 80c6011
+- key: leave.shift-summary
+  type: Feature
+  parent: leave
+  subject: Shift-summary report (scoped, Excel export)
+  status: Closed
+  start: '2026-06-30'
+  finish: '2026-10-30'
+  category: leave
+  description: 'Spec / code: payroll/reports.py'
+  commits:
+  - 219215f
+  - 01aa8ae
+  - b2b5ca2
+  - 26a85df
+  - 98d0b42
+  - fb4a1a6
+- key: leave.menu
+  type: Feature
+  parent: leave
+  subject: Leave menu section
+  status: Closed
+  start: '2026-06-30'
+  finish: '2026-06-30'
+  category: leave
+  commits:
+  - c8cdf97
+- key: leave.calendar
+  type: Feature
+  parent: leave
+  subject: Leave calendar view
+  status: Closed
+  start: '2026-07-09'
+  finish: '2026-07-09'
+  category: leave
+  commits:
+  - 9af914f
+  - c60db24
+- key: leave.race-fixes
+  type: Feature
+  parent: leave
+  subject: Balance race fixes + indexes
+  status: Closed
+  start: '2026-07-21'
+  finish: '2026-07-21'
+  category: leave
+  commits:
+  - 0e10f4a
+- key: leave.al-anniversary
+  type: Feature
+  parent: leave
+  subject: Annual leave on anniversary cycles, live accrual, auto open/close
+  status: Closed
+  start: '2026-08-31'
+  finish: '2026-09-03'
+  category: leave
+  description: 'Spec / code: docs/LEAVE_POLICY_IMPLEMENTATION.md §5.7'
+  commits:
+  - 2b8fed3
+  - 94ced5b
+  - 8f8eead
+  - 5758e7a
+  - 2c00bb3
+  - 12572f5
+  - 17087cf
+  - 6f880cf
+- key: leave.balance-visibility
+  type: Feature
+  parent: leave
+  subject: Leave balance on profile and on approve/decline
+  status: Closed
+  start: '2026-09-02'
+  finish: '2026-09-06'
+  category: leave
+  commits:
+  - db5bf75
+  - 674b569
+- key: leave.list-filters
+  type: Feature
+  parent: leave
+  subject: Leave list filter, sort, pagination + Team column
+  status: Closed
+  start: '2026-09-06'
+  finish: '2026-09-07'
+  category: leave
+  commits:
+  - 49b06a4
+  - 1eb7036
+  - 1a689dc
+- key: leave.advance
+  type: Feature
+  parent: leave
+  subject: Leave in advance of future entitlement
+  status: Closed
+  start: '2026-09-10'
+  finish: '2026-09-10'
+  category: leave
+  commits:
+  - 7825b11
+- key: leave.cpl
+  type: Feature
+  parent: leave
+  subject: Compensatory leave tracking, carry-forward, year-end rollover
+  status: Closed
+  start: '2026-09-13'
+  finish: '2026-10-01'
+  category: leave
+  commits:
+  - 387c32a
+  - 6b9c16b
+  - a58ab18
+- key: leave.double-debit
+  type: Feature
+  parent: leave
+  subject: Double-debit fix (application vs roster)
+  status: Closed
+  start: '2026-09-22'
+  finish: '2026-09-22'
+  category: leave
+  commits:
+  - d80d106
+- key: leave.direct-reports
+  type: Feature
+  parent: leave
+  subject: '"Direct reports only" switch'
+  status: Closed
+  start: '2026-10-09'
+  finish: '2026-10-09'
+  category: leave
+  commits:
+  - 6a98c20
+- key: leave.edit-pending
+  type: Feature
+  parent: leave
+  subject: Edit a pending leave application
+  status: Closed
+  start: '2026-10-19'
+  finish: '2026-10-19'
+  category: leave
+  commits:
+  - 29a8852
+- key: attendance.overlay
+  type: Feature
+  parent: attendance
+  subject: TimeLy office-presence overlay on the dashboard
+  status: Closed
+  start: '2026-05-06'
+  finish: '2026-05-13'
+  category: attendance
+  commits:
+  - f5bbbd7
+  - fb22005
+- key: attendance.history
+  type: Feature
+  parent: attendance
+  subject: Local attendance history synced from TimeLy
+  status: Closed
+  start: '2026-09-07'
+  finish: '2026-09-16'
+  category: attendance
+  commits:
+  - 705bc51
+  - 7f5577a
+  - bbbc547
+- key: attendance.corrections
+  type: Feature
+  parent: attendance
+  subject: Timesheet corrections with supervisor approval
+  status: Closed
+  start: '2026-09-07'
+  finish: '2026-09-07'
+  category: attendance
+  commits:
+  - db5136b
+  - 22d95d8
+- key: attendance.single-range
+  type: Feature
+  parent: attendance
+  subject: Single-employee date-range mode
+  status: Closed
+  start: '2026-09-11'
+  finish: '2026-09-11'
+  category: attendance
+  commits:
+  - eb82169
+- key: attendance.pattern-guard
+  type: Feature
+  parent: attendance
+  subject: Roster-pattern fallback limited to the employment window
+  status: Closed
+  start: '2026-09-22'
+  finish: '2026-09-22'
+  category: attendance
+  commits:
+  - ef70c9a
+- key: attendance.team-range
+  type: Feature
+  parent: attendance
+  subject: Department/team date-range mode + Excel export
+  status: Closed
+  start: '2026-10-01'
+  finish: '2026-11-02'
+  category: attendance
+  commits:
+  - 9ee8574
+  - fb99f62
+- key: core.dashboard
+  type: Feature
+  parent: core
+  subject: Dashboard
+  status: Closed
+  start: '2026-04-27'
+  finish: '2026-04-27'
+  category: core
+  commits:
+  - b265a7e
+- key: core.week-strip
+  type: Feature
+  parent: core
+  subject: '"This week" strip + next-shift card'
+  status: Closed
+  start: '2026-06-30'
+  finish: '2026-09-03'
+  category: core
+  commits:
+  - 1a29566
+  - 24d6732
+- key: core.capacity-fix
+  type: Feature
+  parent: core
+  subject: Leave-capacity double-count fix
+  status: Closed
+  start: '2026-06-30'
+  finish: '2026-06-30'
+  category: core
+  commits:
+  - '2054688'
+- key: core.team-drilldowns
+  type: Feature
+  parent: core
+  subject: Team-tab drill-downs + roster-driven "Out today"
+  status: Closed
+  start: '2026-07-21'
+  finish: '2026-07-21'
+  category: core
+  commits:
+  - f88d205
+  - 304d03a
+- key: core.pending-approvals
+  type: Feature
+  parent: core
+  subject: Unified pending-approvals widget
+  status: Closed
+  start: '2026-09-11'
+  finish: '2026-09-11'
+  category: core
+  commits:
+  - 222aa74
+- key: core.scope-count
+  type: Feature
+  parent: core
+  subject: '"Total in your scope" matches the Employees page'
+  status: Closed
+  start: '2026-09-11'
+  finish: '2026-09-11'
+  category: core
+  commits:
+  - 068d75c
+- key: dynamic_menu.payroll-acl
+  type: Feature
+  parent: dynamic_menu
+  subject: Payroll menu allowed-users list
+  status: Closed
+  start: '2026-06-12'
+  finish: '2026-06-12'
+  category: dynamic_menu
+  commits:
+  - 0091164
+- key: dynamic_menu.open-menus
+  type: Feature
+  parent: dynamic_menu
+  subject: Main menus open to all staff; managers get the ack queue
+  status: Closed
+  start: '2026-09-05'
+  finish: '2026-09-05'
+  category: dynamic_menu
+  commits:
+  - f15964b
+- key: dynamic_menu.htmx-403
+  type: Feature
+  parent: dynamic_menu
+  subject: htmx requests get 403 on access denial
+  status: Closed
+  start: '2026-09-15'
+  finish: '2026-09-15'
+  category: dynamic_menu
+  commits:
+  - c836cd8
+- key: theme.sidebar
+  type: Feature
+  parent: theme
+  subject: Icon-rail sidebar with hover flyouts + mobile drawer
+  status: Closed
+  start: '2026-05-22'
+  finish: '2026-05-22'
+  category: theme
+  commits:
+  - e9976f8
+- key: theme.avatar
+  type: Feature
+  parent: theme
+  subject: Topbar profile picture with initials fallback
+  status: Closed
+  start: '2026-07-20'
+  finish: '2026-07-20'
+  category: theme
+  commits:
+  - 47e0ae6
+- key: theme.flatpickr
+  type: Feature
+  parent: theme
+  subject: Flatpickr for every date input
+  status: Closed
+  start: '2026-09-06'
+  finish: '2026-09-06'
+  category: theme
+  commits:
+  - b5448fd
+- key: theme.drawer-shell
+  type: Feature
+  parent: theme
+  subject: Shared drawer shell + department→team cascade
+  status: Closed
+  start: '2026-09-06'
+  finish: '2026-09-06'
+  category: theme
+  commits:
+  - e727222
+  - a3b5400
+  - 0dd7841
+- key: theme.density
+  type: Feature
+  parent: theme
+  subject: Tighter table density
+  status: Closed
+  start: '2026-09-06'
+  finish: '2026-09-06'
+  category: theme
+  commits:
+  - efca882
+  - 7e24749
+- key: theme.toasts
+  type: Feature
+  parent: theme
+  subject: Messages shown as toasts
+  status: Closed
+  start: '2026-09-15'
+  finish: '2026-09-15'
+  category: theme
+  commits:
+  - 6e20a4d
+- key: theme.bell
+  type: Feature
+  parent: theme
+  subject: Topbar notification bell + "Direct reports only" on approval lists
+  status: Closed
+  start: '2026-10-16'
+  finish: '2026-10-16'
+  category: theme
+  description: 'Spec / code: docs/PLAN.md "Notifications"'
+  commits:
+  - 381830c
+- key: theme.branding
+  type: Feature
+  parent: theme
+  subject: Orbis branding (logo, favicon, login wordmark)
+  status: Closed
+  start: '2026-10-19'
+  finish: '2026-10-30'
+  category: theme
+  commits:
+  - 3082d54
+  - bb7c338
+  - 962eed6
+  - 947d50f
+- key: theme.credits
+  type: Feature
+  parent: theme
+  subject: Copyright footer + Project Credits page
+  status: Closed
+  start: '2026-10-30'
+  finish: '2026-10-30'
+  category: theme
+  commits:
+  - 54211dc
+  - 77a1c25
+  - cce1d76
+- key: documents.letters
+  type: Feature
+  parent: documents
+  subject: HR letter generation
+  status: Closed
+  start: '2026-05-22'
+  finish: '2026-05-22'
+  category: documents
+  commits:
+  - 3706cf7
+- key: documents.veridoc
+  type: Feature
+  parent: documents
+  subject: Document verification features (Veridoc port)
+  status: Closed
+  start: '2026-06-10'
+  finish: '2026-06-10'
+  category: documents
+  description: 'Spec / code: docs/VERIDOC_IMPLEMENTATION_PLAN.md'
+  commits:
+  - d8894c9
+- key: documents.verify-hardening
+  type: Feature
+  parent: documents
+  subject: Review/approval step guard + hardened public verify page
+  status: Closed
+  start: '2026-07-21'
+  finish: '2026-07-21'
+  category: documents
+  commits:
+  - f069fc7
+  - 65a2014
+- key: documents.ckeditor5
+  type: Feature
+  parent: documents
+  subject: CKEditor 4 → django-ckeditor-5
+  status: Closed
+  start: '2026-07-21'
+  finish: '2026-07-21'
+  category: documents
+  commits:
+  - 96a40f6
+- key: documents.pdf-design
+  type: Feature
+  parent: documents
+  subject: PDF design refresh
+  status: Closed
+  start: '2026-07-30'
+  finish: '2026-07-30'
+  category: documents
+  commits:
+  - adf6385
+- key: documents.salary-cert
+  type: Feature
+  parent: documents
+  subject: Salary certificate
+  status: Closed
+  start: '2026-09-01'
+  finish: '2026-09-01'
+  category: documents
+  commits:
+  - 489fd02
+  - a29f378
+- key: offboarding.clearance
+  type: Feature
+  parent: offboarding
+  subject: Clearance levels / pending workflow
+  status: Closed
+  start: '2026-06-11'
+  finish: '2026-06-12'
+  category: offboarding
+  commits:
+  - c41a472
+  - 0c689d5
+- key: offboarding.active-step
+  type: Feature
+  parent: offboarding
+  subject: Active-step fix on case detail
+  status: Closed
+  start: '2026-07-21'
+  finish: '2026-07-21'
+  category: offboarding
+  commits:
+  - f29a6a3
+- key: offboarding.skipped-detect
+  type: Feature
+  parent: offboarding
+  subject: Detect separations that skipped offboarding
+  status: Closed
+  start: '2026-09-05'
+  finish: '2026-09-05'
+  category: offboarding
+  commits:
+  - 8cb2266
+- key: policies.module
+  type: Feature
+  parent: policies
+  subject: Policy Acknowledgement module
+  status: Closed
+  start: '2026-06-24'
+  finish: '2026-06-24'
+  category: policies
+  description: 'Spec / code: docs/POLICY_MODULE_PLAN.md'
+  commits:
+  - b520cb3
+  - f123a9d
+- key: policies.picker
+  type: Feature
+  parent: policies
+  subject: Searchable adherent picker + department targeting
+  status: Closed
+  start: '2026-07-31'
+  finish: '2026-07-31'
+  category: policies
+  commits:
+  - 708b7fd
+  - 87d57c4
+- key: policies.canvas
+  type: Feature
+  parent: policies
+  subject: Canvas PDF reader with no download
+  status: Closed
+  start: '2026-08-04'
+  finish: '2026-08-04'
+  category: policies
+  commits:
+  - b8e906b
+  - dadaa53
+- key: policies.publish-split
+  type: Feature
+  parent: policies
+  subject: Publish split into Activate / Circulate
+  status: Closed
+  start: '2026-09-18'
+  finish: '2026-10-28'
+  category: policies
+  commits:
+  - '5436202'
+  - 7c727c8
+- key: policies.deterrence
+  type: Feature
+  parent: policies
+  subject: Print / screenshot deterrence
+  status: Closed
+  start: '2026-09-18'
+  finish: '2026-09-18'
+  category: policies
+  commits:
+  - 4838aad
+  - b0cb8f4
+- key: policies.targeting-preview
+  type: Feature
+  parent: policies
+  subject: Targeting preview before circulation
+  status: Closed
+  start: '2026-10-28'
+  finish: '2026-10-28'
+  category: policies
+  commits:
+  - 9731d2d
+- key: policies.retired-reset
+  type: Feature
+  parent: policies
+  subject: 'Retired policies: reset signing data'
+  status: Closed
+  start: '2026-10-28'
+  finish: '2026-10-28'
+  category: policies
+  commits:
+  - d03e450
+- key: policies.pdf-cap
+  type: Feature
+  parent: policies
+  subject: PDF size cap follows MEDIA_MAX_UPLOAD_BYTES
+  status: Closed
+  start: '2026-10-29'
+  finish: '2026-10-29'
+  category: policies
+  commits:
+  - 823d794
+- key: scheduler.db-beat
+  type: Feature
+  parent: scheduler
+  subject: Beat schedule stored in the database, managed in the admin
+  status: Closed
+  start: '2026-09-29'
+  finish: '2026-09-29'
+  category: scheduler
+  description: 'Spec / code: docs/SCHEDULER_ADMIN_PLAN.md'
+  commits:
+  - 8f56a57
+  - b6890a3
+- key: scheduler.jan15
+  type: Feature
+  parent: scheduler
+  subject: Jan-15 year-end rollover catch-up
+  status: Closed
+  start: '2026-10-01'
+  finish: '2026-10-01'
+  category: scheduler
+  commits:
+  - 4e9d26c
+- key: scheduler.run-with-args
+  type: Feature
+  parent: scheduler
+  subject: '"Run once with arguments" in the admin'
+  status: Closed
+  start: '2026-10-30'
+  finish: '2026-10-30'
+  category: scheduler
+  commits:
+  - 1211b61
+- key: audit.access-log
+  type: Feature
+  parent: audit
+  subject: Access log (who accessed which data or page)
+  status: Closed
+  start: '2026-10-09'
+  finish: '2026-10-09'
+  category: audit
+  description: 'Spec / code: docs/ACCESS_LOG_PLAN.md'
+  commits:
+  - a4c6ac6
+  - f212981
+  - b54f767
+  - 8eb0dc1
+- key: media_store.drive
+  type: Feature
+  parent: media_store
+  subject: Media on Google Drive as an encrypted blob store
+  status: Closed
+  start: '2026-10-10'
+  finish: '2026-10-10'
+  category: media_store
+  description: 'Spec / code: docs/MEDIA_GOOGLE_DRIVE_PLAN.md'
+  commits:
+  - ee279a0
+  - a9dda65
+  - f534b67
+  - 5127b3d
+- key: media_store.keys-optional
+  type: Feature
+  parent: media_store
+  subject: Encryption keys required only for the Drive backend
+  status: Closed
+  start: '2026-10-11'
+  finish: '2026-10-11'
+  category: media_store
+  commits:
+  - e53675d
+- key: media_store.case-sensitive
+  type: Feature
+  parent: media_store
+  subject: Case-sensitive names + /media/ checked against the owning row
+  status: Closed
+  start: '2026-10-16'
+  finish: '2026-10-16'
+  category: media_store
+  commits:
+  - 02248fa
+  - 1db630c
+- key: media_store.resumable
+  type: Feature
+  parent: media_store
+  subject: Recover interrupted Drive uploads
+  status: Closed
+  start: '2026-10-16'
+  finish: '2026-10-16'
+  category: media_store
+  commits:
+  - e74b5db
+- key: media_store.prod-flip
+  type: Feature
+  parent: media_store
+  subject: Production flip to Drive (2026-10-16)
+  status: Closed
+  start: '2026-10-16'
+  finish: '2026-10-16'
+  category: media_store
+  description: 'Spec / code: deploy/README.md "Media on Google Drive"'
+  commits:
+  - c95943d
+  - cb3ab35
+  - '8624610'
+- key: payroll.first-report
+  type: Feature
+  parent: payroll
+  subject: First payroll report (no hour calculations)
+  status: Closed
+  start: '2026-06-10'
+  finish: '2026-06-10'
+  category: payroll
+  commits:
+  - dddaeaf
+- key: payroll.excel-export
+  type: Feature
+  parent: payroll
+  subject: Payroll Excel export + support info
+  status: Closed
+  start: '2026-07-02'
+  finish: '2026-07-02'
+  category: payroll
+  commits:
+  - 9f9ec94
+  - de6d5a6
+  - 4da9502
+- key: payroll.downline-scope
+  type: Feature
+  parent: payroll
+  subject: Reports limited to the viewer's downline
+  status: Closed
+  start: '2026-07-17'
+  finish: '2026-07-17'
+  category: payroll
+  commits:
+  - 5fd8074
+- key: payroll.design-docs
+  type: Feature
+  parent: payroll
+  subject: Payroll process design + technical plan
+  status: Closed
+  start: '2026-08-10'
+  finish: '2026-08-10'
+  category: payroll
+  description: 'Spec / code: docs/PAYROLL_PROCESS.md'
+  commits:
+  - 79f55f0
+  - e955aab
+- key: payroll.module
+  type: Feature
+  parent: payroll
+  subject: 'Phases 1–4: compensation, rates, calculation engine, in-house tax'
+  status: Closed
+  start: '2026-08-24'
+  finish: '2026-08-24'
+  category: payroll
+  description: 'Spec / code: docs/PAYROLL_PLAN.md'
+  commits:
+  - 65e3bbb
+- key: payroll.gross-register
+  type: Feature
+  parent: payroll
+  subject: Gross-salary register + overtime upload template
+  status: Closed
+  start: '2026-08-28'
+  finish: '2026-08-28'
+  category: payroll
+  commits:
+  - 6c1a1ab
+- key: payroll.acl
+  type: Feature
+  parent: payroll
+  subject: Payroll view access rules enforced
+  status: Closed
+  start: '2026-09-05'
+  finish: '2026-09-06'
+  category: payroll
+  commits:
+  - 9833e0c
+  - f1fd097
+- key: payroll.adops-policy
+  type: Feature
+  parent: payroll
+  subject: AdOps night-shift / overtime / transport allowance policy
+  status: Closed
+  start: '2026-09-07'
+  finish: '2026-09-07'
+  category: payroll
+  commits:
+  - 454e78a
+- key: payroll.resigned-pay
+  type: Feature
+  parent: payroll
+  subject: Pay resigned employees for days actually worked
+  status: Closed
+  start: '2026-09-08'
+  finish: '2026-09-08'
+  category: payroll
+  commits:
+  - 032da61
+- key: payroll.ot-split
+  type: Feature
+  parent: payroll
+  subject: Overtime column split by overtime type
+  status: Closed
+  start: '2026-09-08'
+  finish: '2026-09-08'
+  category: payroll
+  commits:
+  - 0e9d5f4
+- key: payroll.dedicated-night
+  type: Feature
+  parent: payroll
+  subject: Dedicated night-shift assignments (admin, bulk, supervisor upkeep, roster sidebar)
+  status: Closed
+  start: '2026-09-08'
+  finish: '2026-11-03'
+  category: payroll
+  commits:
+  - 835b22b
+  - 68e13d9
+  - 2c80fa8
+  - '1072294'
+  - a204093
+- key: payroll.rate-seeding
+  type: Feature
+  parent: payroll
+  subject: Department / team rate seeding (night, OT, transport, GH OT)
+  status: Closed
+  start: '2026-09-08'
+  finish: '2026-09-09'
+  category: payroll
+  commits:
+  - 82fd57f
+  - 0e105f7
+  - d7894cf
+  - 4b1c1d8
+- key: payroll.custom-range
+  type: Feature
+  parent: payroll
+  subject: Custom from/to dates for a payroll run
+  status: Closed
+  start: '2026-09-08'
+  finish: '2026-09-08'
+  category: payroll
+  commits:
+  - 9e2cbce
+- key: payroll.gross-ot-basis
+  type: Feature
+  parent: payroll
+  subject: Gross-derived overtime basis (Software, Creative)
+  status: Closed
+  start: '2026-09-09'
+  finish: '2026-09-09'
+  category: payroll
+  commits:
+  - 6f71123
+- key: payroll.tax-decl-seed
+  type: Feature
+  parent: payroll
+  subject: seed_tax_declarations
+  status: Closed
+  start: '2026-09-09'
+  finish: '2026-09-09'
+  category: payroll
+  commits:
+  - 9e4d0fb
+- key: payroll.register-breakdown
+  type: Feature
+  parent: payroll
+  subject: 'Register breakdown: earnings, deductions, totals'
+  status: Closed
+  start: '2026-09-09'
+  finish: '2026-09-09'
+  category: payroll
+  commits:
+  - ada2f1f
+  - 9b0e27c
+- key: payroll.meal
+  type: Feature
+  parent: payroll
+  subject: Meal deduction in the engine + report
+  status: Closed
+  start: '2026-09-09'
+  finish: '2026-09-28'
+  category: payroll
+  commits:
+  - 14ac5d0
+  - 2f93e83
+  - 795bbb2
+- key: payroll.notes
+  type: Feature
+  parent: payroll
+  subject: Role-gated runs + Supervisor/HR/Finance notes
+  status: Closed
+  start: '2026-09-10'
+  finish: '2026-09-16'
+  category: payroll
+  commits:
+  - 2c07ced
+  - 6795c90
+- key: payroll.report-search
+  type: Feature
+  parent: payroll
+  subject: Employee search in the payroll report
+  status: Closed
+  start: '2026-09-13'
+  finish: '2026-09-13'
+  category: payroll
+  commits:
+  - 6f2ed84
+- key: payroll.overtime-window
+  type: Feature
+  parent: payroll
+  subject: Overtime screens + input window / lock
+  status: Closed
+  start: '2026-09-15'
+  finish: '2026-09-15'
+  category: payroll
+  commits:
+  - 6cc9825
+  - 7cbd114
+  - 299bdb0
+- key: payroll.runs-stats
+  type: Feature
+  parent: payroll
+  subject: Runs list shows non-monetary stats
+  status: Closed
+  start: '2026-09-16'
+  finish: '2026-09-16'
+  category: payroll
+  commits:
+  - 5df0375
+- key: payroll.payrate-import
+  type: Feature
+  parent: payroll
+  subject: PayRate import / export
+  status: Closed
+  start: '2026-09-16'
+  finish: '2026-09-16'
+  category: payroll
+  commits:
+  - 4db62fe
+- key: payroll.team-ot-rate
+  type: Feature
+  parent: payroll
+  subject: Team-specific overtime rates
+  status: Closed
+  start: '2026-09-16'
+  finish: '2026-09-16'
+  category: payroll
+  commits:
+  - 9644f72
+- key: payroll.gh-ot
+  type: Feature
+  parent: payroll
+  subject: Auto-generated GH overtime from attendance / TTMS
+  status: Closed
+  start: '2026-09-16'
+  finish: '2026-09-16'
+  category: payroll
+  commits:
+  - fceb194
+  - e2fe9a4
+- key: payroll.filtered-export
+  type: Feature
+  parent: payroll
+  subject: Filtered Excel export (run detail, overtime list)
+  status: Closed
+  start: '2026-09-17'
+  finish: '2026-09-18'
+  category: payroll
+  commits:
+  - f994137
+  - 113f2a4
+- key: payroll.mid-period
+  type: Feature
+  parent: payroll
+  subject: Mid-period salary changes paid per segment
+  status: Closed
+  start: '2026-09-19'
+  finish: '2026-09-19'
+  category: payroll
+  commits:
+  - 6b8dded
+- key: payroll.ds-pay-events
+  type: Feature
+  parent: payroll
+  subject: Data Solutions pay events as structured data
+  status: Closed
+  start: '2026-09-19'
+  finish: '2026-09-19'
+  category: payroll
+  commits:
+  - 157c203
+  - 2855e51
+- key: payroll.upload-center
+  type: Feature
+  parent: payroll
+  subject: Upload Center, Go Live, day-count Test Salary
+  status: Closed
+  start: '2026-09-21'
+  finish: '2026-09-21'
+  category: payroll
+  commits:
+  - 24724ed
+- key: payroll.encryption
+  type: Feature
+  parent: payroll
+  subject: 'Data protection Phases 0–1: money encrypted at rest'
+  status: Closed
+  start: '2026-10-05'
+  finish: '2026-10-05'
+  category: payroll
+  description: 'Spec / code: docs/PAYROLL_DATA_PROTECTION_PLAN.md'
+  commits:
+  - 56a72b9
+  - 671edd9
+  - 879f6ae
+  - fcb5720
+  - d37f5f9
+- key: payroll.gross-history-import
+  type: Feature
+  parent: payroll
+  subject: Gross-salary history importer (legacy 60)
+  status: Closed
+  start: '2026-10-05'
+  finish: '2026-10-05'
+  category: payroll
+  commits:
+  - cdc03a8
+- key: payroll.money-format
+  type: Feature
+  parent: payroll
+  subject: Whole-taka money formatting everywhere
+  status: Closed
+  start: '2026-10-05'
+  finish: '2026-10-05'
+  category: payroll
+  description: 'Spec / code: docs/MONEY_FORMAT_PLAN.md'
+  commits:
+  - 4740da0
+- key: payroll.tax-trueup
+  type: Feature
+  parent: payroll
+  subject: Tax declaration rework + year-to-date TDS true-up
+  status: Closed
+  start: '2026-10-08'
+  finish: '2026-10-08'
+  category: payroll
+  description: 'Spec / code: docs/TAX_CALCULATION_TRUEUP_PLAN.md'
+  commits:
+  - f59f2ad
+- key: payroll.loans
+  type: Feature
+  parent: payroll
+  subject: Salary loans
+  status: Closed
+  start: '2026-10-08'
+  finish: '2026-10-08'
+  category: payroll
+  description: 'Spec / code: docs/SALARY_LOAN_PLAN.md'
+  commits:
+  - dea658a
+- key: payroll.pre-orbis-months
+  type: Feature
+  parent: payroll
+  subject: Pre-Orbis payroll months importer + tax challans
+  status: Closed
+  start: '2026-10-08'
+  finish: '2026-10-09'
+  category: payroll
+  description: 'Spec / code: docs/PRE_ORBIS_PAYROLL_IMPORT_PLAN.md'
+  commits:
+  - 09b5e95
+  - d990fe3
+  - 694d12e
+  - ebcd6c3
+- key: payroll.salary-adjustment
+  type: Feature
+  parent: payroll
+  subject: Derived salary adjustments, TDS by challan, Revise-salary drawer
+  status: Closed
+  start: '2026-10-09'
+  finish: '2026-10-09'
+  category: payroll
+  description: 'Spec / code: docs/SALARY_ADJUSTMENT_PLAN.md'
+  commits:
+  - 22b9740
+- key: payroll.support-paging
+  type: Feature
+  parent: payroll
+  subject: Support info loads page by page
+  status: Closed
+  start: '2026-10-13'
+  finish: '2026-10-13'
+  category: payroll
+  commits:
+  - acd66e3
+- key: payroll.night-perf
+  type: Feature
+  parent: payroll
+  subject: Faster night-shift classification
+  status: Closed
+  start: '2026-10-14'
+  finish: '2026-10-14'
+  category: payroll
+  commits:
+  - 17d729f
+- key: payroll.ot-chain
+  type: Feature
+  parent: payroll
+  subject: Overtime review → approve chain
+  status: Closed
+  start: '2026-10-17'
+  finish: '2026-10-17'
+  category: payroll
+  description: 'Spec / code: docs/OVERTIME_APPROVAL_CHAIN_PLAN.md'
+  commits:
+  - fd5d5be
+- key: payroll.report-population
+  type: Feature
+  parent: payroll
+  subject: Report uses the engine's employee population
+  status: Closed
+  start: '2026-11-02'
+  finish: '2026-11-02'
+  category: payroll
+  commits:
+  - 48049ad
+- key: payroll.night-confirmation
+  type: Feature
+  parent: payroll
+  subject: Digital Advertising night allowance starts at confirmation
+  status: Closed
+  start: '2026-11-03'
+  finish: '2026-11-03'
+  category: payroll
+  commits:
+  - 20b32dc
+- key: dynamic_menu.menu
+  type: Feature
+  parent: dynamic_menu
+  subject: Dynamic menu with group access lists
+  status: Closed
+  start: '2026-04-24'
+  finish: '2026-04-24'
+  category: dynamic_menu
+  description: Built in the initial setup commit 197e7d7 (tracked under Infrastructure).
+  commits: []
+- key: offboarding.lifecycle
+  type: Feature
+  parent: offboarding
+  subject: Offboarding lifecycle (resignation → clearance)
+  status: Closed
+  start: '2026-05-22'
+  finish: '2026-05-22'
+  category: offboarding
+  description: Shipped in commit 3706cf7 together with HR letters (tracked under Documents).
+  commits: []
+- key: infra.planning-support
+  type: Task
+  parent: infra
+  subject: Planning, support & operations
+  status: In progress
+  category: infra
+  description: 'Ongoing work that doesn''t land as a commit: planning, HR/Finance meetings, UAT support, production
+    operations. Time on days with no commit is logged here.'
+  start: '2026-04-24'
+- key: payroll.phase5.approval-chain
+  type: Feature
+  parent: payroll.phase5
+  subject: Payroll run approval chain (Department Review → HR → Finance)
+  status: On hold
+  category: payroll
+  description: PayrollApprovalConfig, PayrollRunApproval, PayrollRunDepartmentReview; lock/paid/reversal run states.
+    docs/PAYROLL_PLAN.md §7, §9
+  blocked_on: HR/Finance sign-off of PAYROLL_PROCESS.md §14
+- key: payroll.phase5.payslips
+  type: Feature
+  parent: payroll.phase5
+  subject: Payslips (WeasyPrint, chunked Celery)
+  status: On hold
+  category: payroll
+  description: payslip.py, ~50 per task, retention plan for old PDFs. docs/PAYROLL_PLAN.md §9, §12
+  blocked_on: HR/Finance sign-off
+- key: payroll.phase5.bank-advice
+  type: Feature
+  parent: payroll.phase5
+  subject: Bank advice (Bank Asia, EBL, Modhumoti formats)
+  status: On hold
+  category: payroll
+  description: BankAdvice(+Line), bank.py. docs/PAYROLL_PLAN.md §4, §9
+  blocked_on: HR/Finance sign-off
+- key: payroll.phase5.cash-payouts
+  type: Feature
+  parent: payroll.phase5
+  subject: Cash / cheque / mobile-wallet payouts
+  status: On hold
+  category: payroll
+  description: CashChequeDisbursement, bKash/Nagad account type, signed disbursement sheet upload (Q23, Q30, Q31).
+  blocked_on: HR/Finance sign-off
+- key: payroll.phase5.export-audit
+  type: Feature
+  parent: payroll.phase5
+  subject: Payroll export audit
+  status: On hold
+  category: payroll
+  description: PayrollExportAudit logs every Finance download (Q20).
+  blocked_on: HR/Finance sign-off
+- key: payroll.phase6.final-settlement
+  type: Feature
+  parent: payroll.phase6
+  subject: Final settlement (incl. AL payout at separation)
+  status: On hold
+  category: payroll
+  description: FinalSettlement (no gratuity), link from offboarding. Manual HR step today.
+  blocked_on: HR/Finance sign-off
+- key: payroll.phase6.festival-bonus
+  type: Feature
+  parent: payroll.phase6
+  subject: Festival bonus off-cycle run
+  status: On hold
+  category: payroll
+  description: Two Eids, 50% of gross, staff with >180 days' service.
+  blocked_on: HR/Finance sign-off
+- key: payroll.phase6.encashment
+  type: Feature
+  parent: payroll.phase6
+  subject: Leave encashment paid through payroll
+  status: On hold
+  category: payroll
+  description: EncashmentRequest.paid_in_run.
+  blocked_on: Finance Q22 (encashment rate)
+- key: payroll.phase6.service-benefit
+  type: Feature
+  parent: payroll.phase6
+  subject: Service benefit (long-service award)
+  status: On hold
+  category: payroll
+  description: Confirmed real, deliberately deferred (Q32).
+  blocked_on: Deferred by decision
+- key: payroll.phase6.gl-split
+  type: Feature
+  parent: payroll.phase6
+  subject: Statutory GL salary split
+  status: On hold
+  category: payroll
+  description: Basic 50 / Housing 25 / Medical 5 / Conveyance 10 / Other (Q29).
+  blocked_on: Deferred by decision
+- key: payroll.eid-coverage
+  type: Feature
+  parent: payroll
+  subject: Eid coverage window (Phase 7 remainder)
+  status: New
+  category: payroll
+  description: EidCoverageWindow(+Entry) — the only unbuilt Phase 7 piece.
+- key: payroll.taxcert.build
+  type: Feature
+  parent: payroll.taxcert
+  subject: Tax certificate pieces A + B
+  status: On hold
+  category: payroll
+  description: TaxChallanMember, TaxCertificateIssue, context builder, PDF and pages.
+  blocked_on: Finance Q67–Q76
+- key: payroll.protection.phase2
+  type: Feature
+  parent: payroll.protection
+  subject: Encryption Phase 2 — side channels
+  status: On hold
+  category: payroll
+  description: Strip figures from control-check messages and audit JSON, delete applied batch files, currency-figure
+    lint, no-amount-printed test.
+  blocked_on: Deferred by user
+- key: payroll.protection.phase3
+  type: Feature
+  parent: payroll.protection
+  subject: Encryption Phase 3 — visibility + hardening
+  status: On hold
+  category: payroll
+  description: Optional.
+  blocked_on: Timing open
+- key: payroll.trueup-drawer
+  type: Task
+  parent: payroll
+  subject: Per-employee tax true-up drawer + export columns
+  status: New
+  category: payroll
+  description: Left as a follow-up in docs/TAX_CALCULATION_TRUEUP_PLAN.md; the TDS line's calc_note carries the
+    figures meanwhile.
+- key: payroll.night-stale
+  type: Task
+  parent: payroll
+  subject: Stale-run warning when a dedicated night window changes
+  status: New
+  category: payroll
+  description: dedicated_night_changed_since_calculation, like the overtime one.
+- key: payroll.gh-ot-reversal
+  type: Task
+  parent: payroll
+  subject: Void generated GH overtime when the qualifying punch goes away
+  status: On hold
+  category: payroll
+  description: generate_gh_overtime*.py TODOs.
+  blocked_on: A real case to design against
+- key: payroll.dept-assignment
+  type: Task
+  parent: payroll
+  subject: Effective-dated DepartmentAssignment (cost-centre history)
+  status: New
+  category: payroll
+  description: Risk 10 in docs/PAYROLL_PLAN.md §12.
+- key: payroll.reconciliation
+  type: Task
+  parent: payroll
+  subject: Pre-cutover reconciliation (2 clean months)
+  status: On hold
+  category: payroll
+  description: Two consecutive months with zero unexplained net-pay difference before go-live. docs/PAYROLL_PROCESS.md
+    §13
+  blocked_on: HR/Finance
+- key: infra.followups.pre-orbis-deploy
+  type: Task
+  parent: infra.followups
+  subject: Deploy the pre-Orbis months importer (verify state)
+  status: New
+  category: infra
+  description: Runbook docs/PRE_ORBIS_PAYROLL_IMPORT_PLAN.md §4. (per memory — confirm on prod)
+- key: infra.followups.tax-cutover
+  type: Task
+  parent: infra.followups
+  subject: Tax true-up cutover on prod
+  status: On hold
+  category: infra
+  description: Set FY2026-27 orbis_live_from, upload Finance's openings, recalculate.
+  blocked_on: Finance data
+- key: infra.followups.loans-cutover
+  type: Task
+  parent: infra.followups
+  subject: Salary loans cutover upload (~100 loans)
+  status: On hold
+  category: infra
+  description: Upload Center "Salary loans (cutover)" card.
+  blocked_on: Finance sheet
+- key: infra.followups.legacy-60
+  type: Task
+  parent: infra.followups
+  subject: Legacy 60 uploads on prod (profile → address → salary → AL)
+  status: New
+  category: infra
+  description: docs/LEGACY_60_IMPORT_PLAN.md §5. (per memory — confirm on prod)
+- key: infra.followups.leave-reversal
+  type: Task
+  parent: infra.followups
+  subject: Run the stale leave-debit reversal (26 rows) + 1,900-row backlog
+  status: On hold
+  category: infra
+  description: Code committed; not run.
+  blocked_on: User review / HR sign-off
+- key: infra.followups.media-cleanup
+  type: Task
+  parent: infra.followups
+  subject: Delete the pre-Drive media copy (overdue since 2026-10-30)
+  status: New
+  category: infra
+  description: ~/orbis/media + the pre-migration tarball. deploy/README.md "Media on Google Drive" step 2.5
+- key: infra.followups.hsts
+  type: Task
+  parent: infra.followups
+  subject: Enable HSTS in stages
+  status: New
+  category: infra
+  description: SECURE_HSTS_SECONDS.
+- key: infra.followups.timely-token
+  type: Task
+  parent: infra.followups
+  subject: Rotate TIMELY_API_TOKEN
+  status: On hold
+  category: infra
+  description: It travelled in cleartext before TLS.
+  blocked_on: TimeLy team
+- key: infra.followups.github-pat
+  type: Task
+  parent: infra.followups
+  subject: Revoke the old GitHub PAT
+  status: New
+  category: infra
+  description: Move veridoc and resumeintel to their own deploy keys first.
+- key: infra.followups.phase0-leftovers
+  type: Task
+  parent: infra.followups
+  subject: Payroll Phase 0 server leftovers
+  status: New
+  category: infra
+  description: Rotate orbis_user password, backup script, clean media/payroll/batches, delete the Drive dump.
+- key: infra.followups.seed-in-deploy
+  type: Task
+  parent: infra.followups
+  subject: Run seeds from update_orbis.sh + fix bare seed_orbis
+  status: New
+  category: infra
+  description: Decide the two hand-edited prod submenu grants first; fix the seed_org.json "Human Resources" collision.
+  blocked_on: Submenu grant decision
+- key: infra.followups.gunicorn-timeout
+  type: Task
+  parent: infra.followups
+  subject: Gunicorn --timeout 60
+  status: On hold
+  category: infra
+  description: Prod is ~3x slower than dev; heavy exports near 30s.
+  blocked_on: User decision
+- key: infra.followups.dev-key
+  type: Task
+  parent: infra.followups
+  subject: Rotate the dev payroll key
+  status: On hold
+  category: infra
+  description: Dev still holds the prod PAYROLL_FIELD_KEYS.
+  blocked_on: Deferred
+- key: accounts.directory-switchover.timely
+  type: Task
+  parent: accounts.directory-switchover
+  subject: Switch TimeLy to an ApiClient token
+  status: On hold
+  category: accounts
+  description: Create the client, swap tokens, watch the access log, then remove the env token.
+  blocked_on: Date with TimeLy team
+- key: accounts.directory-switchover.dsndd
+  type: Task
+  parent: accounts.directory-switchover
+  subject: Switch dsndd (rnc.sebpo.net) to an ApiClient token
+  status: On hold
+  category: accounts
+  description: roster:write scope.
+  blocked_on: Date with dsndd team
+- key: accounts.directory-switchover.entra-ids
+  type: Task
+  parent: accounts.directory-switchover
+  subject: Backfill Entra object ids
+  status: On hold
+  category: accounts
+  description: manage.py import_entra_object_ids on IT's export.
+  blocked_on: IT export
+- key: accounts.directory-hygiene
+  type: Feature
+  parent: accounts
+  subject: Directory API Phase 4 — data hygiene
+  status: On hold
+  category: accounts
+  description: Merge duplicate MBD location and HR departments, fill department heads, resolve 31 unlinked records,
+    offboarding warning. docs/DIRECTORY_API_PLAN.md §8
+  blocked_on: HR input
+- key: accounts.entra-writeback
+  type: Feature
+  parent: accounts
+  subject: Stop Oracle → Entra sync / write back to Entra via Graph
+  status: On hold
+  category: accounts
+  description: Later, separate decision.
+  blocked_on: IT (User.ReadWrite.All)
+- key: accounts.permissions-pass
+  type: Task
+  parent: techdebt
+  subject: Groups & permissions pass
+  status: New
+  description: 'Overloaded is_staff, unused Roster Planner group, separation of duties, delegation, more permission
+    tests. docs/PLAN.md open items #6'
+- key: roster.dsndd-phase2
+  type: Feature
+  parent: roster
+  subject: dsndd integration Phase 2
+  status: New
+  category: roster
+  description: Drop dsndd's local ShiftType, OrbisClient, push on live edits, reconcile beat task. docs/DSNDD_INTEGRATION.md
+- key: attendance.timely-api-v2
+  type: Task
+  parent: attendance
+  subject: Move to TimeLy's final attendance API
+  status: On hold
+  category: attendance
+  description: Current endpoint is pre-final.
+  blocked_on: TimeLy team
+- key: attendance.on-time-late
+  type: Feature
+  parent: future
+  subject: Scheduled vs actual attendance (on time / late)
+  status: New
+  description: docs/PLAN.md attendance.
+  category: future
+- key: questions.q22
+  type: Task
+  parent: questions
+  subject: 'Q22: leave encashment rate (÷30 or ÷26)'
+  status: On hold
+  description: docs/PAYROLL_PROCESS.md §12
+  blocked_on: Finance
+- key: questions.q35
+  type: Task
+  parent: questions
+  subject: 'Q35: third AdOps OT rate (300 Tk) — live or dormant?'
+  status: On hold
+  description: docs/PAYROLL_PROCESS.md §12
+  blocked_on: HR
+- key: questions.q49
+  type: Task
+  parent: questions
+  subject: 'Q49: Special OT rate for Software/Creative'
+  status: On hold
+  description: Calculates as zero with a warning until answered.
+  blocked_on: Finance
+- key: questions.q42
+  type: Task
+  parent: questions
+  subject: 'Q42: lower minimum-tax floor for non-Dhaka staff?'
+  status: On hold
+  description: docs/PAYROLL_PROCESS.md §12
+  blocked_on: Finance
+- key: questions.q67-76
+  type: Task
+  parent: questions
+  subject: 'Q67–Q76: tax certificate questions'
+  status: On hold
+  description: docs/TAX_CERTIFICATE_PLAN.md §9
+  blocked_on: Finance
+- key: questions.dsdd-q4
+  type: Task
+  parent: questions
+  subject: 'DSDD Q4: SLA pay rules'
+  status: On hold
+  description: docs/DSDD_PAYROLL_AUTOMATION_PLAN.md §5
+  blocked_on: HR/Finance
+- key: questions.dsdd-q6
+  type: Task
+  parent: questions
+  subject: 'DSDD Q6: temporary suspension pay'
+  status: On hold
+  description: docs/DSDD_PAYROLL_AUTOMATION_PLAN.md §5
+  blocked_on: HR
+- key: questions.q33
+  type: Task
+  parent: questions
+  subject: 'Q33: legacy leave-balance cutover scope and source'
+  status: On hold
+  description: docs/PAYROLL_PROCESS.md §12
+  blocked_on: HR/Finance
+- key: questions.risk7
+  type: Task
+  parent: questions
+  subject: 'Risk 7: do department additional managers see salary?'
+  status: On hold
+  description: docs/PAYROLL_PLAN.md §12
+  blocked_on: Decision
+- key: questions.legacy-60
+  type: Task
+  parent: questions
+  subject: Legacy 60 data follow-ups for HR
+  status: On hold
+  description: Salary start dates, unmatched union/ward texts, designation/department differences, police stations.
+    docs/LEGACY_60_IMPORT_PLAN.md §6
+  blocked_on: HR
+- key: questions.legacy-rest
+  type: Task
+  parent: questions
+  subject: Import the remaining ~1,400 legacy employees
+  status: On hold
+  description: Reuses the three importers.
+  blocked_on: HR data
+- key: questions.escalation
+  type: Task
+  parent: questions
+  subject: Notification escalation rule
+  status: On hold
+  description: Untouched for N days → next manager. docs/PLAN.md Notifications
+  blocked_on: HR
+- key: techdebt.team-package-tests
+  type: Bug
+  parent: techdebt
+  subject: 7 failing SalaryProposalTests (tests_team_package)
+  status: New
+  description: SQLite unique TeamAssignment in the test helper.
+- key: techdebt.query-budget-tests
+  type: Bug
+  parent: techdebt
+  subject: 2 roster query-budget test failures
+  status: New
+  description: Upload 16 vs 12, external shift batch 26 vs 20.
+- key: techdebt.shift-change-form-test
+  type: Bug
+  parent: techdebt
+  subject: Date-dependent shift-change form test
+  status: New
+  description: FormTests.test_shift_only_and_location_only_are_valid.
+- key: techdebt.flaky-ot-test
+  type: Bug
+  parent: techdebt
+  subject: Flaky OvertimeReviewChainTests approve test (~40%)
+  status: New
+  description: pk % 7 work-date collision.
+- key: techdebt.pre-join-display
+  type: Bug
+  parent: techdebt
+  subject: Shift label shown for dates before joining
+  status: New
+  description: today_status_buckets / _resolve_shifts.
+- key: techdebt.alias-maps
+  type: Task
+  parent: techdebt
+  subject: Retire LWP/NIG/CUST alias maps in payroll/reports.py
+  status: New
+  description: Add a test that every LEAVE ShiftType has a policy (risk 2).
+- key: techdebt.partial-unique
+  type: Task
+  parent: techdebt
+  subject: MySQL partial-unique mirrors for Phase 5 models
+  status: New
+  description: clean() + select_for_update (risk 4).
+- key: techdebt.veridoc-gaps
+  type: Task
+  parent: techdebt
+  subject: Veridoc gaps
+  status: New
+  description: Action-workflow subsystem, workflow tests, verify/PDF fallback validation, ProtectedView coverage.
+    docs/VERIDOC_IMPLEMENTATION_PLAN.md
+- key: future.ai-assistant
+  type: Feature
+  parent: future
+  subject: AI assistant (assistant app)
+  status: In progress
+  description: Chat, weekly manager brief, payroll variance explanation, upload assist — via the logged-in CLI,
+    no API key. Plan written; not built. docs/AI_ASSISTANT_PLAN.md
+  commits:
+  - 710661a
+  category: future
+- key: future.bell-websocket
+  type: Feature
+  parent: future
+  subject: Notification bell v2 (WebSockets)
+  status: New
+  description: Needs an ASGI/nginx/supervisor infra plan first.
+  category: future
+- key: future.informational-notifications
+  type: Feature
+  parent: future
+  subject: Informational notifications with read state
+  status: New
+  description: '"Your leave was approved". docs/PLAN.md Notifications'
+  category: future
+- key: future.media-phase3
+  type: Feature
+  parent: future
+  subject: Media Phase 3 hardening
+  status: New
+  description: Read-only DriveObject admin with re-verify, rotate_media_keys. docs/MEDIA_GOOGLE_DRIVE_PLAN.md §5
+  category: future
+- key: future.org-chart-print
+  type: Feature
+  parent: future
+  subject: Printable leadership org-chart overview
+  status: New
+  description: Deliberately not built; revisit if HR asks.
+  category: future
+- key: future.grc
+  type: Feature
+  parent: future
+  subject: GRC beyond policies (Risk, Compliance, Vendors, Tasks, Reports)
+  status: New
+  description: About 6 months out.
+  category: future
+- key: future.rename-tenure
+  type: Feature
+  parent: future
+  subject: Rename Orbis → Tenure (tenure.sebpo.net)
+  status: On hold
+  description: Proposed because "Orbis" clashes with a client platform. Not approved — do not rename yet.
+  blocked_on: Leadership approval
+  category: future
+- key: infra.openproject
+  type: Feature
+  parent: infra
+  subject: OpenProject tracking — inventory, Playwright sync, time log
+  status: Closed
+  start: '2026-11-03'
+  finish: '2026-11-03'
+  category: infra
+  description: 'Spec / code: docs/OPENPROJECT.md'
+  commits:
+  - b6e355e
+  - f5e4af7
+- key: infra.staging-snapshot
+  type: Feature
+  parent: infra
+  subject: Staging snapshot for IT — re-key, mock salaries, package
+  status: Closed
+  start: '2026-11-04'
+  finish: '2026-11-04'
+  category: infra
+  description: 'prepare_staging_snapshot: staging-only payroll key, per-employee 10–15% salary cut, beat jobs off, encrypted
+    7z with staging.env. Spec / code: deploy/README.md "Staging snapshot for IT", core/staging_snapshot.py'
+  commits:
+  - 'b5926f8'

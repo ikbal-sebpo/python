@@ -1,0 +1,32 @@
+{% comment %}
+A manager's reports. Children who manage people stand side by side under a
+horizontal bus; individual contributors stack in one column off a left
+spine so a 30-person team stays readable. Also the htmx response for
+employee_org_chart_node. Expects `node`, `visible_pks`, `leaf_preview`.
+{% endcomment %}
+<div class="org-row">
+    {% for child in node.managers %}
+        <div class="org-branch">{% include "employees/_org_node.html" with node=child is_root=False %}</div>
+    {% endfor %}
+    {% with leaves=node.individuals %}
+    {% if leaves %}
+        <div class="org-branch org-branch--leaves" x-data="{ more: false }">
+            <ul class="org-leafcol" :class="{ 'org-leafcol--continues': more }">
+                {% for child in leaves %}{% if forloop.counter <= leaf_preview %}
+                    <li>{% include "employees/_org_card.html" with node=child is_root=False %}</li>
+                {% endif %}{% endfor %}
+            </ul>
+            {% if leaves|length > leaf_preview %}
+                <ul class="org-leafcol org-leafcol--more" x-show="more" x-cloak>
+                    {% for child in leaves %}{% if forloop.counter > leaf_preview %}
+                        <li>{% include "employees/_org_card.html" with node=child is_root=False %}</li>
+                    {% endif %}{% endfor %}
+                </ul>
+                <button type="button" class="org-more" x-show="!more" @click="more = true">
+                    Show all {{ leaves|length }} people
+                </button>
+            {% endif %}
+        </div>
+    {% endif %}
+    {% endwith %}
+</div>

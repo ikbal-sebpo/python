@@ -1,0 +1,145 @@
+{# Result fragment for /payroll/salary/upload/history/ — swapped in by HTMX on each submit. #}
+<div class="card mb-4">
+    <h2 class="text-sm font-semibold mb-3">Result</h2>
+
+    {% if inline_error %}
+        <div class="mb-3 px-3 py-2 rounded border border-red-300 bg-red-50 text-red-800
+                    dark:border-red-700/50 dark:bg-red-900/20 dark:text-red-200 text-sm">
+            {{ inline_error }}
+        </div>
+    {% endif %}
+
+    {% if report %}
+        {% if aborted %}
+            <div class="mb-3 px-3 py-2 rounded border border-red-300 bg-red-50 text-red-800
+                        dark:border-red-700/50 dark:bg-red-900/20 dark:text-red-200 text-sm">
+                Import aborted. Nothing was written. Fix the errors below and re-upload.
+            </div>
+        {% elif preview %}
+            <div class="mb-3 px-3 py-2 rounded border border-blue-300 bg-blue-50 text-blue-800
+                        dark:border-blue-700/50 dark:bg-blue-900/20 dark:text-blue-200 text-sm">
+                Preview only — nothing was written. Click <span class="font-medium">Import</span> to commit the same file.
+            </div>
+        {% else %}
+            <div class="mb-3 px-3 py-2 rounded border border-emerald-300 bg-emerald-50 text-emerald-800
+                        dark:border-emerald-700/50 dark:bg-emerald-900/20 dark:text-emerald-200 text-sm">
+                <span class="font-medium">{{ report.total_writes }}</span> salary record(s) imported for
+                <span class="font-medium">{{ report.employees_written }}</span> employee(s)
+                {% if report.skipped_existing %}· <span class="font-medium">{{ report.skipped_existing|length }}</span> skipped (already have records){% endif %}
+            </div>
+        {% endif %}
+
+        {% if report.parse_errors %}
+            <h3 class="text-xs font-semibold uppercase tracking-wide text-red-700 dark:text-red-300 mt-4 mb-2">
+                Errors ({{ report.parse_errors|length }})
+            </h3>
+            <div class="overflow-x-auto">
+                <table class="table-simple text-sm">
+                    <thead><tr><th class="w-12">Row</th><th>Employee ID</th><th>Gross monthly</th><th>Effective from</th><th>Effective to</th><th>Error</th></tr></thead>
+                    <tbody>
+                        {% for err in report.parse_errors %}
+                            <tr class="text-red-700 dark:text-red-300">
+                                <td>{{ err.line_no }}</td>
+                                <td>{{ err.raw.Employee_ID|default:"—" }}</td>
+                                <td>{{ err.raw.Gross_monthly|default:"—" }}</td>
+                                <td>{{ err.raw.Effective_from|default:"—" }}</td>
+                                <td>{{ err.raw.Effective_to|default:"—" }}</td>
+                                <td>{{ err.message }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endif %}
+
+        {% if report.warnings %}
+            <h3 class="text-xs font-semibold uppercase tracking-wide text-amber-700 dark:text-amber-300 mt-4 mb-2">
+                Warnings ({{ report.warnings|length }})
+            </h3>
+            <div class="overflow-x-auto">
+                <table class="table-simple text-sm">
+                    <thead><tr><th class="w-12">Row</th><th>Employee ID</th><th>Warning</th></tr></thead>
+                    <tbody>
+                        {% for w in report.warnings %}
+                            <tr class="text-amber-700 dark:text-amber-300">
+                                <td>{{ w.line_no }}</td><td>{{ w.employee_id }}</td><td>{{ w.message }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endif %}
+
+        {% if report.skipped_existing %}
+            <h3 class="text-xs font-semibold uppercase tracking-wide text-amber-700 dark:text-amber-300 mt-4 mb-2">
+                Skipped — already have salary records ({{ report.skipped_existing|length }})
+            </h3>
+            <div class="overflow-x-auto">
+                <table class="table-simple text-sm">
+                    <thead><tr><th class="w-12">Row</th><th>Employee ID</th><th>Note</th></tr></thead>
+                    <tbody>
+                        {% for err in report.skipped_existing %}
+                            <tr class="text-amber-700 dark:text-amber-300">
+                                <td>{{ err.line_no }}</td><td>{{ err.raw.Employee_ID }}</td><td>{{ err.message }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endif %}
+
+        {% if preview and parsed_preview %}
+            <details class="mt-4" open>
+                <summary class="cursor-pointer text-xs font-semibold uppercase tracking-wide text-text-soft dark:text-white/70">
+                    Histories that would be imported ({{ parsed_preview|length }} employee(s))
+                </summary>
+                <div class="overflow-x-auto mt-2">
+                    <table class="table-simple text-sm">
+                        <thead><tr><th class="w-12">Row</th><th>Employee ID</th><th>Employee</th><th>Rev</th><th>Gross monthly</th><th>Effective from</th><th>Effective to</th><th>Reason</th></tr></thead>
+                        <tbody>
+                            {% for h in parsed_preview %}
+                                {% for row in h.rows %}
+                                    <tr>
+                                        <td>{{ row.line_no }}</td>
+                                        <td>{{ h.employee_id }}</td>
+                                        <td>{% if forloop.first %}{{ h.employee.display_name }}{% endif %}</td>
+                                        <td>{{ forloop.counter }}</td>
+                                        <td>{{ row.gross_monthly|taka }}</td>
+                                        <td>{{ row.effective_from|date:"Y-m-d" }}</td>
+                                        <td>{% if row.effective_to %}{{ row.effective_to|date:"Y-m-d" }}{% else %}<span class="badge badge-success">current</span>{% endif %}</td>
+                                        <td>{{ row.reason_label }}</td>
+                                    </tr>
+                                {% endfor %}
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </details>
+        {% endif %}
+
+        {% if not preview and not aborted and report.created %}
+            <details class="mt-4" open>
+                <summary class="cursor-pointer text-xs font-semibold uppercase tracking-wide text-emerald-700 dark:text-emerald-300">
+                    Imported ({{ report.employees_written }} employee(s), {{ report.total_writes }} record(s))
+                </summary>
+                <div class="overflow-x-auto mt-2">
+                    <table class="table-simple text-sm">
+                        <thead><tr><th>Employee ID</th><th>Employee</th><th>Records</th><th>From</th><th>Current gross</th><th>Current since</th></tr></thead>
+                        <tbody>
+                            {% for h in report.created %}
+                                <tr class="text-emerald-700 dark:text-emerald-300">
+                                    <td>{{ h.employee_id }}</td>
+                                    <td>{{ h.employee.display_name }}</td>
+                                    <td>{{ h.rows|length }}</td>
+                                    <td>{{ h.rows.0.effective_from|date:"Y-m-d" }}</td>
+                                    <td>{{ h.current.gross_monthly|taka }}</td>
+                                    <td>{{ h.current.effective_from|date:"Y-m-d" }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </details>
+        {% endif %}
+    {% endif %}
+</div>

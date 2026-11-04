@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+{% block title %}Upload pre-Orbis payroll months · Orbis{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <h1 class="text-xl font-semibold">Pre-Orbis payroll months{% if tax_year %} · {{ tax_year.code }}{% endif %}</h1>
+    <p class="text-sm text-text-soft dark:text-white/60 mt-1">
+        Restricted to Payroll Admins. A one-time cutover: the payroll months of this tax year that were processed
+        <span class="font-medium">before Orbis went live</span>, one row per employee per month: exactly what was paid —
+        every pay component (earnings and deductions), TDS and net pay — the same shape Orbis exports for any month it ran itself.
+        Nothing derived is typed: the mobile &amp; internet reimbursement is the policy tier of the gross, and which challan carried
+        a month's TDS is the separate <a href="{% url 'payroll_tax_challan_allocation_upload' %}" class="underline">TDS by challan</a> sheet.
+        Everything that reads a year-to-date figure — the TDS true-up, the tax certificate — reads these rows.
+        {% if live_from %}
+            Orbis is live from <span class="font-medium">{{ live_from }}</span>; the months before it
+            ({% for y, m in legacy_months %}{{ y }}-{{ m|stringformat:"02d" }}{% if not forloop.last %}, {% endif %}{% endfor %})
+            are the only ones this sheet may carry.
+        {% else %}
+            Set <span class="font-medium">Orbis live from</span> on the tax year in the admin first — it decides which months are pre-Orbis.
+        {% endif %}
+        Re-uploading overwrites — these are facts from Finance's registers, not a ledger.
+    </p>
+</div>
+
+<div class="card mb-4">
+    <h2 class="text-sm font-semibold mb-3">1. Download a template</h2>
+    <div class="flex flex-wrap items-center gap-2">
+        <a href="{% url 'payroll_legacy_payroll_upload_template' %}" class="btn-secondary">
+            <i data-lucide="file-spreadsheet" class="w-4 h-4"></i><span>Excel template</span>
+        </a>
+        <span class="text-xs text-text-mute ml-2">One sheet, prefilled with every employee × pre-Orbis month they were employed in; amounts blank.</span>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <h2 class="text-sm font-semibold mb-2">2. File format</h2>
+    <div class="overflow-x-auto">
+        <table class="table-simple text-sm mb-2">
+            <thead><tr>{% for h in ledger_headers %}<th>{{ h }}</th>{% endfor %}</tr></thead>
+            <tbody>
+                <tr>
+                    {% for h in ledger_headers %}
+                        {% if forloop.first %}<td>539</td>
+                        {% elif forloop.counter == 2 %}<td>{{ legacy_months.0.0|default:"2026" }}-{{ legacy_months.0.1|default:7|stringformat:"02d" }}</td>
+                        {% elif forloop.last %}<td><span class="text-text-mute italic">reference</span></td>
+                        {% elif forloop.revcounter == 2 %}<td><span class="text-text-mute italic">net, optional</span></td>
+                        {% else %}<td><span class="text-text-mute italic">amount</span></td>{% endif %}
+                    {% endfor %}
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <ul class="text-sm text-text-soft dark:text-white/70 list-disc pl-5 space-y-1">
+        <li>One row per employee per <span class="font-medium">pre-Orbis</span> payroll month (<span class="font-medium">YYYY-MM</span>,
+            named for the month the period closes in — 2026-07 is 16 Jun – 15 Jul). A later month is refused: an Orbis month comes from its run.</li>
+        <li>The amount columns are every pay component Orbis knows — earnings first, then deductions (meal, loan, disciplinary, test salary) —
+            generated from the component list, so a column Orbis doesn't recognise fails the whole file. Blank = 0. Whole taka; a decimal is accepted and kept.</li>
+        <li><span class="font-medium">Gross salary</span> — the gross paid for the month as in your register, before TDS.
+            <span class="font-medium">Salary adjustment</span> — pay belonging to another period paid in this one: an increment-arrear instalment (the 2026-09 payroll carried the first), or a held payment released later. Positive only; it's what makes the row add up to the register.</li>
+        <li><span class="font-medium">TDS deducted</span> and <span class="font-medium">Net pay</span> are their own columns (net is optional, reference only).</li>
+        <li><span class="font-medium">Salary adjustment months</span> — when the row pays a Salary adjustment, how many months of the owed balance that instalment settled
+            (the 2026-09 payroll's first instalment settled 3). The engine starts the next instalment from there; a warning if left blank on such a row.</li>
+        <li>An exported month imports back as-is: its "Mobile &amp; Internet reimbursement" and "Challan No" columns are reference and skipped.</li>
+        <li>Applying also rewrites each employee's two true-up openings (TDS deducted / additional pay) from their month rows —
+            additional pay counts only the taxable earnings, never a deduction.</li>
+    </ul>
+</div>
+
+<div class="card mb-4">
+    <h2 class="text-sm font-semibold mb-3">3. Upload your filled file</h2>
+    <form id="legacy-payroll-upload-form"
+          method="post"
+          enctype="multipart/form-data"
+          hx-post="{% url 'payroll_legacy_payroll_upload' %}"
+          hx-encoding="multipart/form-data"
+          hx-target="#upload-result"
+          hx-swap="innerHTML"
+          hx-indicator="#upload-spinner"
+          class="flex flex-wrap items-end gap-3">
+        {% csrf_token %}
+        <input type="file" name="file" accept=".xlsx,.csv" required class="form-input w-auto max-w-xs">
+        <button type="submit" name="action" value="preview" class="btn-secondary">
+            <i data-lucide="eye" class="w-4 h-4"></i><span>Preview only</span>
+        </button>
+        <button type="submit" name="action" value="apply" class="btn-primary">
+            <i data-lucide="upload-cloud" class="w-4 h-4"></i><span>Upload</span>
+        </button>
+        <span id="upload-spinner" class="htmx-indicator inline-flex items-center gap-1 text-xs text-text-mute">
+            <i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i>Working…
+        </span>
+    </form>
+    <p class="text-xs text-text-mute mt-2">
+        Preview checks the file and shows the warnings without writing. After uploading, recalculate the open payroll run so the TDS true-up picks the openings up.
+    </p>
+</div>
+
+<div id="upload-result">
+    {% if report or inline_error %}
+        {% include "payroll/_legacy_payroll_upload_report.html" with report=report parsed=parsed preview=preview aborted=aborted inline_error=inline_error %}
+    {% endif %}
+</div>
+
+{% if tax_year %}
+<div class="card mb-4">
+    <h2 class="text-sm font-semibold mb-2">What's in · {{ tax_year.code }}</h2>
+    <p class="text-xs text-text-mute mb-2">
+        Every month of the tax year. <span class="font-medium">Export</span> downloads that month in the same shape (plus a reference Challans tab) —
+        imported rows for a pre-Orbis month, the calculated run's figures for an Orbis month — so Finance can reconcile either against their own register.
+    </p>
+    <table class="table-simple text-sm">
+        <thead><tr><th>Payroll month</th><th>Source</th><th>Rows</th><th></th></tr></thead>
+        <tbody>
+            {% for m in month_summary %}
+                <tr>
+                    <td>{{ m.label }}</td>
+                    <td>
+                        {% if m.legacy %}<span class="badge-info">Pre-Orbis (imported)</span>
+                        {% elif m.has_run %}<span class="badge-success">Orbis run</span>
+                        {% else %}<span class="text-text-mute">Orbis — not run yet</span>{% endif %}
+                    </td>
+                    <td>{% if m.legacy %}{{ m.rows }}{% else %}—{% endif %}</td>
+                    <td class="text-right">
+                        {% if m.legacy and m.rows or m.has_run %}
+                            <a href="{% url 'payroll_legacy_payroll_export' %}?year={{ m.year }}&month={{ m.month }}" class="btn-secondary">
+                                <i data-lucide="download" class="w-3.5 h-3.5"></i><span>Export</span>
+                            </a>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
+
+<script>
+    document.body.addEventListener('htmx:afterSwap', function (evt) {
+        if (window.lucide && typeof window.lucide.createIcons === 'function') {
+            window.lucide.createIcons();
+        }
+    });
+</script>
+{% endblock %}

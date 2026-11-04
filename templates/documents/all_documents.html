@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}All documents · Orbis{% endblock %}
+
+{% block content %}
+<div class="page-fill">
+  <h1 class="shrink-0 text-2xl font-semibold text-text-main dark:text-white">All documents</h1>
+
+  <form method="get" class="card shrink-0 flex flex-wrap gap-3 items-end">
+    {% for field in filter_form %}
+      <div>
+        <label class="text-xs text-text-main dark:text-white uppercase block mb-1">{{ field.label }}</label>
+        {{ field }}
+      </div>
+    {% endfor %}
+    <button type="submit" class="btn-secondary">
+      <i data-lucide="search" class="w-4 h-4"></i><span>Filter</span>
+    </button>
+  </form>
+
+  {% include "partials/_result_count.html" with count_noun="documents" %}
+
+  <div class="card p-0 table-scroll">
+    <table class="table-sticky w-full text-sm">
+      <thead class="text-left text-xs uppercase text-text-soft border-b border-bg-soft dark:border-white/10">
+        <tr>
+          <th class="py-2 px-3">Employee</th>
+          <th class="py-2 px-3">Type</th>
+          <th class="py-2 px-3">Submitted</th>
+          <th class="py-2 px-3">Status</th>
+          <th class="py-2 px-3"></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in requests %}
+          <tr class="border-b border-bg-soft dark:border-white/5">
+            <td class="py-2 px-3">
+              <div class="font-medium">{{ r.employee.display_name }}</div>
+              <div class="text-xs text-text-soft">{{ r.employee.email }}</div>
+            </td>
+            <td class="py-2 px-3">{{ r.document_type.display_name }}</td>
+            <td class="py-2 px-3 text-text-soft">{{ r.applied_at|date:"Y-m-d H:i" }}</td>
+            <td class="py-2 px-3"><span class="badge badge-muted">{{ r.get_status_display }}</span></td>
+            <td class="py-2 px-3 text-right">
+              <a href="{% url 'documents:request_detail' r.id %}" class="btn-secondary text-xs">Open</a>
+            </td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="5" class="py-6 px-3 text-center text-text-soft">No requests match the filters.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  {% include "partials/_pagination.html" %}
+</div>
+{% endblock %}

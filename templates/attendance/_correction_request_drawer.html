@@ -1,0 +1,51 @@
+{% comment %}
+    Drawer body for filing a new AttendanceCorrection — or, when there's no
+    existing punch at all for the date, adding a timesheet from scratch.
+    Same form either way; "Currently on file" (or its absence) makes the
+    distinction obvious. GET loads this fragment into #drawer-body; POST
+    re-renders it with errors, or (on success) a bare 204 + HX-Redirect back
+    to the attendance list so pending badges show fresh.
+{% endcomment %}
+<div class="drawer-body space-y-4">
+    {% if requesting_for_other %}
+        <div class="rounded border-l-4 border-brand-accent bg-bg-soft/40 dark:bg-white/5 px-3 py-2 text-sm">
+            For <strong>{{ target_employee.display_name }}</strong>
+            <span class="text-text-mute">({{ target_employee.email }})</span>
+        </div>
+    {% endif %}
+
+    {% if form.non_field_errors %}
+        <div class="rounded border border-red-200 bg-red-50 text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-300 px-3 py-2 text-sm">
+            {{ form.non_field_errors|striptags }}
+        </div>
+    {% endif %}
+
+    <p class="text-xs text-text-mute dark:text-white/50">
+        {{ target_date|date:"Y-m-d" }}.
+        {% if existing_punch %}
+            Currently on file: {{ existing_punch.check_in|time:"H:i"|default:"—" }} → {{ existing_punch.check_out|time:"H:i"|default:"—" }}
+            (time in office: {{ existing_punch.time_in_office|default:"—" }}).
+        {% else %}
+            No punch on file for this date.
+        {% endif %}
+    </p>
+
+    <form method="post" id="correction-request-form" action="{{ action_url }}"
+          hx-post="{{ action_url }}"
+          hx-target="#drawer-body"
+          hx-swap="innerHTML"
+          class="grid grid-cols-1 gap-4">
+        {% csrf_token %}
+        {% include "accounts/_field.html" with field=form.requested_check_in %}
+        {% include "accounts/_field.html" with field=form.requested_check_out %}
+        {% include "accounts/_field.html" with field=form.requested_time_in_office %}
+        {% include "accounts/_field.html" with field=form.reason %}
+    </form>
+</div>
+
+<div class="drawer-footer justify-end">
+    <button type="button" class="btn-secondary" @click="close()">Cancel</button>
+    <button type="submit" form="correction-request-form" class="btn-primary">
+        <i data-lucide="send" class="w-4 h-4"></i><span>Submit request</span>
+    </button>
+</div>

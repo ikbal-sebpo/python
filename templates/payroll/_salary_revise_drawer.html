@@ -1,0 +1,41 @@
+{% comment %}
+    Drawer body for "Revise salary" on the gross-salary page. One new
+    APPROVED structure; the previous one is closed the day before, or
+    cancelled when the date is the same (a correction of the current figure).
+{% endcomment %}
+<div class="drawer-body space-y-5">
+    {% if form.non_field_errors %}
+        <div class="rounded border border-red-200 bg-red-50 text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-300 px-3 py-2 text-sm">
+            {{ form.non_field_errors|striptags }}
+        </div>
+    {% endif %}
+
+    <dl class="grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
+        <dt class="text-text-mute">Employee</dt><dd>{{ employee.display_name }} · {{ employee.employee_id|default:"—" }}</dd>
+        <dt class="text-text-mute">Current</dt>
+        <dd>{% if current %}<span class="font-medium tabular-nums">{{ current.gross_monthly|taka }}</span> from {{ current.effective_from|date:"Y-m-d" }} (rev #{{ current.revision_no }}){% else %}<span class="text-text-mute">none on file</span>{% endif %}</dd>
+    </dl>
+
+    <form method="post" action="{{ action_url }}"
+          hx-post="{{ action_url }}"
+          hx-target="#drawer-body"
+          hx-swap="innerHTML"
+          class="flex flex-col gap-4">
+        {% csrf_token %}
+        <div class="grid grid-cols-1 gap-3">
+            {% include "accounts/_field.html" with field=form.gross_monthly %}
+            {% include "accounts/_field.html" with field=form.effective_from %}
+            {% include "accounts/_field.html" with field=form.reason %}
+            {% include "accounts/_field.html" with field=form.note %}
+        </div>
+        <ul class="text-xs text-text-mute list-disc pl-4 space-y-1">
+            <li>Keep the current effective date to <span class="font-medium">correct the current figure</span> (the old row is cancelled); a later date starts a new revision and closes the old one the day before.</li>
+            <li>A revision back to an earlier month changes the employee's salary adjustment balance — the next run's instalment picks it up. A <span class="font-medium">lower</span> figure stops further instalments but recovers nothing already paid.</li>
+            <li>Saved as approved at once. Recalculate any payroll run for this period or later.</li>
+        </ul>
+        <div class="flex items-center gap-2">
+            <button type="submit" class="btn-primary"><i data-lucide="save" class="w-4 h-4"></i><span>Save revision</span></button>
+            <button type="button" class="btn-secondary" @click="close()">Cancel</button>
+        </div>
+    </form>
+</div>

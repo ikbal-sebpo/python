@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}Pending queue · Orbis{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+  <h1 class="text-2xl font-semibold text-text-main dark:text-white">Pending queue</h1>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+    <div class="card">
+      <h2 class="font-semibold text-text-main dark:text-white mb-3">Pending review</h2>
+      {% if pending_reviews %}
+        <ul class="divide-y divide-bg-soft dark:divide-white/10 text-sm">
+          {% for rv in pending_reviews %}
+            <li class="py-2.5 flex items-center justify-between gap-3">
+              <div class="min-w-0">
+                <a href="{% url 'documents:request_detail' rv.request.id %}"
+                   class="font-medium text-text-main dark:text-white hover:underline truncate block">
+                  {{ rv.request.employee.display_name }} · {{ rv.request.document_type.display_name }}
+                </a>
+                <div class="text-xs text-text-soft">
+                  Step {{ rv.order }} · {{ rv.reviewer_group.name }} · submitted {{ rv.request.applied_at|date:"Y-m-d" }}
+                </div>
+              </div>
+              <a href="{% url 'documents:review_action' rv.pk %}" class="btn-primary text-xs">Review</a>
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p class="text-sm text-text-soft dark:text-white/60">Nothing waiting on you.</p>
+      {% endif %}
+    </div>
+
+    <div class="card">
+      <h2 class="font-semibold text-text-main dark:text-white mb-3">Pending approval</h2>
+      {% if pending_approvals %}
+        <ul class="divide-y divide-bg-soft dark:divide-white/10 text-sm">
+          {% for ap in pending_approvals %}
+            <li class="py-2.5 flex items-center justify-between gap-3">
+              <div class="min-w-0">
+                <a href="{% url 'documents:request_detail' ap.request.id %}"
+                   class="font-medium text-text-main dark:text-white hover:underline truncate block">
+                  {{ ap.request.employee.display_name }} · {{ ap.request.document_type.display_name }}
+                </a>
+                <div class="text-xs text-text-soft">
+                  Step {{ ap.order }} · {{ ap.approver_group.name }} · submitted {{ ap.request.applied_at|date:"Y-m-d" }}
+                </div>
+              </div>
+              <a href="{% url 'documents:approval_action' ap.pk %}" class="btn-primary text-xs">Approve</a>
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p class="text-sm text-text-soft dark:text-white/60">Nothing waiting on you.</p>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

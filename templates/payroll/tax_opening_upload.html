@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% block title %}Upload tax-year openings · Orbis{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <h1 class="text-xl font-semibold">Upload tax-year openings{% if tax_year %} · {{ tax_year.code }}{% endif %}</h1>
+    <p class="text-sm text-text-soft dark:text-white/60 mt-1">
+        Restricted to Payroll Admins. The monthly TDS is now a year-to-date true-up: what is still owed for the
+        tax year, spread over the months left. For that Orbis needs, per employee, what was already deducted in the
+        months of this tax year <span class="font-medium">before Orbis started computing TDS</span>
+        {% if live_from %}(before <span class="font-medium">{{ live_from }}</span>){% else %}
+        (set <span class="font-medium">Orbis live from</span> on the tax year in the admin first){% endif %}.
+        Re-uploading overwrites the figures — they are facts from Finance's sheet, not a ledger.
+    </p>
+</div>
+
+<div class="card mb-4">
+    <h2 class="text-sm font-semibold mb-3">1. Download a template</h2>
+    <div class="flex flex-wrap items-center gap-2">
+        <a href="{% url 'payroll_tax_opening_upload_template' %}" class="btn-secondary">
+            <i data-lucide="file-spreadsheet" class="w-4 h-4"></i><span>Excel template</span>
+        </a>
+        <span class="text-xs text-text-mute ml-2">One line per active employee with the ID and name prefilled.</span>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <h2 class="text-sm font-semibold mb-2">2. File format</h2>
+    <table class="table-simple text-sm mb-2">
+        <thead><tr><th>Employee ID</th><th>TDS deducted to date</th><th>Additional pay to date (optional)</th></tr></thead>
+        <tbody>
+            <tr><td>104</td><td>5829</td><td>12500</td></tr>
+            <tr><td>656</td><td>0</td><td><span class="text-text-mute italic">blank</span></td></tr>
+        </tbody>
+    </table>
+    <ul class="text-sm text-text-soft dark:text-white/70 list-disc pl-5 space-y-1">
+        <li><span class="font-medium">TDS deducted to date</span> — the total already deducted from this employee in this tax
+            year's pre-Orbis months (Finance's "TDS Deducted" figure).</li>
+        <li><span class="font-medium">Additional pay to date</span> — taxable extra pay (overtime, night, transport,
+            incentives, SLA; not the festival bonus) received in those same months. Leave blank when Finance can only
+            supply the TDS figure; it counts as 0.</li>
+        <li>One row per employee. Whole taka; a decimal is accepted and kept.</li>
+        <li>An employee without a declaration for the year gets one created (with their allowable-investment snapshot).</li>
+    </ul>
+</div>
+
+<div class="card mb-4">
+    <h2 class="text-sm font-semibold mb-3">3. Upload your filled file</h2>
+    <form id="tax-opening-upload-form"
+          method="post"
+          enctype="multipart/form-data"
+          hx-post="{% url 'payroll_tax_opening_upload' %}"
+          hx-encoding="multipart/form-data"
+          hx-target="#upload-result"
+          hx-swap="innerHTML"
+          hx-indicator="#upload-spinner"
+          class="flex flex-wrap items-end gap-3">
+        {% csrf_token %}
+        <input type="file" name="file" accept=".xlsx,.csv" required class="form-input w-auto max-w-xs">
+        <button type="submit" name="action" value="preview" class="btn-secondary">
+            <i data-lucide="eye" class="w-4 h-4"></i><span>Preview only</span>
+        </button>
+        <button type="submit" name="action" value="apply" class="btn-primary">
+            <i data-lucide="upload-cloud" class="w-4 h-4"></i><span>Upload</span>
+        </button>
+        <span id="upload-spinner" class="htmx-indicator inline-flex items-center gap-1 text-xs text-text-mute">
+            <i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i>Working…
+        </span>
+    </form>
+    <p class="text-xs text-text-mute mt-2">
+        After uploading, recalculate the open payroll run so the register picks the figures up.
+    </p>
+</div>
+
+<div id="upload-result">
+    {% if report or inline_error %}
+        {% include "payroll/_tax_opening_upload_report.html" with report=report parsed_preview=parsed_preview preview=preview aborted=aborted inline_error=inline_error %}
+    {% endif %}
+</div>
+
+<script>
+    document.body.addEventListener('htmx:afterSwap', function (evt) {
+        if (window.lucide && typeof window.lucide.createIcons === 'function') {
+            window.lucide.createIcons();
+        }
+    });
+</script>
+{% endblock %}

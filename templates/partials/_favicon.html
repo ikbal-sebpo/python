@@ -1,0 +1,5 @@
+{% load static %}{# SVG first — it follows the browser's own light/dark scheme; PNGs for browsers without SVG favicons and for home-screen icons. #}
+<link rel="icon" type="image/svg+xml" href="{% static 'brand/orbis-favicon.svg' %}">
+<link rel="icon" type="image/png" sizes="32x32" href="{% static 'brand/orbis-favicon-32.png' %}">
+<link rel="icon" type="image/png" sizes="192x192" href="{% static 'brand/orbis-favicon-192.png' %}">
+<link rel="apple-touch-icon" href="{% static 'brand/orbis-apple-touch-icon.png' %}">

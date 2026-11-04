@@ -1,0 +1,320 @@
+{% extends "base.html" %}
+{% load menu_extras %}
+{% block title %}Roster · Orbis{% endblock %}
+
+{% block content %}
+<div class="page-fill"
+     x-data="{
+        drawer: false,
+        drawerTitle: '',
+        open(title) { this.drawerTitle = title || ''; this.drawer = true; },
+        close() {
+            this.drawer = false;
+            this.drawerTitle = '';
+            const body = document.getElementById('drawer-body');
+            if (body) body.innerHTML = '';
+        },
+     }"
+     x-on:orbis:drawer-close.window="close()"
+     x-on:keydown.escape.window="close()">
+<div class="card shrink-0 space-y-3">
+    <div class="flex flex-wrap items-center justify-between gap-3">
+    <div class="flex flex-wrap items-center gap-2">
+    {% if range_clamped %}
+        <div class="flex items-start gap-2 text-sm text-amber-700 dark:text-amber-300">
+            <i data-lucide="alert-triangle" class="mt-0.5 h-4 w-4 shrink-0"></i>
+            <span>
+                Grid view caps the range at {{ range_cap_days }} days, so this is
+                showing {{ date_from|date:"Y-m-d" }} – {{ date_to|date:"Y-m-d" }}.
+                {% if is_manager %}
+                    <a href="?{% qs_replace view='flat' page=None %}" class="font-medium underline">Switch to Flat view</a>
+                    for the full range.
+                {% endif %}
+            </span>
+        </div>
+    {% endif %}
+
+    {% if is_manager and not search_active and not scoped_employee %}
+    <div class="group relative">
+        <button type="button"
+                class="btn-secondary !h-10 !px-3"
+                aria-label="About this view">
+            <i data-lucide="info" class="w-4 h-4"></i>
+        </button>
+        <div class="absolute left-0 top-full z-30 hidden w-[min(24rem,calc(100vw-3rem))] pt-2 group-hover:block group-focus-within:block">
+            <div class="menu-panel p-3 text-sm text-text-soft dark:text-white/70">
+                {% if org_wide %}
+                    Showing every employee's shifts, separated employees included. Open <span class="font-medium">Filters</span> to narrow by department, team or shift status.
+                {% else %}
+                    Showing your own roster and your direct reports. Open <span class="font-medium">Filters</span> to search or pick a department / team and see others in your line.
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    <div class="group relative">
+        <button type="button"
+                class="btn-secondary !h-10 !px-3 {% if filters_active %}!bg-brand !text-white{% endif %}"
+                aria-label="Filters"
+                title="Filters">
+            <i data-lucide="sliders-horizontal" class="w-4 h-4"></i>
+            {% if q %}
+                <span class="max-w-28 truncate text-xs">{{ q }}</span>
+            {% elif filters_active %}
+                <span class="text-xs">Filtered</span>
+            {% endif %}
+        </button>
+        <div class="absolute left-0 top-full z-30 hidden w-[min(24rem,calc(100vw-3rem))] pt-2 group-hover:block group-focus-within:block">
+            <form method="get" class="menu-panel space-y-3 p-3">
+                {% if view_mode == "flat" %}<input type="hidden" name="view" value="flat">{% endif %}
+                {% if request.GET.per_page %}<input type="hidden" name="per_page" value="{{ request.GET.per_page }}">{% endif %}
+                {% if employee_param %}<input type="hidden" name="employee" value="{{ employee_param }}">{% endif %}
+
+                <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                    <div>
+                        <label for="roster-from" class="form-label">Date from</label>
+                        <input id="roster-from" type="text" name="from" data-flatpickr data-flatpickr-static
+                               placeholder="YYYY-MM-DD"
+                               value="{{ date_from|date:'Y-m-d' }}" autocomplete="off" class="form-input w-full">
+                    </div>
+                    <div class="flatpickr-align-right">
+                        <label for="roster-to" class="form-label">Date to</label>
+                        <input id="roster-to" type="text" name="to" data-flatpickr data-flatpickr-static
+                               placeholder="YYYY-MM-DD"
+                               value="{{ date_to|date:'Y-m-d' }}" autocomplete="off" class="form-input w-full">
+                    </div>
+                </div>
+
+                {% if is_manager %}
+                <div>
+                    <label for="roster-search" class="form-label">Search</label>
+                    <div class="relative">
+                        <i data-lucide="search" class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-text-mute"></i>
+                        <input id="roster-search" type="text" name="q" value="{{ q }}"
+                               placeholder="Name, email, or employee ID"
+                               class="form-input w-full pl-9" autocomplete="off">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                    <div>
+                        <label for="roster-department" class="form-label">Department</label>
+                        <select id="roster-department" name="department" class="form-input w-full">
+                            {% if can_pick_all_departments %}<option value="">All departments</option>{% endif %}
+                            {% for d in departments %}
+                                <option value="{{ d.pk }}" {% if d.pk == selected_department_id %}selected{% endif %}>{{ d.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div>
+                        <label for="roster-team" class="form-label">Team</label>
+                        <select id="roster-team" name="team" class="form-input w-full"
+                                data-team-for="roster-department">
+                            <option value="">All teams</option>
+                            {% for t in teams %}
+                                <option value="{{ t.pk }}"
+                                        data-department="{{ t.department_id|default_if_none:'' }}"
+                                        {% if t.pk == selected_team_id %}selected{% endif %}>{{ t.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+                {% if view_mode == "flat" %}
+                <div>
+                    <label for="roster-status" class="form-label">Shift status</label>
+                    <select id="roster-status" name="status" class="form-input w-full">
+                        <option value="">All shift statuses</option>
+                        {% for st in flat_status_types %}
+                            <option value="{{ st.pk }}" {% if st.pk == flat_status_id %}selected{% endif %}>
+                                {{ st.name }}{% if st.full_name %} — {{ st.full_name }}{% endif %}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                {% endif %}
+                {% endif %}
+
+                <div class="flex items-center justify-end gap-2">
+                    {% if filters_active %}
+                        <a href="?{% qs_replace q=None department=None team=None employee=None status=None page=None %}"
+                           class="btn-secondary">Clear</a>
+                    {% endif %}
+                    <button type="submit" class="btn-primary">Apply filters</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    </div>
+
+    <div class="flex flex-wrap items-center gap-2">
+        {% if is_manager %}
+        <div class="inline-flex shrink-0 rounded border border-bg-soft bg-bg-card p-0.5 dark:border-white/10 dark:bg-white/5">
+            <a href="?{% qs_replace view=None status=None page=None per_page=None %}"
+               class="inline-flex h-9 w-9 items-center justify-center rounded {% if view_mode == 'grid' %}bg-brand text-white{% else %}text-text-soft hover:bg-bg-soft dark:text-white/70 dark:hover:bg-white/10{% endif %}"
+               aria-label="Grid view"
+               title="Grid view">
+                <i data-lucide="layout-grid" class="w-4 h-4"></i>
+            </a>
+            <a href="?{% qs_replace view='flat' page=None %}"
+               class="inline-flex h-9 w-9 items-center justify-center rounded {% if view_mode == 'flat' %}bg-brand text-white{% else %}text-text-soft hover:bg-bg-soft dark:text-white/70 dark:hover:bg-white/10{% endif %}"
+               aria-label="Flat view"
+               title="Flat view">
+                <i data-lucide="table-2" class="w-4 h-4"></i>
+            </a>
+        </div>
+        {% endif %}
+        {% if is_manager %}
+        <div class="group relative">
+            <button type="button" class="btn-secondary" aria-haspopup="true">
+                <i data-lucide="calendar-range" class="w-4 h-4"></i><span>Payroll period</span>
+            </button>
+            <div class="absolute right-0 top-full z-30 hidden w-64 pt-2 group-hover:block group-focus-within:block">
+                <div class="menu-panel py-1 text-sm">
+                    {% for p in payroll_periods %}
+                    <a href="?{% qs_replace from=p.from to=p.to page=None %}"
+                       class="block px-3 py-2 hover:bg-bg-soft dark:hover:bg-white/10">
+                        <span class="font-medium">{{ p.label }}</span>
+                        <span class="block text-xs text-text-mute">{{ p.from }} – {{ p.to }}</span>
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        <a href="?{% qs_replace from=this_mon to=this_sun page=None %}" class="btn-secondary">This week</a>
+        <a href="?{% qs_replace from=next_mon to=next_sun page=None %}" class="btn-primary">
+            <i data-lucide="calendar-plus" class="w-4 h-4"></i><span>{% if is_manager %}Plan next week{% else %}Next week{% endif %}</span>
+        </a>
+        {% if is_manager %}
+        <a href="{% url 'roster_export' %}?{{ filter_qs }}{% if view_mode == 'flat' %}&view=flat{% if flat_status_id %}&status={{ flat_status_id }}{% endif %}{% endif %}" class="btn-secondary"
+           title="{% if view_mode == 'flat' %}Download the flat view: one row per shift{% else %}Download the grid view: one row per employee{% endif %}">
+            <i data-lucide="download" class="w-4 h-4"></i><span>Export</span>
+        </a>
+        <a href="{% url 'roster_upload' %}" class="btn-secondary">
+            <i data-lucide="upload-cloud" class="w-4 h-4"></i><span>Upload roster</span>
+        </a>
+        {% endif %}
+        {% if can_email_roster %}
+        <button type="button" class="btn-secondary"
+                hx-get="{% url 'roster_email' %}?team={{ selected_team_id }}&week={{ date_from|date:'Y-m-d' }}"
+                hx-target="#drawer-body" hx-swap="innerHTML"
+                @click="open('Email roster')">
+            <i data-lucide="mail" class="w-4 h-4"></i><span>Email roster</span>
+        </button>
+        {% endif %}
+        {% if request.user.is_staff %}
+            <a href="{% url 'shift_type_list' %}" class="btn-secondary">
+                <i data-lucide="settings-2" class="w-4 h-4"></i><span>Shift types</span>
+            </a>
+        {% endif %}
+    </div>
+    </div>
+</div>
+
+{% if scoped_employee %}
+<div class="card shrink-0 flex items-center gap-2 text-sm">
+    <i data-lucide="user" class="w-4 h-4 text-brand dark:text-brand-accent"></i>
+    <span>Showing roster for <span class="font-medium">{{ scoped_employee.display_name }}</span>.</span>
+    <a href="?{% qs_replace employee=None page=None %}"
+       class="text-brand hover:underline dark:text-brand-accent ml-1">Show all employees</a>
+</div>
+{% endif %}
+
+{% if view_mode == "flat" %}
+{% include "partials/_result_count.html" with count_noun="roster entries" %}
+
+<div class="card p-0 table-scroll">
+    <table class="table-simple table-sticky">
+        <thead>
+            <tr>
+                <th class="min-w-[140px]">Date</th>
+                <th class="min-w-[140px]">EmployeeID</th>
+                <th class="min-w-[200px]">Employee Name</th>
+                <th class="min-w-[180px]">Team</th>
+                <th class="min-w-[220px]">Tracker Current Shift Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in flat_rows %}
+                <tr>
+                    <td class="tabular-nums">{{ row.date|date:"Y-m-d" }}</td>
+                    <td>{{ row.employee_id }}</td>
+                    <td>{{ row.name }}</td>
+                    <td>{{ row.team }}</td>
+                    <td class="font-medium">{{ row.status }}</td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="5" class="text-center py-8 text-text-mute">
+                        No roster entries match the current date range and filters.
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% include "partials/_pagination.html" %}
+{% else %}
+<div class="card p-0 table-scroll">
+    <table class="table-simple table-sticky">
+        <thead>
+            <tr>
+                <th class="min-w-[240px]">Employee</th>
+                {% for h in day_headers %}
+                    <th class="min-w-[180px]">
+                        <div class="text-[11px]">{{ h.date|date:"D" }}</div>
+                        <div class="text-xs text-text-main dark:text-white normal-case tracking-normal">{{ h.date|date:"Y-m-d" }}</div>
+                        {% if h.holiday %}
+                            <span class="inline-block mt-1 badge badge-info" title="{{ h.holiday.name }}">
+                                <i data-lucide="calendar-x" class="w-3 h-3"></i>Holiday
+                            </span>
+                        {% endif %}
+                    </th>
+                {% endfor %}
+                <th class="min-w-[110px] bg-bg-soft/30 dark:bg-white/[0.03]">Total</th>
+            </tr>
+            <tr>
+                <th class="align-top">
+                    <div class="text-[11px] font-normal normal-case tracking-normal text-text-soft dark:text-white/60">
+                        Shift count
+                    </div>
+                </th>
+                {% for h in day_headers %}
+                    {% include "roster/_count_cell.html" with day_header=h oob=False %}
+                {% endfor %}
+                <th class="bg-bg-soft/30 dark:bg-white/[0.03] border-l border-bg-soft dark:border-white/10"></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in rows %}
+                <tr>
+                    {% include "roster/_emp_name.html" with employee=row.employee off_count=row.off_count can_manage_patterns=can_manage_patterns oob=False %}
+                    {% for cell in row.cells %}
+                        {% include "roster/_cell.html" with employee=row.employee date=cell.date shift=cell.shift holiday=cell.holiday shift_types=shift_types filter_qs=filter_qs oob=False can_edit_cell=row.can_edit pending_change_pk=cell.pending_change_pk night_window=cell.night_window night_locked=cell.night_locked %}
+                    {% endfor %}
+                    {% include "roster/_row_total.html" with employee=row.employee totals=row.totals oob=False %}
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="{{ days|length|add:2 }}" class="text-center py-8 text-text-mute">
+                        {% if not is_manager %}
+                            No roster entries for you this week.
+                        {% elif search_active %}
+                            No employees match your search in your line.
+                        {% else %}
+                            No direct reports to show. Use search or the department / team
+                            filters to view someone's roster.
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
+{% include "partials/_drawer_shell.html" %}
+</div>
+
+{% endblock %}

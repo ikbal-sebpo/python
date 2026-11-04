@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% block title %}Upload AL bank · Orbis{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <h1 class="text-xl font-semibold">Upload AL bank (historical opening balance)</h1>
+    <p class="text-sm text-text-soft dark:text-white/60 mt-1">
+        Restricted to HR. One-time seed of each long-tenured employee's current Annual Leave
+        balance from the HR file, up to the 60-day lifetime cap. This sets each employee's
+        opening balance on their current AL cycle — it does not create leave usage or change
+        anything else.
+    </p>
+</div>
+
+<div class="card mb-4">
+    <h2 class="text-sm font-semibold mb-3">1. Download a template</h2>
+    <div class="flex flex-wrap items-center gap-2">
+        <a href="{% url 'leave_al_bank_upload_template' %}" class="btn-secondary">
+            <i data-lucide="file-spreadsheet" class="w-4 h-4"></i><span>Excel template</span>
+        </a>
+        <span class="text-xs text-text-mute ml-2">
+            Prefilled with every active employee's ID and name for reference. Fill in the
+            balance only for employees who actually have a nonzero historical AL balance —
+            leave the rest blank, an unedited row is skipped.
+        </span>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <h2 class="text-sm font-semibold mb-2">2. File format</h2>
+    <p class="text-sm text-text-soft dark:text-white/70 mb-2">
+        One row per employee, two columns, header on row 1:
+    </p>
+    <table class="table-simple text-sm mb-2">
+        <thead><tr><th>Employee ID</th><th>Current AL Balance (days)</th></tr></thead>
+        <tbody>
+            <tr><td>539</td><td>60</td></tr>
+        </tbody>
+    </table>
+    <ul class="text-sm text-text-soft dark:text-white/70 list-disc pl-5 space-y-1">
+        <li>Balance must be between 0 and 60 (the lifetime carry-forward cap).</li>
+        <li>This is a <span class="font-medium">one-time</span> import per employee — a
+            second upload for an employee who already has an opening balance is skipped
+            and reported, not applied. Corrections after the fact go through a manual
+            adjustment in Django admin.</li>
+        <li>There is no approval gate — your upload is final.</li>
+    </ul>
+</div>
+
+<div class="card mb-4">
+    <h2 class="text-sm font-semibold mb-3">3. Upload your filled file</h2>
+    <form id="al-bank-upload-form"
+          method="post"
+          enctype="multipart/form-data"
+          hx-post="{% url 'leave_al_bank_upload' %}"
+          hx-encoding="multipart/form-data"
+          hx-target="#upload-result"
+          hx-swap="innerHTML"
+          hx-indicator="#upload-spinner"
+          class="flex flex-wrap items-end gap-3">
+        {% csrf_token %}
+        <input type="file" name="file" accept=".xlsx,.csv" required class="form-input w-auto max-w-xs">
+        <button type="submit" name="action" value="preview" class="btn-secondary">
+            <i data-lucide="eye" class="w-4 h-4"></i><span>Preview only</span>
+        </button>
+        <button type="submit" name="action" value="apply" class="btn-primary">
+            <i data-lucide="upload-cloud" class="w-4 h-4"></i><span>Apply upload</span>
+        </button>
+        <span id="upload-spinner" class="htmx-indicator inline-flex items-center gap-1 text-xs text-text-mute">
+            <i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i>Working…
+        </span>
+    </form>
+    <p class="text-xs text-text-mute mt-2">
+        Tip: click <span class="font-medium">Preview only</span> first to see what will change without writing,
+        then click <span class="font-medium">Apply upload</span> — the file stays attached, no need to re-upload.
+    </p>
+</div>
+
+<div id="upload-result">
+    {% if report or inline_error %}
+        {% include "leave/_al_bank_upload_report.html" with report=report parsed_preview=parsed_preview preview=preview aborted=aborted inline_error=inline_error %}
+    {% endif %}
+</div>
+
+<script>
+    document.body.addEventListener('htmx:afterSwap', function (evt) {
+        if (window.lucide && typeof window.lucide.createIcons === 'function') {
+            window.lucide.createIcons();
+        }
+    });
+</script>
+{% endblock %}

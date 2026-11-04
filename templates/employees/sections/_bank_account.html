@@ -1,0 +1,44 @@
+{% if rows %}
+    <ul class="space-y-3 text-sm">
+        {% for row in rows %}
+            <li class="flex items-start justify-between gap-3">
+                <div class="min-w-0">
+                    <div class="text-xs text-text-mute uppercase tracking-wider flex items-center gap-2">
+                        {{ row.get_account_type_display }}
+                        {% if row.is_primary %}<span class="badge badge-muted">Primary</span>{% endif %}
+                        {% if not row.is_verified %}<span class="badge badge-info">Unverified</span>{% endif %}
+                    </div>
+                    <div>{{ row.account_name }} · <span class="font-mono text-xs">{{ row.account_number }}</span></div>
+                    {% if row.bank %}
+                        <div class="text-text-soft dark:text-white/60 text-xs">
+                            {{ row.bank }}{% if row.branch %} — {{ row.branch.name }}{% endif %}
+                        </div>
+                    {% endif %}
+                    {% if row.is_verified %}
+                        <div class="text-text-mute text-xs mt-0.5">
+                            Verified by {{ row.verified_by.get_full_name|default:row.verified_by.email|default:"—" }}
+                            on {{ row.verified_at|date:"Y-m-d" }}
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="flex items-center gap-2 shrink-0">
+                    {% if spec.slug in editable_section_slugs %}
+                        <form method="post" action="{% url 'bank_account_verify' row.pk %}"
+                              hx-post="{% url 'bank_account_verify' row.pk %}"
+                              hx-target="#section-card-{{ spec.slug }}" hx-swap="outerHTML">
+                            {% csrf_token %}
+                            <button type="submit"
+                                    class="text-xs {% if row.is_verified %}text-text-mute hover:underline{% else %}text-brand hover:underline dark:text-brand-accent{% endif %} inline-flex items-center gap-1">
+                                <i data-lucide="{% if row.is_verified %}shield-off{% else %}shield-check{% endif %}" class="w-3.5 h-3.5"></i>
+                                {% if row.is_verified %}Unverify{% else %}Verify{% endif %}
+                            </button>
+                        </form>
+                    {% endif %}
+                    {% include "employees/sections/_row_actions.html" %}
+                </div>
+            </li>
+        {% endfor %}
+    </ul>
+{% else %}
+    {% include "employees/sections/_empty.html" %}
+{% endif %}

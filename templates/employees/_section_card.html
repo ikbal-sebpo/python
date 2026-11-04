@@ -1,0 +1,50 @@
+{% comment %}
+    spec                       SectionSpec
+    object                     singleton instance (or None)
+    rows                       list of repeating rows (empty for singleton)
+    employee                   CustomUser
+    oob                        Legacy flag — was used to mark the post-save card
+                               as an htmx out-of-band fragment. Now ignored: the
+                               form in _drawer.html already targets this card by
+                               id with `hx-target="#section-card-X" hx-swap="outerHTML"`,
+                               so a regular swap is enough. Marking the response as
+                               OOB caused the new Add button NOT to be wired up
+                               for the second click — HTMX processes regular-
+                               swapped content reliably, OOB-only responses less so
+                               on this version.
+    editable_section_slugs     set of section slugs the viewer is allowed to edit;
+                               provided by EmployeeDetailView. Falls back to empty
+                               set on the post-save re-render path.
+{% endcomment %}
+<div class="card"
+     id="section-card-{{ spec.slug }}">
+    <div class="flex items-start justify-between gap-3 mb-3">
+        <div class="flex items-center gap-2">
+            <i data-lucide="{{ spec.icon }}" class="w-4 h-4 text-brand-accent"></i>
+            <h3 class="text-sm font-semibold uppercase tracking-wider text-text-mute">{{ spec.label }}</h3>
+        </div>
+        {% if spec.slug in editable_section_slugs %}
+            {% if spec.is_singleton %}
+                <button type="button"
+                        class="text-xs text-brand hover:underline dark:text-brand-accent inline-flex items-center gap-1"
+                        hx-get="{% url 'section_edit' employee.pk spec.slug %}"
+                        hx-target="#drawer-body"
+                        hx-swap="innerHTML"
+                        @click="open('{{ spec.label|escapejs }}')">
+                    <i data-lucide="pencil" class="w-3.5 h-3.5"></i>Edit
+                </button>
+            {% else %}
+                <button type="button"
+                        class="text-xs text-brand hover:underline dark:text-brand-accent inline-flex items-center gap-1"
+                        hx-get="{% url 'section_add' employee.pk spec.slug %}"
+                        hx-target="#drawer-body"
+                        hx-swap="innerHTML"
+                        @click="open('Add {{ spec.singular_label|lower|escapejs }}')">
+                    <i data-lucide="plus" class="w-3.5 h-3.5"></i>Add
+                </button>
+            {% endif %}
+        {% endif %}
+    </div>
+
+    {% include "employees/sections/"|add:spec.partial %}
+</div>

@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+{% block title %}Payroll runs · Orbis{% endblock %}
+
+{% block content %}
+<div class="page-fill">
+    <div class="flex items-center justify-between gap-3 shrink-0">
+        <div>
+            <h1 class="text-xl font-semibold">Payroll runs</h1>
+            <p class="text-sm text-text-soft dark:text-white/60 mt-1">
+                Phase 3 — calculation engine only. No approval chain yet; a run stops at Calculated.
+            </p>
+        </div>
+        {% if can_create_run %}
+        <form method="post" class="flex items-end gap-2">
+            {% csrf_token %}
+            <div>
+                <label for="{{ create_run_form.start_date.id_for_label }}" class="block text-xs text-text-soft dark:text-white/60 mb-1">{{ create_run_form.start_date.label }}</label>
+                {{ create_run_form.start_date }}
+            </div>
+            <div>
+                <label for="{{ create_run_form.end_date.id_for_label }}" class="block text-xs text-text-soft dark:text-white/60 mb-1">{{ create_run_form.end_date.label }}</label>
+                {{ create_run_form.end_date }}
+            </div>
+            <button type="submit" class="btn-primary">
+                <i data-lucide="plus" class="w-4 h-4"></i><span>Create run</span>
+            </button>
+        </form>
+        {% endif %}
+    </div>
+    {% if can_create_run %}
+    <p class="text-xs text-text-soft dark:text-white/60 -mt-2 shrink-0">
+        Defaults to the current standard period (16th–15th). Change the dates for a past period or a custom-length run (e.g. a shorter Eid-month cycle).
+    </p>
+    {% endif %}
+
+    {% include "partials/_result_count.html" with count_noun="runs" %}
+
+    <div class="card p-0 table-scroll">
+        <table class="table-simple table-sticky min-w-full text-sm">
+            <thead>
+                <tr>
+                    <th class="text-left">Period</th>
+                    <th class="text-left">Status</th>
+                    <th class="text-right">Employees</th>
+                    <th class="text-right">Night shifts</th>
+                    <th class="text-right">Overtime</th>
+                    <th class="text-right">Pending OT</th>
+                    <th class="text-right">Open checks</th>
+                    <th class="text-left">Calculated at</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for run in runs %}
+                    <tr class="cursor-pointer hover:bg-bg-soft/40 dark:hover:bg-white/5"
+                        onclick="window.location='{% url 'payroll_run_detail' run.pk %}'">
+                        <td>
+                            {{ run.period }}
+                            {% if run.period.period_type == "CUSTOM" %}<span class="badge badge-warning ml-1">Custom</span>{% endif %}
+                        </td>
+                        <td><span class="badge badge-info">{{ run.get_status_display }}</span></td>
+                        <td class="text-right tabular-nums">{{ run.employee_count }}</td>
+                        <td class="text-right tabular-nums">
+                            {% if run.calculated_at %}
+                                {{ run.night_total }}
+                                {% if run.night_total %}
+                                    <span class="text-xs text-text-soft dark:text-white/60">
+                                        ({% if run.night_regular_total %}{{ run.night_regular_total }} Reg{% endif %}{% if run.night_custom_total %}{% if run.night_regular_total %} · {% endif %}{{ run.night_custom_total }} Custom{% endif %}{% if run.night_dedicated_total %}{% if run.night_regular_total or run.night_custom_total %} · {% endif %}{{ run.night_dedicated_total }} Ded.{% endif %})
+                                    </span>
+                                {% endif %}
+                            {% else %}—{% endif %}
+                        </td>
+                        <td class="text-right tabular-nums">
+                            {% if run.calculated_at %}
+                                {{ run.ot_hours_total }}h
+                                {% if run.ot_hours_by_type %}
+                                    <span class="text-xs text-text-soft dark:text-white/60">
+                                        ({% for name, hours in run.ot_hours_by_type.items %}{{ name }} {{ hours }}{% if not forloop.last %} · {% endif %}{% endfor %})
+                                    </span>
+                                {% endif %}
+                            {% else %}—{% endif %}
+                        </td>
+                        <td class="text-right tabular-nums">
+                            {% if run.pending_ot_count %}<span class="badge badge-warning">{{ run.pending_ot_count }}</span>{% else %}0{% endif %}
+                        </td>
+                        <td class="text-right tabular-nums">
+                            {% if run.open_blocking_check_count %}<span class="badge badge-danger">{{ run.open_blocking_check_count }} blocking</span>{% endif %}
+                            {% if run.open_warning_check_count %}<span class="badge badge-warning">{{ run.open_warning_check_count }} warning</span>{% endif %}
+                            {% if not run.open_blocking_check_count and not run.open_warning_check_count %}0{% endif %}
+                        </td>
+                        <td>{{ run.calculated_at|date:"Y-m-d H:i"|default:"—" }}</td>
+                    </tr>
+                {% empty %}
+                    <tr><td colspan="8" class="text-center italic text-text-mute py-4">No runs yet.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% include "partials/_pagination.html" %}
+</div>
+{% endblock %}

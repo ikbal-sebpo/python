@@ -1,0 +1,203 @@
+{% extends "base.html" %}
+{% load menu_extras %}
+{% block title %}Salary loans · Orbis{% endblock %}
+
+{% block content %}
+<div x-data="{
+        drawer: false,
+        drawerTitle: '',
+        open(title) { this.drawerTitle = title || ''; this.drawer = true; },
+        close() {
+            this.drawer = false;
+            this.drawerTitle = '';
+            const body = document.getElementById('drawer-body');
+            if (body) body.innerHTML = '';
+        },
+     }"
+     x-on:orbis:drawer-close.window="close()"
+     x-on:keydown.escape.window="close()"
+     class="page-fill">
+
+    <div class="card shrink-0">
+        <form method="get" class="flex flex-wrap items-center gap-2">
+            <input type="hidden" name="tab" value="{{ tab }}">
+            <input type="text" name="q" value="{{ q }}" placeholder="Employee ID, name or file reference"
+                   class="form-input w-72" aria-label="Search">
+            <button type="submit" class="btn-secondary">Search</button>
+            <span class="flex-1"></span>
+            <button type="button" class="btn-primary"
+                    hx-get="{% url 'payroll_loan_create' %}?{% qs_replace %}"
+                    hx-target="#drawer-body"
+                    hx-swap="innerHTML"
+                    @click="open('Record approved loan')">
+                <i data-lucide="plus" class="w-4 h-4"></i><span>Add loan</span>
+            </button>
+        </form>
+        <p class="mt-3 text-xs text-text-mute">
+            HR records each management-approved loan from the file note; Finance marks it disbursed; payroll then
+            deducts the instalment every month until the balance is zero. A loan can't be deducted before it is disbursed.
+            {% if missing_documents %}
+                <span class="text-red-600 dark:text-red-400 font-medium">{{ missing_documents }} loan{{ missing_documents|pluralize }} without the signed file note attached.</span>
+            {% endif %}
+        </p>
+    </div>
+
+    <div class="shrink-0 flex flex-wrap items-center gap-1 border-b border-border dark:border-white/10 mt-2">
+        {% for key, label, count in tabs %}
+            <a href="?{% qs_replace tab=key page=1 %}"
+               class="px-3 py-2 text-sm border-b-2 -mb-px {% if tab == key %}border-brand text-brand dark:text-brand-accent font-medium{% else %}border-transparent text-text-mute hover:text-text-main dark:hover:text-white{% endif %}">
+                {{ label }} <span class="ml-1 text-xs tabular-nums {% if tab == key %}text-brand dark:text-brand-accent{% else %}text-text-mute{% endif %}">{{ count }}</span>
+            </a>
+        {% endfor %}
+    </div>
+
+    {% include "partials/_result_count.html" with count_noun="loans" %}
+
+    <div class="card p-0 table-scroll">
+        <table class="table-simple table-sticky min-w-full text-sm">
+            <thead>
+                <tr>
+                    <th class="text-left">Emp ID</th>
+                    <th class="text-left">Employee</th>
+                    <th class="text-left">File ref · approved</th>
+                    <th class="text-right">Principal</th>
+                    <th class="text-right">Instalment</th>
+                    <th class="text-left">Recovered / outstanding</th>
+                    <th class="text-left">First deduction</th>
+                    <th class="text-left">Status</th>
+                    <th class="text-right">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for loan in rows %}
+                    <tr class="{% if loan.is_cancelled %}opacity-60{% endif %}">
+                        <td class="tabular-nums">{{ loan.employee.employee_id|default:"—" }}</td>
+                        <td class="whitespace-nowrap">
+                            <a href="{% url 'employee_detail' loan.employee.pk %}" class="font-medium hover:underline">{{ loan.employee.display_name }}</a>
+                            <div class="text-xs text-text-mute">{{ loan.employee.department|default:"—" }}</div>
+                        </td>
+                        <td class="whitespace-nowrap">
+                            <div class="font-mono text-xs">{{ loan.file_reference }}</div>
+                            <div class="text-xs text-text-mute">
+                                {{ loan.approved_on|date:"Y-m-d" }}
+                                {% if loan.approval_document %}
+                                    · <a href="{% url 'payroll_loan_document' loan.pk %}" target="_blank" rel="noopener"
+                                         class="text-brand hover:underline dark:text-brand-accent">document</a>
+                                {% elif not loan.is_cancelled %}
+                                    · <span class="text-red-600 dark:text-red-400">no document</span>
+                                {% endif %}
+                            </div>
+                        </td>
+                        <td class="text-right tabular-nums font-semibold">{{ loan.principal|taka }}</td>
+                        <td class="text-right tabular-nums whitespace-nowrap">
+                            {{ loan.installment_amount|taka }}
+                            <span class="text-xs text-text-mute">× {{ loan.installment_count }}</span>
+                        </td>
+                        <td class="whitespace-nowrap">
+                            {% if loan.is_cancelled %}
+                                <span class="text-text-mute">—</span>
+                            {% else %}
+                                <div class="tabular-nums text-xs">
+                                    <span class="font-medium">{{ loan.balance.recovered|taka }}</span>
+                                    <span class="text-text-mute">/</span>
+                                    <span class="{% if loan.balance.is_settled %}text-emerald-600 dark:text-emerald-400{% endif %}">{{ loan.balance.outstanding|taka }}</span>
+                                    <span class="text-text-mute ml-1">({{ loan.balance.instalments_deducted }} of {{ loan.installment_count }})</span>
+                                </div>
+                                <div class="h-1.5 w-32 rounded bg-bg-soft dark:bg-white/10 mt-1">
+                                    <div class="h-1.5 rounded bg-brand dark:bg-brand-accent" style="width: {{ loan.balance.progress_pct }}%"></div>
+                                </div>
+                            {% endif %}
+                        </td>
+                        <td class="whitespace-nowrap text-xs">
+                            {% if loan.first_deduction_period %}
+                                {{ loan.first_deduction_period }}
+                            {% else %}
+                                <span class="text-text-mute">from disbursement</span>
+                            {% endif %}
+                            {% if loan.disbursed_on %}
+                                <div class="text-text-mute">disbursed {{ loan.disbursed_on|date:"Y-m-d" }}</div>
+                            {% endif %}
+                        </td>
+                        <td class="whitespace-nowrap">
+                            {% if loan.is_cancelled %}
+                                <span class="badge badge-muted" title="{{ loan.cancelled_reason }}">Cancelled</span>
+                            {% elif loan.is_pending %}
+                                <span class="badge badge-warning">Awaiting disbursement</span>
+                            {% elif loan.balance.is_settled %}
+                                <span class="badge badge-success">Settled</span>
+                            {% else %}
+                                <span class="badge badge-info">Active</span>
+                            {% endif %}
+                            {% if loan.recorded_source == "OUTSIDE_ORBIS" %}
+                                <span class="badge badge-muted" title="Loaded from Finance's cutover sheet">Cutover</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-right whitespace-nowrap">
+                            <button type="button"
+                                    class="p-1.5 rounded text-text-mute hover:bg-bg-soft hover:text-brand dark:hover:bg-white/5 dark:hover:text-brand-accent"
+                                    title="History"
+                                    hx-get="{% url 'payroll_loan_history' loan.pk %}"
+                                    hx-target="#drawer-body" hx-swap="innerHTML"
+                                    @click="open('Loan {{ loan.file_reference|escapejs }} — {{ loan.employee.display_name|escapejs }}')">
+                                <i data-lucide="history" class="w-4 h-4"></i>
+                            </button>
+                            {% if not loan.is_cancelled %}
+                                <button type="button"
+                                        class="p-1.5 rounded text-text-mute hover:bg-bg-soft hover:text-brand dark:hover:bg-white/5 dark:hover:text-brand-accent"
+                                        title="Edit"
+                                        hx-get="{% url 'payroll_loan_edit' loan.pk %}?{% qs_replace %}"
+                                        hx-target="#drawer-body" hx-swap="innerHTML"
+                                        @click="open('Edit loan {{ loan.file_reference|escapejs }}')">
+                                    <i data-lucide="pencil" class="w-4 h-4"></i>
+                                </button>
+                            {% endif %}
+                            {% if loan.is_pending %}
+                                {% if can_disburse %}
+                                    <button type="button"
+                                            class="p-1.5 rounded text-text-mute hover:bg-bg-soft hover:text-emerald-600 dark:hover:bg-white/5"
+                                            title="Mark disbursed"
+                                            hx-get="{% url 'payroll_loan_disburse' loan.pk %}?{% qs_replace %}"
+                                            hx-target="#drawer-body" hx-swap="innerHTML"
+                                            @click="open('Mark disbursed — {{ loan.file_reference|escapejs }}')">
+                                        <i data-lucide="banknote" class="w-4 h-4"></i>
+                                    </button>
+                                {% endif %}
+                                <button type="button"
+                                        class="p-1.5 rounded text-text-mute hover:bg-bg-soft hover:text-red-600 dark:hover:bg-white/5"
+                                        title="Cancel"
+                                        hx-get="{% url 'payroll_loan_cancel' loan.pk %}?{% qs_replace %}"
+                                        hx-target="#drawer-body" hx-swap="innerHTML"
+                                        @click="open('Cancel loan {{ loan.file_reference|escapejs }}')">
+                                    <i data-lucide="ban" class="w-4 h-4"></i>
+                                </button>
+                            {% elif loan.is_active and not loan.balance.is_settled and can_disburse %}
+                                <button type="button"
+                                        class="p-1.5 rounded text-text-mute hover:bg-bg-soft hover:text-amber-600 dark:hover:bg-white/5"
+                                        title="Skip a month"
+                                        hx-get="{% url 'payroll_loan_skip' loan.pk %}?{% qs_replace %}"
+                                        hx-target="#drawer-body" hx-swap="innerHTML"
+                                        @click="open('Skip a month — {{ loan.file_reference|escapejs }}')">
+                                    <i data-lucide="calendar-off" class="w-4 h-4"></i>
+                                </button>
+                                <button type="button"
+                                        class="p-1.5 rounded text-text-mute hover:bg-bg-soft hover:text-brand dark:hover:bg-white/5 dark:hover:text-brand-accent"
+                                        title="Adjust balance (repaid outside payroll / waiver / correction)"
+                                        hx-get="{% url 'payroll_loan_adjust' loan.pk %}?{% qs_replace %}"
+                                        hx-target="#drawer-body" hx-swap="innerHTML"
+                                        @click="open('Adjust balance — {{ loan.file_reference|escapejs }}')">
+                                    <i data-lucide="scale" class="w-4 h-4"></i>
+                                </button>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr><td colspan="9" class="text-center italic text-text-mute py-4">No loans here.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% include "partials/_pagination.html" %}
+    {% include "partials/_drawer_shell.html" %}
+</div>
+{% endblock %}

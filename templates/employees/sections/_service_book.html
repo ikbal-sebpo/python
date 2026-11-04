@@ -1,0 +1,25 @@
+{% if can_view_service_book %}
+<div class="card" id="section-card-service-book">
+    <div class="flex items-start justify-between gap-3 mb-3">
+        <div class="flex items-center gap-2">
+            <i data-lucide="book-text" class="w-4 h-4 text-brand-accent"></i>
+            <h3 class="text-sm font-semibold uppercase tracking-wider text-text-mute">Service book</h3>
+        </div>
+    </div>
+    <p class="text-sm text-text-soft dark:text-white/60 mb-3">
+        Bangladesh Labour Rules Form-7 record — identity, employment, service &amp; wage history, leave, and conduct.
+    </p>
+    <div class="flex flex-wrap items-center gap-4">
+        <a href="{% url 'employee_service_book' employee.pk %}"
+           class="text-xs text-brand hover:underline dark:text-brand-accent inline-flex items-center gap-1">
+            <i data-lucide="external-link" class="w-3.5 h-3.5"></i>View service book
+        </a>
+        {% if can_edit_gross_salary %}
+            <a href="{% url 'payroll_salary_detail' employee.pk %}"
+               class="text-xs text-brand hover:underline dark:text-brand-accent inline-flex items-center gap-1">
+                <i data-lucide="banknote" class="w-3.5 h-3.5"></i>Gross salary &amp; revisions
+            </a>
+        {% endif %}
+    </div>
+</div>
+{% endif %}

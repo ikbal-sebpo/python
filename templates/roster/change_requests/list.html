@@ -1,0 +1,165 @@
+{% extends "base.html" %}
+{% load menu_extras %}
+{% block title %}Shift changes · Orbis{% endblock %}
+
+{% block content %}
+<div class="page-fill">
+<div class="card shrink-0">
+    <div class="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
+    <div class="flex flex-wrap items-center gap-1">
+        <a href="?tab=mine{{ query_suffix }}"
+           class="btn-secondary {% if tab == 'mine' %}!bg-brand !text-white{% endif %}">
+            My requests
+            <span class="ml-1 text-[11px] opacity-70">({{ mine_count }})</span>
+        </a>
+        {% if show_pending_tab %}
+            <a href="?tab=pending{{ query_suffix }}"
+               class="btn-secondary {% if tab == 'pending' %}!bg-brand !text-white{% endif %}">
+                Pending approvals
+                <span class="ml-1 text-[11px] {% if pending_count %}!text-brand-accent{% endif %} opacity-70">({{ pending_count }})</span>
+            </a>
+        {% endif %}
+        {% if show_all_tab %}
+            <a href="?tab=all{{ query_suffix }}"
+               class="btn-secondary {% if tab == 'all' %}!bg-brand !text-white{% endif %}">
+                All requests
+                <span class="ml-1 text-[11px] opacity-70">({{ all_count }})</span>
+            </a>
+        {% endif %}
+        {% if has_direct_reports and tab != 'mine' %}
+            {# Scope switch, not a filter — same control as leave/list.html. #}
+            {# Default on; an unchecked checkbox sends nothing, so the change #}
+            {# handler navigates to ?direct=0 / drops the param explicitly. #}
+            <label class="ml-2 inline-flex cursor-pointer select-none items-center gap-2 text-xs font-medium text-text-soft dark:text-white/70"
+                   title="Show only requests from people who report directly to you">
+                <input type="checkbox"
+                       class="form-checkbox"
+                       {% if direct_only %}checked{% endif %}
+                       onchange="window.location = '?' + (this.checked ? '{% qs_replace direct=None page=None %}' : '{% qs_replace direct='0' page=None %}');">
+                <span>Direct reports only</span>
+            </label>
+        {% endif %}
+    </div>
+
+    <div class="flex flex-wrap items-center gap-2 xl:ml-auto xl:justify-end">
+        <div class="group relative">
+            <button type="button"
+                    class="btn-secondary !h-10 !px-3 {% if filters_active %}!bg-brand !text-white{% endif %}"
+                    aria-label="Filters"
+                    title="Filters">
+                <i data-lucide="sliders-horizontal" class="w-4 h-4"></i>
+                {% if q %}
+                    <span class="max-w-28 truncate text-xs">{{ q }}</span>
+                {% elif filters_active %}
+                    <span class="text-xs">Filtered</span>
+                {% endif %}
+            </button>
+            <div class="absolute right-0 top-full z-30 hidden w-[min(24rem,calc(100vw-3rem))] pt-2 group-hover:block group-focus-within:block">
+                <form method="get" class="menu-panel space-y-3 p-3">
+                    <input type="hidden" name="tab" value="{{ tab }}">
+                    {# The scope switch isn't a filter, but a GET form builds the #}
+                    {# querystring from scratch — carry an unticked state through. #}
+                    {% if has_direct_reports and not direct_only %}
+                        <input type="hidden" name="direct" value="0">
+                    {% endif %}
+                    <label for="shift-change-search" class="form-label">Search</label>
+                    <div class="relative">
+                        <i data-lucide="search" class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-text-mute"></i>
+                        <input id="shift-change-search"
+                               type="search"
+                               name="q"
+                               value="{{ q }}"
+                               placeholder="Name, email, or employee ID"
+                               class="form-input w-full pl-9"
+                               autocomplete="off">
+                    </div>
+
+                    <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                        <div>
+                            <label for="shift-change-department" class="form-label">Department</label>
+                            <select id="shift-change-department" name="department" class="form-input">
+                                {% if can_pick_all_departments %}
+                                    <option value="">All departments</option>
+                                {% endif %}
+                                {% for department in departments %}
+                                    <option value="{{ department.pk }}" {% if department.pk == selected_department_id %}selected{% endif %}>
+                                        {{ department.name }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div>
+                            <label for="shift-change-team" class="form-label">Team</label>
+                            {# Narrowed to the picked department client-side #}
+                            {# (base.html::wireDepartmentTeamCascade) -- a reload #}
+                            {# would close this hover popover mid-edit. #}
+                            <select id="shift-change-team" name="team" class="form-input"
+                                    data-team-for="shift-change-department">
+                                <option value="">All teams</option>
+                                {% for team in teams %}
+                                    <option value="{{ team.pk }}"
+                                            data-department="{{ team.department_id|default_if_none:'' }}"
+                                            {% if team.pk == selected_team_id %}selected{% endif %}>
+                                        {{ team.name }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-end gap-2">
+                        {% if filters_active %}
+                            <a href="?tab={{ tab }}{% if has_direct_reports and not direct_only %}&direct=0{% endif %}" class="btn-secondary">Clear</a>
+                        {% endif %}
+                        <button type="submit" class="btn-primary">Apply filters</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <a href="{% url 'shift_change_apply' %}" class="btn-primary">
+            <i data-lucide="refresh-cw" class="w-4 h-4"></i><span>Request shift change</span>
+        </a>
+    </div>
+    </div>
+</div>
+
+{% include "partials/_result_count.html" with count_noun="shift change requests" %}
+
+<div class="card p-0 table-scroll">
+    <table class="table-simple table-sticky">
+        <thead>
+            <tr>
+                <th>Employee</th>
+                <th>Team</th>
+                <th>Date</th>
+                <th>From</th>
+                <th>To</th>
+                <th>Status</th>
+                <th>Filed</th>
+                <th class="text-right">Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in rows %}
+                {% include "roster/change_requests/_row.html" with row=row current_user_pk=current_user_pk oob=False show_actions=True %}
+            {% empty %}
+                <tr><td colspan="8" class="text-center py-8 text-text-mute">
+                    {% if tab == 'mine' %}
+                        You haven't requested any shift changes yet.
+                    {% elif tab == 'pending' and direct_only %}
+                        No pending shift change requests from your direct reports.
+                    {% elif tab == 'pending' %}
+                        No pending shift change requests from your team.
+                    {% else %}
+                        No shift change requests on record.
+                    {% endif %}
+                </td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% include "partials/_pagination.html" %}
+</div>
+{% endblock %}

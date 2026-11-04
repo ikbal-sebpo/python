@@ -1,0 +1,12 @@
+Hello {{ recipient.first_name|default:recipient.email }},
+
+Your request for "{{ request_obj.document_type.display_name }}" was rejected.
+
+{% if latest_rejection %}Stage:  {{ latest_rejection.stage }}
+Step:   {{ latest_rejection.step_order }}
+Reason: {{ latest_rejection.reason|default:"(no reason provided)" }}
+{% endif %}
+
+You can submit a new request from Orbis if needed.
+
+— Orbis

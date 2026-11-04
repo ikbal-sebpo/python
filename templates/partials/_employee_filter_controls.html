@@ -1,0 +1,31 @@
+{# Shared employee filter controls: open search + department + team. #}
+{# Drop inside a <form method="get">. Needs q / departments / teams / #}
+{# selected_department_id / selected_team_id / can_pick_all_departments. #}
+{# Optional `search_placeholder` overrides the box's placeholder text (e.g. #}
+{# attendance uses "Employee ID" since its search box also drives its #}
+{# single-employee mode — see attendance.views._resolve_employee); the #}
+{# search itself is unchanged, still name/email/ID (accounts.filters). #}
+{# The team <select> is narrowed to the picked department client-side by #}
+{# base.html::wireDepartmentTeamCascade -- keep the data-department #}
+{# attribute on every option and pass an un-narrowed `teams` (see #}
+{# accounts.filters.employee_filter_context). #}
+<div class="relative min-w-[200px] flex-1 max-w-xs">
+    <i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-text-mute"></i>
+    <input type="text" name="q" value="{{ q }}"
+           placeholder="{{ search_placeholder|default:"Search name, email, or ID" }}" class="form-input pl-9 w-full">
+</div>
+<select id="employee-filter-department" name="department" class="form-input w-44" onchange="this.form.submit()">
+    {% if can_pick_all_departments %}<option value="">All departments</option>{% endif %}
+    {% for d in departments %}
+        <option value="{{ d.pk }}" {% if selected_department_id|stringformat:'s' == d.pk|stringformat:'s' %}selected{% endif %}>{{ d.name }}</option>
+    {% endfor %}
+</select>
+<select id="employee-filter-team" name="team" class="form-input w-44" onchange="this.form.submit()"
+        data-team-for="employee-filter-department">
+    <option value="">All teams</option>
+    {% for t in teams %}
+        <option value="{{ t.pk }}"
+                data-department="{{ t.department_id|default_if_none:'' }}"
+                {% if selected_team_id|stringformat:'s' == t.pk|stringformat:'s' %}selected{% endif %}>{{ t.name }}</option>
+    {% endfor %}
+</select>

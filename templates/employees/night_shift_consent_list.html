@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+{% load menu_extras %}
+{% block title %}Night shift consent · Orbis{% endblock %}
+
+{% block content %}
+<div class="page-fill">
+    <div class="card shrink-0 flex flex-wrap items-center justify-between gap-3">
+        <form method="get" class="flex flex-wrap items-center gap-2 flex-1 min-w-[240px]">
+            {% include "partials/_employee_filter_controls.html" %}
+            <input type="hidden" name="period" value="{{ period|date:'Y-m-d' }}">
+            <button type="submit" class="btn-secondary">Search</button>
+        </form>
+        <div class="flex items-center gap-2 shrink-0">
+            <a href="?{% qs_replace period=prev_period|date:'Y-m-d' page=None %}" class="btn-secondary !py-1.5" aria-label="Previous month">
+                <i data-lucide="chevron-left" class="w-4 h-4"></i>
+            </a>
+            <span class="text-sm font-medium tabular-nums min-w-[9rem] text-center">
+                {{ period|date:"F Y" }}{% if period == this_month %}<span class="ml-1 text-[10px] uppercase text-text-mute">current</span>{% endif %}
+            </span>
+            <a href="?{% qs_replace period=next_period|date:'Y-m-d' page=None %}" class="btn-secondary !py-1.5" aria-label="Next month">
+                <i data-lucide="chevron-right" class="w-4 h-4"></i>
+            </a>
+        </div>
+    </div>
+
+    {% include "partials/_result_count.html" with count_noun="employees" %}
+
+    <div class="card p-0 table-scroll">
+        <table class="table-simple table-sticky min-w-full text-sm">
+            <thead>
+                <tr>
+                    <th class="text-left">Employee</th>
+                    <th class="text-left">Department / Team</th>
+                    <th class="text-left">Status</th>
+                    <th class="text-left">Decided by</th>
+                    <th class="text-left">Decided at</th>
+                    <th class="text-left">Note</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in rows %}
+                    <tr>
+                        <td class="whitespace-nowrap">
+                            <a href="{% url 'employee_detail' row.employee.pk %}" class="font-medium hover:underline">
+                                {{ row.employee.display_name }}
+                            </a>
+                            {% if row.employee.employee_id %}
+                                <span class="ml-1.5 text-xs text-text-mute">· {{ row.employee.employee_id }}</span>
+                            {% endif %}
+                        </td>
+                        <td class="whitespace-nowrap text-xs text-text-soft dark:text-white/60">
+                            {{ row.employee.department|default:"—" }}{% if row.employee.team %} · {{ row.employee.team }}{% endif %}
+                        </td>
+                        <td class="whitespace-nowrap">
+                            {% if row.consents %}
+                                <span class="badge badge-success"><i data-lucide="check" class="w-3 h-3"></i>Consents</span>
+                            {% else %}
+                                <span class="badge" style="background:rgba(239,68,68,.15); color:#dc2626;">
+                                    <i data-lucide="x" class="w-3 h-3"></i>Declined
+                                </span>
+                            {% endif %}
+                            {% if row.source == 'AUTO_DEFAULT' %}
+                                <span class="ml-1 text-[10px] uppercase text-text-mute">Not yet reviewed</span>
+                            {% endif %}
+                        </td>
+                        <td class="whitespace-nowrap text-xs text-text-soft dark:text-white/60">
+                            {{ row.decided_by.display_name|default:"—" }}
+                        </td>
+                        <td class="whitespace-nowrap text-xs text-text-soft dark:text-white/60 tabular-nums">
+                            {{ row.decided_at|date:"Y-m-d H:i"|default:"—" }}
+                        </td>
+                        <td class="text-xs text-text-soft dark:text-white/60 max-w-xs truncate" title="{{ row.note }}">
+                            {{ row.note|default:"—" }}
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="6" class="text-center italic text-text-mute py-4">
+                            No qualifying female employees with a night shift scheduled this month.
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% include "partials/_pagination.html" %}
+</div>
+{% endblock %}

@@ -1,0 +1,226 @@
+{% load payroll_extras %}
+{# Result fragment for /payroll/overtime/upload/ — swapped in by HTMX on each submit. #}
+<div class="card mb-4">
+    <h2 class="text-sm font-semibold mb-3">Result</h2>
+
+    {% if inline_error %}
+        <div class="mb-3 px-3 py-2 rounded border border-red-300 bg-red-50 text-red-800
+                    dark:border-red-700/50 dark:bg-red-900/20 dark:text-red-200 text-sm">
+            {{ inline_error }}
+        </div>
+    {% endif %}
+
+    {% if report %}
+        {% if aborted %}
+            <div class="mb-3 px-3 py-2 rounded border border-red-300 bg-red-50 text-red-800
+                        dark:border-red-700/50 dark:bg-red-900/20 dark:text-red-200 text-sm">
+                Upload aborted. Nothing was written. Fix the errors below and re-upload.
+            </div>
+        {% elif preview %}
+            <div class="mb-3 px-3 py-2 rounded border border-blue-300 bg-blue-50 text-blue-800
+                        dark:border-blue-700/50 dark:bg-blue-900/20 dark:text-blue-200 text-sm">
+                Preview only — nothing was written. Click <span class="font-medium">Apply upload</span>
+                to commit the same file.
+            </div>
+        {% else %}
+            <div class="mb-3 px-3 py-2 rounded border border-emerald-300 bg-emerald-50 text-emerald-800
+                        dark:border-emerald-700/50 dark:bg-emerald-900/20 dark:text-emerald-200 text-sm">
+                <span class="font-medium">{{ report.created|length }}</span> created ·
+                <span class="font-medium">{{ report.updated|length }}</span> updated ·
+                <span class="font-medium">{{ report.skipped_scope|length }}</span> scope-skipped
+                {% if report.skipped_window %}· <span class="font-medium">{{ report.skipped_window|length }}</span> outside the open period{% endif %}
+                {% if report.skipped_locked %}· <span class="font-medium">{{ report.skipped_locked|length }}</span> already settled{% endif %}
+                {% if report.pending %}· <span class="font-medium text-amber-600">{{ report.pending|length }}</span> pending review{% endif %}
+                {% if report.resubmitted %}· <span class="font-medium text-amber-600">{{ report.resubmitted|length }}</span> sign-off undone{% endif %}
+                {% if report.unchanged %}· <span class="font-medium">{{ report.unchanged|length }}</span> unchanged{% endif %}
+            </div>
+        {% endif %}
+
+        {% if report.parse_errors %}
+            <h3 class="text-xs font-semibold uppercase tracking-wide text-red-700 dark:text-red-300 mt-4 mb-2">
+                Errors ({{ report.parse_errors|length }})
+            </h3>
+            <div class="overflow-x-auto">
+                <table class="table-simple text-sm">
+                    <thead>
+                        <tr><th class="w-12">Row</th><th>Employee ID</th><th>Date</th><th>Type</th><th>Reason</th></tr>
+                    </thead>
+                    <tbody>
+                        {% for err in report.parse_errors %}
+                            <tr class="text-red-700 dark:text-red-300">
+                                <td>{{ err.line_no }}</td>
+                                <td>{{ err.raw.Employee_ID|default:"—" }}</td>
+                                <td>{{ err.raw.Working_date|default:"—" }}</td>
+                                <td>{{ err.raw.Overtime_type|default:"—" }}</td>
+                                <td>{{ err.message }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endif %}
+
+        {% if report.duplicates %}
+            <h3 class="text-xs font-semibold uppercase tracking-wide text-red-700 dark:text-red-300 mt-4 mb-2">
+                Duplicates within file ({{ report.duplicates|length }})
+            </h3>
+            <div class="overflow-x-auto">
+                <table class="table-simple text-sm">
+                    <thead>
+                        <tr><th class="w-12">Row</th><th>Employee ID</th><th>Date</th><th>Type</th><th>Reason</th></tr>
+                    </thead>
+                    <tbody>
+                        {% for err in report.duplicates %}
+                            <tr class="text-red-700 dark:text-red-300">
+                                <td>{{ err.line_no }}</td>
+                                <td>{{ err.raw.Employee_ID|default:"—" }}</td>
+                                <td>{{ err.raw.Working_date|default:"—" }}</td>
+                                <td>{{ err.raw.Overtime_type|default:"—" }}</td>
+                                <td>{{ err.message }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endif %}
+
+        {% if report.skipped_scope %}
+            <h3 class="text-xs font-semibold uppercase tracking-wide text-amber-700 dark:text-amber-300 mt-4 mb-2">
+                Outside your scope ({{ report.skipped_scope|length }})
+            </h3>
+            <div class="overflow-x-auto">
+                <table class="table-simple text-sm">
+                    <thead>
+                        <tr><th class="w-12">Row</th><th>Employee ID</th><th>Date</th><th>Reason</th></tr>
+                    </thead>
+                    <tbody>
+                        {% for err in report.skipped_scope %}
+                            <tr class="text-amber-700 dark:text-amber-300">
+                                <td>{{ err.line_no }}</td>
+                                <td>{{ err.raw.Employee_ID|default:"—" }}</td>
+                                <td>{{ err.raw.Working_date|default:"—" }}</td>
+                                <td>{{ err.message }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endif %}
+
+        {% if report.skipped_window %}
+            <h3 class="text-xs font-semibold uppercase tracking-wide text-amber-700 dark:text-amber-300 mt-4 mb-2">
+                Outside the open payroll period ({{ report.skipped_window|length }})
+            </h3>
+            <div class="overflow-x-auto">
+                <table class="table-simple text-sm">
+                    <thead>
+                        <tr><th class="w-12">Row</th><th>Employee ID</th><th>Date</th><th>Type</th><th>Reason</th></tr>
+                    </thead>
+                    <tbody>
+                        {% for err in report.skipped_window %}
+                            <tr class="text-amber-700 dark:text-amber-300">
+                                <td>{{ err.line_no }}</td>
+                                <td>{{ err.raw.Employee_ID|default:"—" }}</td>
+                                <td>{{ err.raw.Working_date|default:"—" }}</td>
+                                <td>{{ err.raw.Overtime_type|default:"—" }}</td>
+                                <td>{{ err.message }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endif %}
+
+        {% if report.skipped_locked %}
+            <h3 class="text-xs font-semibold uppercase tracking-wide text-amber-700 dark:text-amber-300 mt-4 mb-2">
+                Already approved or voided for a locked period ({{ report.skipped_locked|length }})
+            </h3>
+            <p class="text-xs text-text-mute mb-2">
+                These periods have already been locked for calculation — ask HR-Payroll to make the change.
+            </p>
+            <div class="overflow-x-auto">
+                <table class="table-simple text-sm">
+                    <thead>
+                        <tr><th class="w-12">Row</th><th>Employee ID</th><th>Date</th><th>Type</th><th>Reason</th></tr>
+                    </thead>
+                    <tbody>
+                        {% for err in report.skipped_locked %}
+                            <tr class="text-amber-700 dark:text-amber-300">
+                                <td>{{ err.line_no }}</td>
+                                <td>{{ err.raw.Employee_ID|default:"—" }}</td>
+                                <td>{{ err.raw.Working_date|default:"—" }}</td>
+                                <td>{{ err.raw.Overtime_type|default:"—" }}</td>
+                                <td>{{ err.message }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endif %}
+
+        {% if preview and parsed_preview %}
+            <details class="mt-4" open>
+                <summary class="cursor-pointer text-xs font-semibold uppercase tracking-wide text-text-soft dark:text-white/70">
+                    Rows that would be applied ({{ parsed_preview|length }})
+                </summary>
+                <div class="overflow-x-auto mt-2">
+                    <table class="table-simple text-sm">
+                        <thead>
+                            <tr><th class="w-12">Row</th><th>Employee ID</th><th>Date</th><th>Type</th><th>Hours</th></tr>
+                        </thead>
+                        <tbody>
+                            {% for row in parsed_preview %}
+                                <tr>
+                                    <td>{{ row.line_no }}</td>
+                                    <td>{{ row.employee_id }}</td>
+                                    <td>{{ row.work_date|date:"Y-m-d" }}</td>
+                                    <td>{{ row.overtime_type.name }}</td>
+                                    <td>{{ row.seconds|hhmmss }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </details>
+        {% endif %}
+
+        {% if not preview and not aborted %}
+            {% if report.created or report.updated %}
+                <details class="mt-4" open>
+                    <summary class="cursor-pointer text-xs font-semibold uppercase tracking-wide text-emerald-700 dark:text-emerald-300">
+                        Applied rows ({{ report.created|length|add:report.updated|length }})
+                    </summary>
+                    <div class="overflow-x-auto mt-2">
+                        <table class="table-simple text-sm">
+                            <thead>
+                                <tr><th class="w-12">Row</th><th>Status</th><th>Employee ID</th><th>Date</th><th>Type</th><th>Hours</th></tr>
+                            </thead>
+                            <tbody>
+                                {% for row in report.created %}
+                                    <tr class="text-emerald-700 dark:text-emerald-300">
+                                        <td>{{ row.line_no }}</td>
+                                        <td><span class="badge badge-success">Created</span></td>
+                                        <td>{{ row.employee_id }}</td>
+                                        <td>{{ row.work_date|date:"Y-m-d" }}</td>
+                                        <td>{{ row.overtime_type.name }}</td>
+                                        <td>{{ row.seconds|hhmmss }}</td>
+                                    </tr>
+                                {% endfor %}
+                                {% for row in report.updated %}
+                                    <tr>
+                                        <td>{{ row.line_no }}</td>
+                                        <td>{% if row in report.resubmitted %}<span class="badge badge-warning" title="This entry had been reviewed or approved; the new figures sent it back to Pending review">Re-submitted</span>{% else %}<span class="badge badge-info">Updated</span>{% endif %}</td>
+                                        <td>{{ row.employee_id }}</td>
+                                        <td>{{ row.work_date|date:"Y-m-d" }}</td>
+                                        <td>{{ row.overtime_type.name }}</td>
+                                        <td>{{ row.seconds|hhmmss }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </details>
+            {% endif %}
+        {% endif %}
+    {% endif %}
+</div>

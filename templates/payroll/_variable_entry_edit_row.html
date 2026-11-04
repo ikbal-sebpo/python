@@ -1,0 +1,25 @@
+{% comment %}
+    One VariablePayEntry, edit mode. Needs entry / run / employee / form in context.
+{% endcomment %}
+<li id="variable-entry-{{ entry.pk }}"
+    class="rounded border border-brand/40 dark:border-brand-accent/40 px-3 py-2 text-sm">
+    <form method="post"
+          action="{% url 'payroll_run_variable_edit' run.pk employee.pk entry.pk %}"
+          hx-post="{% url 'payroll_run_variable_edit' run.pk employee.pk entry.pk %}"
+          hx-target="#drawer-body" hx-swap="innerHTML"
+          class="space-y-2">
+        {% csrf_token %}
+        <div class="text-xs font-medium text-text-mute">{{ entry.component.name }}</div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            {% include "accounts/_field.html" with field=form.amount %}
+            {% include "accounts/_field.html" with field=form.reason %}
+        </div>
+        <div class="flex items-center gap-2 justify-end">
+            <button type="button" class="btn-secondary text-xs px-2 py-1"
+                    hx-get="{{ drawer_reload_url }}" hx-target="#drawer-body" hx-swap="innerHTML">
+                Cancel
+            </button>
+            <button type="submit" class="btn-primary text-xs px-2 py-1">Save</button>
+        </div>
+    </form>
+</li>

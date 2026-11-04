@@ -1,0 +1,298 @@
+{% load static %}
+
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+
+    {# --- Next shift --- #}
+    <div class="card">
+        <div class="flex items-center justify-between">
+            <div class="text-xs uppercase tracking-wider text-text-mute">My next shift</div>
+            <div class="w-9 h-9 rounded bg-brand-accent/15 text-brand-accent flex items-center justify-center">
+                <i data-lucide="clock" class="w-4 h-4"></i>
+            </div>
+        </div>
+        {% if me.next_shift %}
+            <div class="mt-2 text-lg font-semibold">
+                {{ me.next_shift.shift_type.name }}
+            </div>
+            <div class="text-sm text-text-soft dark:text-white/60">
+                {{ me.next_shift.date|date:"l, M j" }}
+                {% with t=me.next_shift.display_times %}
+                    {% if t.0 %}· {{ t.0|time:"H:i" }}{% if t.1 %}–{{ t.1|time:"H:i" }}{% endif %}{% endif %}
+                {% endwith %}
+            </div>
+            {% if me.next_shift_location %}
+                <div class="mt-1 inline-flex items-center gap-1 text-xs font-medium
+                            {% if me.next_shift_location == 'WFH' %}text-brand-blue{% else %}text-brand-accent{% endif %}">
+                    <i data-lucide="map-pin" class="w-3.5 h-3.5"></i>{{ me.next_shift_location }}
+                </div>
+            {% endif %}
+        {% else %}
+            <div class="mt-3 text-sm text-text-mute italic">No shift in the next 7 days.</div>
+        {% endif %}
+        {% if me.upcoming_holidays %}
+            <div class="mt-3 pt-2 border-t border-bg-soft/50 dark:border-white/5 text-xs text-text-mute">
+                <span class="uppercase tracking-wider text-[10px]">Next holiday</span>
+                · <span class="text-text-soft dark:text-white/70">{{ me.upcoming_holidays.0.name }}</span>
+                · <span class="tabular-nums">{{ me.upcoming_holidays.0.date|date:"M j" }}</span>
+            </div>
+        {% endif %}
+    </div>
+
+    {# --- Quick CTA: Apply for leave --- #}
+    <div class="card flex flex-col justify-between">
+        <div>
+            <div class="text-xs uppercase tracking-wider text-text-mute">Need time off?</div>
+            <div class="mt-2 text-sm text-text-soft dark:text-white/60">
+                Apply for leave — your manager and HR will be notified.
+            </div>
+        </div>
+        <a href="{% url 'leave_apply' %}" class="btn-primary mt-4 self-start">
+            <i data-lucide="plus" class="w-4 h-4"></i><span>Apply for leave</span>
+        </a>
+    </div>
+
+    {# --- Profile completeness --- #}
+    <div class="card">
+        <div class="flex items-center justify-between">
+            <div class="text-xs uppercase tracking-wider text-text-mute">Profile</div>
+            <div class="w-9 h-9 rounded bg-brand-blue/15 text-brand-blue flex items-center justify-center">
+                <i data-lucide="user-round" class="w-4 h-4"></i>
+            </div>
+        </div>
+        <div class="mt-2 text-2xl font-semibold tabular-nums">{{ me.profile_completeness.pct }}%</div>
+        <div class="text-xs text-text-soft dark:text-white/60">
+            {{ me.profile_completeness.filled }} of {{ me.profile_completeness.total }} sections filled
+        </div>
+        <div class="h-2 bg-bg-soft dark:bg-white/10 rounded mt-3 overflow-hidden">
+            <div class="h-full bg-brand-accent" style="width: {{ me.profile_completeness.pct }}%"></div>
+        </div>
+        {% if me.profile_completeness.next_missing %}
+            <a href="{% url 'employee_detail' request.user.pk %}"
+               class="mt-3 inline-flex items-center gap-1 text-xs text-brand hover:underline dark:text-brand-accent">
+                Finish your profile · {{ me.profile_completeness.next_missing }}
+                <i data-lucide="arrow-right" class="w-3 h-3"></i>
+            </a>
+        {% endif %}
+    </div>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
+
+    {# --- This week (horizontal flex strip — flex-1 per cell since grid-cols-7 isn't compiled) --- #}
+    <div class="card">
+        <div class="flex items-center justify-between mb-3">
+            <div class="text-xs uppercase tracking-wider text-text-mute">This week</div>
+            {% if me.can_access_roster %}
+                <a href="{% url 'roster_week' %}" class="text-xs text-brand hover:underline dark:text-brand-accent">
+                    Open roster
+                </a>
+            {% endif %}
+        </div>
+        <div class="flex items-stretch gap-1">
+            {% for day in me.week_strip %}
+                <div class="flex-1 min-w-0 rounded p-1 text-center
+                            {% if day.is_today %}ring-1 ring-brand-accent bg-brand-accent/5{% else %}bg-bg-soft/40 dark:bg-white/5{% endif %}">
+                    <div class="text-[10px] uppercase tracking-wider text-text-mute leading-none">{{ day.weekday_short }}</div>
+                    <div class="text-xs tabular-nums leading-tight mt-0.5
+                                {% if day.is_today %}font-semibold text-brand dark:text-brand-accent{% endif %}">
+                        {{ day.date|date:"j" }}
+                    </div>
+                    <div class="text-[9px] mt-0.5 leading-none truncate
+                                {% if day.is_leave %}text-brand-blue dark:text-brand-accent
+                                {% elif day.is_off %}text-text-mute
+                                {% else %}text-text-soft dark:text-white/70{% endif %}"
+                         title="{% if day.shift_label %}{{ day.shift_label }}{% if day.location %} · {{ day.location }}{% endif %}{% endif %}">
+                        {% if day.shift_label %}{{ day.shift_label }}{% else %}—{% endif %}
+                    </div>
+                    {% if day.location %}
+                        <div class="text-[8px] mt-0.5 leading-none truncate font-medium
+                                    {% if day.location == 'WFH' %}text-brand-blue dark:text-brand-blue{% else %}text-brand-accent{% endif %}"
+                             title="Location: {{ day.location }}">
+                            {{ day.location }}
+                        </div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    {# --- Leave balances (compact, top 4) --- #}
+    <div class="card">
+        <div class="flex items-center justify-between mb-3">
+            <div class="text-xs uppercase tracking-wider text-text-mute">Leave balances · {{ me.today|date:"Y" }}</div>
+            <a href="{% url 'leave_balance' %}" class="text-xs text-brand hover:underline dark:text-brand-accent">
+                View all
+            </a>
+        </div>
+        {% for row in me.leave_balances|slice:":4" %}
+            <div class="py-1.5 border-b border-bg-soft/50 dark:border-white/5 last:border-0">
+                <div class="flex items-center justify-between text-sm">
+                    <div class="font-medium truncate">
+                        {{ row.name }}
+                        {% if row.frozen %}<span class="ml-1 text-[10px] uppercase text-text-mute">Frozen</span>{% endif %}
+                    </div>
+                    <div class="tabular-nums whitespace-nowrap">
+                        <span class="font-semibold">{{ row.available }}</span>
+                        <span class="text-xs text-text-mute"> / {{ row.capacity }} d</span>
+                    </div>
+                </div>
+                <div class="h-1.5 bg-bg-soft dark:bg-white/10 rounded mt-1 overflow-hidden">
+                    <div class="h-full {% if row.is_paid %}bg-brand-accent{% else %}bg-text-mute{% endif %}"
+                         style="width: {{ row.used_pct }}%"></div>
+                </div>
+            </div>
+        {% empty %}
+            <div class="text-sm text-text-mute italic py-4">
+                No balance rows yet.
+                <a href="{% url 'leave_balance' %}" class="text-brand hover:underline dark:text-brand-accent">
+                    Open the balance dashboard
+                </a> to materialise yours.
+            </div>
+        {% endfor %}
+    </div>
+
+    {# --- Recent leave applications (compact) --- #}
+    <div class="card">
+        <div class="flex items-center justify-between mb-3">
+            <div class="text-xs uppercase tracking-wider text-text-mute">Recent applications</div>
+            <a href="{% url 'leave_list' %}" class="text-xs text-brand hover:underline dark:text-brand-accent">
+                View all
+            </a>
+        </div>
+        {% for app in me.recent_applications %}
+            <a href="{% url 'leave_detail' app.pk %}"
+               class="block py-1.5 border-b border-bg-soft/50 dark:border-white/5 last:border-0 hover:bg-bg-soft/40 dark:hover:bg-white/5 -mx-2 px-2 rounded">
+                <div class="flex items-center justify-between text-sm gap-2">
+                    <div class="truncate">{{ app.leave_type.name }}</div>
+                    <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded shrink-0
+                                 {% if app.status == 'APPROVED' %}bg-brand-accent/15 text-brand-accent
+                                 {% elif app.status == 'PENDING' %}bg-brand-gold/20 text-brand-gold
+                                 {% elif app.status == 'DECLINED' %}bg-red-500/15 text-red-400
+                                 {% else %}bg-bg-soft text-text-mute{% endif %}">
+                        {{ app.get_status_display }}
+                    </span>
+                </div>
+                <div class="text-xs text-text-mute tabular-nums">
+                    {{ app.start_date|date:"M j" }}–{{ app.end_date|date:"M j" }}
+                </div>
+            </a>
+        {% empty %}
+            <div class="text-sm text-text-mute italic py-4">No leave applications yet.</div>
+        {% endfor %}
+    </div>
+</div>
+
+{# --- Night shift consent (Bangladesh Labour Act 2006 s.109) --- #}
+{% if me.night_shift_consent %}
+    <div class="grid grid-cols-1 gap-4 mt-4">
+        <div class="card {% if not me.night_shift_consent.consents %}border-l-4 border-red-500{% endif %}">
+            <div class="flex items-center justify-between">
+                <div class="text-xs uppercase tracking-wider text-text-mute">
+                    Night shift consent · {{ me.night_shift_consent.period|date:"F Y" }}
+                </div>
+                <div class="w-9 h-9 rounded bg-brand-gold/20 text-brand-gold flex items-center justify-center">
+                    <i data-lucide="moon" class="w-4 h-4"></i>
+                </div>
+            </div>
+            <div class="mt-2 text-sm text-text-soft dark:text-white/60">
+                You have a night shift scheduled this month. Bangladesh labour law requires
+                your written consent to work night hours — you can change your decision at
+                any time this month.
+            </div>
+            <div class="mt-3 text-sm font-semibold
+                        {% if me.night_shift_consent.consents %}text-brand-accent{% else %}text-red-500{% endif %}">
+                {% if me.night_shift_consent.consents %}
+                    <i data-lucide="check-circle-2" class="w-4 h-4 inline align-text-bottom"></i>
+                    You've consented to work your scheduled night shift(s) this month
+                {% else %}
+                    <i data-lucide="x-circle" class="w-4 h-4 inline align-text-bottom"></i>
+                    You've declined to work night shift(s) this month
+                {% endif %}
+            </div>
+            <form method="post" action="{% url 'night_shift_consent_update' %}" class="mt-3">
+                {% csrf_token %}
+                <input type="hidden" name="next" value="{% url 'home' %}">
+                <textarea name="note" rows="2" class="form-input text-xs w-full"
+                          placeholder="Optional note (e.g. reason for declining)"></textarea>
+                <div class="flex gap-2 mt-2">
+                    <button type="submit" name="consents" value="true"
+                            class="btn-primary !py-1.5 text-xs {% if me.night_shift_consent.consents %}opacity-50{% endif %}">
+                        <i data-lucide="check" class="w-4 h-4"></i><span>I consent</span>
+                    </button>
+                    <button type="submit" name="consents" value="false"
+                            class="btn-secondary !py-1.5 text-xs !text-red-600 dark:!text-red-400
+                                   {% if not me.night_shift_consent.consents %}opacity-50{% endif %}">
+                        <i data-lucide="x" class="w-4 h-4"></i><span>Decline</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endif %}
+
+{# --- Tax declaration awaiting confirmation (payroll.EmployeeTaxDeclaration) --- #}
+{% if me.pending_tax_declaration %}
+    <div class="grid grid-cols-1 gap-4 mt-4">
+        <div class="card border-l-4 border-brand-gold">
+            <div class="flex items-center justify-between">
+                <div class="text-xs uppercase tracking-wider text-text-mute">
+                    Tax declaration · {{ me.pending_tax_declaration.tax_year.code }}
+                </div>
+                <div class="w-9 h-9 rounded bg-brand-gold/20 text-brand-gold flex items-center justify-center">
+                    <i data-lucide="percent" class="w-4 h-4"></i>
+                </div>
+            </div>
+            <div class="mt-2 text-sm text-text-soft dark:text-white/60">
+                Your investment declaration for this tax year is waiting for your confirmation.
+                Payroll assumes you will invest your full allowable amount of
+                <span class="font-mono">{{ me.pending_tax_declaration.allowable_investment|taka }}</span>
+                for the maximum rebate — review it, declare any advance tax you've already paid, and confirm.
+                {% if me.pending_tax_declaration.tax_year.declaration_deadline %}
+                    It locks automatically on {{ me.pending_tax_declaration.tax_year.declaration_deadline|date:"j F Y" }}.
+                {% endif %}
+            </div>
+            <div class="mt-3">
+                <a href="{% url 'payroll_tax_declaration_review' me.pending_tax_declaration.pk %}" class="btn-primary !py-1.5 text-xs inline-flex items-center gap-1">
+                    <i data-lucide="check-circle-2" class="w-4 h-4"></i><span>Review &amp; confirm</span>
+                </a>
+            </div>
+        </div>
+    </div>
+{% endif %}
+
+{# --- Optional cards (only when relevant) --- #}
+{% if me.is_birthday_today or me.probation_days_remaining or me.manager %}
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+        {% if me.is_birthday_today %}
+            <div class="card border-l-4 border-brand-gold">
+                <div class="flex items-start gap-3">
+                    <div class="w-9 h-9 rounded bg-brand-gold/20 text-brand-gold flex items-center justify-center">
+                        <i data-lucide="cake" class="w-4 h-4"></i>
+                    </div>
+                    <div>
+                        <div class="text-sm font-semibold">Happy birthday!</div>
+                        <div class="text-xs text-text-soft dark:text-white/60">Wishing you a great year ahead.</div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+        {% if me.probation_days_remaining is not None %}
+            <div class="card">
+                <div class="text-xs uppercase tracking-wider text-text-mute">Probation</div>
+                <div class="mt-2 text-2xl font-semibold tabular-nums">{{ me.probation_days_remaining }}</div>
+                <div class="text-xs text-text-soft dark:text-white/60">
+                    days until confirmation ({{ request.user.confirmation_date|date:"M j, Y" }})
+                </div>
+            </div>
+        {% endif %}
+        {% if me.manager %}
+            <div class="card">
+                <div class="text-xs uppercase tracking-wider text-text-mute">My manager</div>
+                <div class="mt-2 text-sm font-semibold">{{ me.manager.display_name }}</div>
+                <div class="text-xs text-text-soft dark:text-white/60">
+                    {{ me.manager.designation.name|default:"" }}{% if me.manager.department %} · {{ me.manager.department.name }}{% endif %}
+                </div>
+            </div>
+        {% endif %}
+    </div>
+{% endif %}

@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+{% block title %}{{ doc_request.document_type.display_name }} · Orbis{% endblock %}
+
+{% block content %}
+<div class="space-y-6 max-w-4xl">
+  <div>
+    <a href="{% url 'documents:my_documents' %}" class="text-sm text-text-soft hover:underline">← Back</a>
+    <h1 class="text-2xl font-semibold text-text-main dark:text-white mt-2">
+      {{ doc_request.document_type.display_name }}
+    </h1>
+    <div class="text-sm text-text-soft mt-1">
+      Requested by <strong>{{ doc_request.employee.display_name }}</strong>
+      on {{ doc_request.applied_at|date:"Y-m-d H:i" }}
+    </div>
+  </div>
+
+  <div class="card flex flex-wrap items-center justify-between gap-4">
+    <div>
+      <span class="badge badge-info text-sm">{{ doc_request.get_status_display }}</span>
+      {% if doc_request.process_note %}
+        <span class="text-xs text-text-soft ml-2">{{ doc_request.process_note }}</span>
+      {% endif %}
+    </div>
+    <div class="flex gap-2">
+      {% if doc_request.is_approved and doc_request.generated_file %}
+        <a href="{% url 'documents:download_pdf' doc_request.id %}" class="btn-primary">
+          <i data-lucide="download" class="w-4 h-4"></i><span>Download PDF</span>
+        </a>
+        <a href="{% url 'documents_public:public_preview' doc_request.id %}" target="_blank" class="btn-secondary">
+          <i data-lucide="eye" class="w-4 h-4"></i><span>Preview</span>
+        </a>
+        <a href="{% url 'documents_public:verify_document' doc_request.id %}" target="_blank" class="btn-secondary">
+          <i data-lucide="check-circle" class="w-4 h-4"></i><span>Verify URL</span>
+        </a>
+      {% endif %}
+      {% if can_cancel %}
+        <form method="post" action="{% url 'documents:request_cancel' doc_request.id %}">
+          {% csrf_token %}
+          <button class="btn-secondary text-red-600">
+            <i data-lucide="x" class="w-4 h-4"></i><span>Cancel request</span>
+          </button>
+        </form>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+    <div class="card">
+      <h2 class="font-semibold text-text-main dark:text-white mb-3">Review chain</h2>
+      {% if doc_request.reviews.all %}
+        <ul class="space-y-2 text-sm">
+          {% for rv in doc_request.reviews.all %}
+            <li class="border-l-2 pl-3
+                {% if rv.status == 'REVIEWED' %}border-green-500{% elif rv.status == 'REJECTED' %}border-red-500{% else %}border-bg-soft dark:border-white/20{% endif %}">
+              <div class="font-medium">Step {{ rv.order }} · {{ rv.reviewer_group.name }}</div>
+              <div class="text-xs text-text-soft">
+                {{ rv.get_status_display }}
+                {% if rv.reviewer %}· by {{ rv.reviewer.display_name }}{% endif %}
+                {% if rv.reviewed_at %}· {{ rv.reviewed_at|date:"Y-m-d H:i" }}{% endif %}
+              </div>
+              {% if rv.remarks %}<div class="text-xs italic mt-1">{{ rv.remarks }}</div>{% endif %}
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p class="text-sm text-text-soft">No review required.</p>
+      {% endif %}
+    </div>
+
+    <div class="card">
+      <h2 class="font-semibold text-text-main dark:text-white mb-3">Approval chain</h2>
+      {% if doc_request.approvals.all %}
+        <ul class="space-y-2 text-sm">
+          {% for ap in doc_request.approvals.all %}
+            <li class="border-l-2 pl-3
+                {% if ap.status == 'APPROVED' %}border-green-500{% elif ap.status == 'REJECTED' %}border-red-500{% else %}border-bg-soft dark:border-white/20{% endif %}">
+              <div class="font-medium">Step {{ ap.order }} · {{ ap.approver_group.name }}</div>
+              <div class="text-xs text-text-soft">
+                {{ ap.get_status_display }}
+                {% if ap.signatory %}· by {{ ap.signatory.display_name }}{% endif %}
+                {% if ap.signed_at %}· {{ ap.signed_at|date:"Y-m-d H:i" }}{% endif %}
+              </div>
+              {% if ap.remarks %}<div class="text-xs italic mt-1">{{ ap.remarks }}</div>{% endif %}
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p class="text-sm text-text-soft">No approval required.</p>
+      {% endif %}
+    </div>
+
+    {% if doc_request.extra_field_values.all %}
+      <div class="card lg:col-span-2">
+        <h2 class="font-semibold text-text-main dark:text-white mb-3">Submitted data</h2>
+        <dl class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+          {% for v in doc_request.extra_field_values.all %}
+            <div>
+              <dt class="text-xs text-text-soft uppercase">{{ v.field_type.field_name }}</dt>
+              <dd class="text-text-main dark:text-white">{{ v.value|default:"—" }}</dd>
+            </div>
+          {% endfor %}
+        </dl>
+      </div>
+    {% endif %}
+
+    {% if doc_request.rejection_history %}
+      <div class="card lg:col-span-2 border-l-4 border-red-500">
+        <h2 class="font-semibold text-text-main dark:text-white mb-3">Rejection history</h2>
+        <ul class="space-y-2 text-sm">
+          {% for entry in doc_request.rejection_history %}
+            <li class="border-l-2 border-red-300 pl-3">
+              <div class="text-xs text-text-soft">
+                {{ entry.at }} · stage <strong>{{ entry.stage }}</strong> · step {{ entry.step_order }}
+                {% if entry.by_email %}· by {{ entry.by_email }}{% endif %}
+              </div>
+              <div>{{ entry.reason|default:"(no reason)" }}</div>
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

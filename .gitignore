@@ -1,0 +1,93 @@
+# Secrets & env
+.env
+.env.*
+!.env.example
+
+# Deploy scripts — contain embedded production secrets, never commit.
+deploy_orbis.sh
+update_orbis.sh
+reicrm_deploy.sh
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+.eggs/
+*.egg
+MANIFEST
+build/
+dist/
+.installed.cfg
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Virtual environments
+venv/
+env/
+.venv/
+ENV/
+
+# Django
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+
+# Celery beat state
+celerybeat-schedule
+celerybeat-schedule.*
+celerybeat.pid
+
+# Database dumps — contain production PII, never commit.
+*.sql
+# No secrets in this one: a GRANT list generated from the model registry.
+!deploy/mysql-dev-grants.sql
+*.sql.gz
+*.dump
+media/
+# media_store: local ciphertext cache of Drive blobs (disposable)
+media_cache/
+media_cache_test/
+staticfiles/
+logs/
+site/
+
+# Node (for django-tailwind)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+theme/static_src/package-lock.json
+
+# Tailwind build output is regenerated; commit source only
+theme/static/css/dist/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Test / coverage
+.coverage
+.coverage.*
+htmlcov/
+.pytest_cache/
+.tox/
+.nox/
+coverage.xml
+*.cover
+.hypothesis/
+
+# Mypy / ruff / black caches
+.mypy_cache/
+.ruff_cache/
+
+# OS
+Thumbs.db
+.gstack/

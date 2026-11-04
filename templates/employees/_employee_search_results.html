@@ -1,0 +1,32 @@
+{% comment %}
+    Rendered by employees.views.load_employees (htmx GET), swapped into the
+    results panel inside templates/employees/widgets/_employee_search.html.
+    The row's `@click="select(...)"` references the widget's own Alpine
+    scope — Alpine auto-initialises directives on nodes htmx swaps in, since
+    they land inside that scope. Mirrors
+    templates/policies/_adherent_search_results.html's row layout, single
+    click-to-select instead of a checkbox.
+{% endcomment %}
+{% if not q %}
+    <p class="px-3 py-6 text-sm text-text-soft dark:text-white/50 text-center">
+        Type a name or employee ID to search.
+    </p>
+{% elif results %}
+    {% for u in results %}
+        <div class="flex items-center gap-2 px-3 py-2 cursor-pointer hover:bg-bg-soft dark:hover:bg-white/5"
+             @click="select('{{ u.pk }}', '{{ u.search_label|escapejs }}')">
+            <span class="min-w-0 leading-tight">
+                <span class="block text-sm text-text-main dark:text-white truncate">{{ u.display_name }}</span>
+                <span class="block text-xs text-text-soft dark:text-white/50 truncate">
+                    {{ u.employee_id|default:"—" }} · {{ u.email }}
+                </span>
+            </span>
+        </div>
+    {% endfor %}
+{% else %}
+    <p class="px-3 py-6 text-sm text-text-soft dark:text-white/50 text-center">
+        {% comment %} Callers rendering this fragment for a different candidate set pass
+           their own empty_message; the reports-to wording is the default. {% endcomment %}
+        {{ empty_message|default:"No Team Lead+ employees found in this department — designations may still need an access level assigned in admin." }}
+    </p>
+{% endif %}

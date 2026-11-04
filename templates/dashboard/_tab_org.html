@@ -1,0 +1,219 @@
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+
+    <div class="card">
+        <div class="flex items-center justify-between">
+            <div class="text-xs uppercase tracking-wider text-text-mute">Active employees</div>
+            <div class="w-9 h-9 rounded bg-brand-accent/15 text-brand-accent flex items-center justify-center">
+                <i data-lucide="users" class="w-4 h-4"></i>
+            </div>
+        </div>
+        <div class="mt-2 text-2xl font-semibold tabular-nums">{{ org.headcount.active }}</div>
+        <div class="text-xs text-text-mute">
+            {{ org.headcount.on_probation }} on probation · {{ org.headcount.leaving }} leaving
+        </div>
+    </div>
+
+        <div class="card">
+    <div class="flex items-center justify-between">
+        <div class="text-xs uppercase tracking-wider text-text-mute">Employee by locations</div>
+        <div class="w-9 h-9 rounded bg-brand-accent/15 text-brand-accent flex items-center justify-center">
+            <i data-lucide="calendar-clock" class="w-4 h-4"></i>
+        </div>
+    </div>
+
+    <div class="mt-4 flex items-center divide-x divide-bg-soft/60 dark:divide-white/10">
+        <a href="{% url 'dashboard_status_today' %}?bucket=office_mbd"
+           class="flex-1 px-1 first:pl-0 hover:bg-bg-soft/40 dark:hover:bg-white/5 rounded-l transition">
+            <div class="text-xl font-semibold tabular-nums text-brand-accent">{{ org.office_dist.mbd_count }}</div>
+            <div class="text-[10px] text-text-mute uppercase tracking-tighter">MBD</div>
+        </a>
+        
+        <a href="{% url 'dashboard_status_today' %}?bucket=office_mhk"
+           class="flex-1 px-1 hover:bg-bg-soft/40 dark:hover:bg-white/5 transition">
+            <div class="text-xl font-semibold tabular-nums text-brand-teal">{{ org.office_dist.mhk_count }}</div>
+            <div class="text-[10px] text-text-mute uppercase tracking-tighter">MHK</div>
+        </a>
+        
+        <a href="{% url 'dashboard_status_today' %}?bucket=office_raowa"
+           class="flex-1 px-1 hover:bg-bg-soft/40 dark:hover:bg-white/5 transition">
+            <div class="text-xl font-semibold tabular-nums text-brand-blue">{{ org.office_dist.raowa_count }}</div>
+            <div class="text-[10px] text-text-mute uppercase tracking-tighter">RAOWA</div>
+        </a>
+        
+        <a href="{% url 'dashboard_status_today' %}?bucket=office_unassigned"
+           class="flex-1 px-1 last:pr-0 hover:bg-bg-soft/40 dark:hover:bg-white/5 rounded-r transition">
+            <div class="text-xl font-semibold tabular-nums text-text-mute">{{ org.office_dist.unassigned_count }}</div>
+            <div class="text-[10px] text-text-mute uppercase tracking-tighter truncate" title="Unassigned">Unassigned</div>
+        </a>
+    </div>
+    </div>
+    
+
+    <div class="card">
+        <div class="flex items-center justify-between">
+            <div class="text-xs uppercase tracking-wider text-text-mute">Shift summary today</div>
+            <div class="w-9 h-9 rounded bg-brand-accent/15 text-brand-accent flex items-center justify-center">
+                <i data-lucide="calendar-clock" class="w-4 h-4"></i>
+            </div>
+        </div>
+        <div class="mt-2 grid grid-cols-3 divide-x divide-bg-soft/60 dark:divide-white/10">
+            <a href="{% url 'dashboard_status_today' %}?bucket=working"
+               class="px-2 first:pl-0 hover:bg-bg-soft/40 dark:hover:bg-white/5 rounded-l transition">
+                <div class="text-xl font-semibold tabular-nums text-brand-accent">{{ org.status_today.working_count }}</div>
+                <div class="text-[11px] text-text-mute uppercase tracking-wider">On working shift</div>
+            </a>
+            <a href="{% url 'dashboard_status_today' %}?bucket=off"
+               class="px-2 hover:bg-bg-soft/40 dark:hover:bg-white/5 transition">
+                <div class="text-xl font-semibold tabular-nums text-brand-teal">{{ org.status_today.off_count }}</div>
+                <div class="text-[11px] text-text-mute uppercase tracking-wider">Day off</div>
+            </a>
+            <a href="{% url 'dashboard_status_today' %}?bucket=leave"
+               class="px-2 last:pr-0 hover:bg-bg-soft/40 dark:hover:bg-white/5 rounded-r transition">
+                <div class="text-xl font-semibold tabular-nums text-brand-blue">{{ org.status_today.leave_count }}</div>
+                <div class="text-[11px] text-text-mute uppercase tracking-wider">On leave</div>
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
+
+    <a href="{% url 'leave_list' %}?tab=pending" class="card hover:ring-1 hover:ring-brand-accent/40 transition block">
+        <div class="flex items-center justify-between">
+            <div class="text-xs uppercase tracking-wider text-text-mute">Pending leaves</div>
+            <div class="w-9 h-9 rounded bg-brand-gold/20 text-brand-gold flex items-center justify-center">
+                <i data-lucide="inbox" class="w-4 h-4"></i>
+            </div>
+        </div>
+        <div class="mt-2 text-2xl font-semibold tabular-nums
+                    {% if org.pending_total %}text-brand-gold{% endif %}">
+            {{ org.pending_total }}
+        </div>
+        <div class="text-xs text-text-mute">
+            across the organisation
+        </div>
+    </a>
+
+    {# --- New joiners (count) --- #}
+    <a href="{% url 'dashboard_status_today' %}?bucket=new_joiners" class="card hover:ring-1 hover:ring-brand-accent/40 transition block">
+        <div class="flex items-center justify-between">
+            <div class="text-xs uppercase tracking-wider text-text-mute">New joiners this month</div>
+            <div class="w-9 h-9 rounded bg-brand-accent/15 text-brand-accent flex items-center justify-center">
+                <i data-lucide="user-plus" class="w-4 h-4"></i>
+            </div>
+        </div>
+        <div class="mt-2 text-2xl font-semibold tabular-nums">{{ org.new_joiners_count }}</div>
+        <div class="text-xs text-text-mute">joined since {{ org.today|date:"M 1" }}</div>
+    </a>
+
+    {# --- Birthdays (count) --- #}
+    <a href="{% url 'dashboard_status_today' %}?bucket=birthdays_week" class="card hover:ring-1 hover:ring-brand-accent/40 transition block">
+        <div class="flex items-center justify-between">
+            <div class="text-xs uppercase tracking-wider text-text-mute">Birthdays this week</div>
+            <div class="w-9 h-9 rounded bg-brand-gold/15 text-brand-gold flex items-center justify-center">
+                <i data-lucide="cake" class="w-4 h-4"></i>
+            </div>
+        </div>
+        <div class="mt-2 text-2xl font-semibold tabular-nums">{{ org.birthdays_week_count }}</div>
+        <div class="text-xs {% if org.birthdays_today_count %}text-brand-gold{% else %}text-text-mute{% endif %}">
+            {% if org.birthdays_today_count %}{{ org.birthdays_today_count }} today{% else %}none today{% endif %}
+        </div>
+    </a>
+
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mt-4">
+
+    {# --- Confirmations due (count) --- #}
+    <a href="{% url 'dashboard_status_today' %}?bucket=confirmations_due" class="card hover:ring-1 hover:ring-brand-accent/40 transition block">
+        <div class="flex items-center justify-between">
+            <div class="text-xs uppercase tracking-wider text-text-mute">Confirmations due this month</div>
+            <div class="w-9 h-9 rounded bg-brand-gold/15 text-brand-gold flex items-center justify-center">
+                <i data-lucide="user-check" class="w-4 h-4"></i>
+            </div>
+        </div>
+        <div class="mt-2 text-2xl font-semibold tabular-nums
+                    {% if org.confirmations_due_count %}text-brand-gold{% endif %}">
+            {{ org.confirmations_due_count }}
+        </div>
+        <div class="text-xs text-text-mute">due this month</div>
+    </a>
+
+    {# --- Leave-balance pressure (count) --- #}
+    <div class="card">
+        <div class="flex items-center justify-between">
+            <div class="text-xs uppercase tracking-wider text-text-mute">Leave-balance pressure</div>
+            <div class="w-9 h-9 rounded bg-brand-gold/15 text-brand-gold flex items-center justify-center">
+                <i data-lucide="alert-triangle" class="w-4 h-4"></i>
+            </div>
+        </div>
+        <div class="mt-2 text-2xl font-semibold tabular-nums
+                    {% if org.balance_pressure.count %}text-brand-gold{% endif %}">
+            {{ org.balance_pressure.count }}
+        </div>
+        <div class="text-xs text-text-mute">
+            under {{ org.balance_pressure.threshold }} days in CL or SL
+        </div>
+    </div>
+
+    {# --- Profile data quality --- #}
+    <div class="card">
+        <div class="flex items-center justify-between mb-3">
+            <div class="text-xs uppercase tracking-wider text-text-mute">Profile data quality</div>
+            <span class="text-xs text-text-mute">{{ org.data_quality.total }} active</span>
+        </div>
+        <div class="space-y-2">
+            {% with q=org.data_quality %}
+                <div>
+                    <div class="flex items-center justify-between text-xs">
+                        <span>Missing JobInfo</span>
+                        <span class="tabular-nums">{{ q.missing_jobinfo }} ({{ q.missing_jobinfo_pct }}%)</span>
+                    </div>
+                    <div class="h-1.5 bg-bg-soft dark:bg-white/10 rounded mt-0.5 overflow-hidden">
+                        <div class="h-full bg-red-500/70" style="width: {{ q.missing_jobinfo_pct }}%"></div>
+                    </div>
+                </div>
+                <div>
+                    <div class="flex items-center justify-between text-xs">
+                        <span>Missing PersonalInfo</span>
+                        <span class="tabular-nums">{{ q.missing_personalinfo }} ({{ q.missing_personalinfo_pct }}%)</span>
+                    </div>
+                    <div class="h-1.5 bg-bg-soft dark:bg-white/10 rounded mt-0.5 overflow-hidden">
+                        <div class="h-full bg-red-500/70" style="width: {{ q.missing_personalinfo_pct }}%"></div>
+                    </div>
+                </div>
+                <div>
+                    <div class="flex items-center justify-between text-xs">
+                        <span>No Address on file</span>
+                        <span class="tabular-nums">{{ q.missing_address }} ({{ q.missing_address_pct }}%)</span>
+                    </div>
+                    <div class="h-1.5 bg-bg-soft dark:bg-white/10 rounded mt-0.5 overflow-hidden">
+                        <div class="h-full bg-red-500/70" style="width: {{ q.missing_address_pct }}%"></div>
+                    </div>
+                </div>
+            {% endwith %}
+        </div>
+    </div>
+</div>
+
+{# --- Quick actions --- #}
+<div class="card mt-4">
+    <h2 class="text-sm font-semibold text-text-main dark:text-white mb-3">Quick actions</h2>
+    <div class="flex flex-wrap gap-2">
+        <a href="{% url 'user_create' %}" class="btn-secondary">
+            <i data-lucide="user-plus" class="w-4 h-4"></i><span>Create user</span>
+        </a>
+        <a href="{% url 'employee_list' %}" class="btn-secondary">
+            <i data-lucide="users" class="w-4 h-4"></i><span>Employee directory</span>
+        </a>
+        <a href="{% url 'leave_list' %}?tab=pending" class="btn-secondary">
+            <i data-lucide="inbox" class="w-4 h-4"></i><span>Leave queue</span>
+        </a>
+        <a href="{% url 'leave_monthly_report' %}" class="btn-secondary">
+            <i data-lucide="file-down" class="w-4 h-4"></i><span>Monthly HR report (CSV)</span>
+        </a>
+        <a href="{% url 'encashment_list' %}" class="btn-secondary">
+            <i data-lucide="banknote" class="w-4 h-4"></i><span>Encashments</span>
+        </a>
+    </div>
+</div>

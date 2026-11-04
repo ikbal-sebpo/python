@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}Request timesheet correction · Orbis{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl">
+
+    {% if requesting_for_other %}
+        <div class="card mb-4 border-l-4 border-brand-accent">
+            <div class="text-sm">
+                Requesting on behalf of
+                <strong>{{ target_employee.display_name }}</strong>
+                <span class="text-text-mute">({{ target_employee.email }})</span>
+            </div>
+        </div>
+    {% endif %}
+
+    <div class="card mb-4 text-sm">
+        <div class="text-text-mute">Date</div>
+        <div class="font-medium">{{ target_date|date:"Y-m-d" }}</div>
+        {% if existing_punch %}
+            <div class="mt-2 text-text-mute">Currently on file</div>
+            <div>
+                {{ existing_punch.check_in|time:"H:i"|default:"—" }} → {{ existing_punch.check_out|time:"H:i"|default:"—" }}
+                <span class="text-text-mute">(time in office: {{ existing_punch.time_in_office|default:"—" }})</span>
+            </div>
+        {% else %}
+            <div class="mt-2 text-text-mute italic">No punch on file for this date.</div>
+        {% endif %}
+    </div>
+
+    {% if form.non_field_errors %}
+        <div class="mb-4 rounded border border-red-200 bg-red-50 text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-300 px-3 py-2 text-sm">
+            {{ form.non_field_errors|striptags }}
+        </div>
+    {% endif %}
+
+    <form method="post" class="card space-y-4">
+        {% csrf_token %}
+        {% if requesting_for_other %}
+            <input type="hidden" name="for" value="{{ target_employee.pk }}">
+        {% endif %}
+        <input type="hidden" name="date" value="{{ target_date|date:'Y-m-d' }}">
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {% include "accounts/_field.html" with field=form.requested_check_in %}
+            {% include "accounts/_field.html" with field=form.requested_check_out %}
+            <div class="md:col-span-2">
+                {% include "accounts/_field.html" with field=form.requested_time_in_office %}
+            </div>
+            <div class="md:col-span-2">
+                {% include "accounts/_field.html" with field=form.reason %}
+            </div>
+        </div>
+
+        <div class="pt-4 border-t border-bg-soft dark:border-white/10 flex items-center gap-3">
+            <button type="submit" class="btn-primary">
+                <i data-lucide="send" class="w-4 h-4"></i><span>Submit request</span>
+            </button>
+            <a href="{% url 'attendance_list' %}?date={{ target_date|date:'Y-m-d' }}" class="btn-secondary">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

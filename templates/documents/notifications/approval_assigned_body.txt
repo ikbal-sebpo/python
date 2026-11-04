@@ -1,0 +1,12 @@
+Hello {{ recipient.first_name|default:recipient.email }},
+
+A document request is ready for your approval / signature.
+
+Employee:       {{ request_obj.employee.display_name }}
+Document type:  {{ request_obj.document_type.display_name }}
+Submitted at:   {{ request_obj.applied_at|date:"Y-m-d H:i" }}
+Approval step:  {{ approval.order }}
+
+Open the approval queue in Orbis to take action.
+
+— Orbis

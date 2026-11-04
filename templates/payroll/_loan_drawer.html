@@ -1,0 +1,65 @@
+{% comment %}
+    Drawer body for recording or editing one SalaryLoan. GET loads this into
+    #drawer-body; an invalid POST re-renders it here (status 400) so the
+    errors show inside the drawer; a valid one answers 204 + HX-Redirect.
+    Multipart because of the scanned file note.
+{% endcomment %}
+<div class="drawer-body space-y-4">
+    {% if form.non_field_errors %}
+        <div class="rounded border border-red-200 bg-red-50 text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-300 px-3 py-2 text-sm">
+            {{ form.non_field_errors|striptags }}
+        </div>
+    {% endif %}
+
+    <p class="text-xs text-text-mute dark:text-white/50">
+        {% if loan %}
+            {{ loan.employee.display_name }}{% if loan.employee.employee_id %} · {{ loan.employee.employee_id }}{% endif %}
+            — recorded {{ loan.added_at|date:"Y-m-d" }}{% if loan.added_by %} by {{ loan.added_by.display_name }}{% endif %}.
+            {% if form.terms_locked %}An instalment has already been deducted, so the principal, first deduction and
+            cutover opening are locked; the instalment amount, document and note can still change.{% endif %}
+        {% else %}
+            Copy the figures from the approved file note. Nothing is deducted until Finance marks the loan disbursed.
+        {% endif %}
+    </p>
+
+    <form method="post" id="loan-form" action="{{ action_url }}" enctype="multipart/form-data"
+          hx-post="{{ action_url }}" hx-encoding="multipart/form-data"
+          hx-target="#drawer-body" hx-swap="innerHTML"
+          class="grid grid-cols-1 gap-4"
+          x-data="{ principal: '{{ form.principal.value|default:'' }}', count: '{{ form.installment_count.value|default:'' }}',
+                    suggested() { const p = parseFloat(this.principal), c = parseInt(this.count); return (p > 0 && c > 0) ? Math.ceil(p / c).toLocaleString() : ''; } }">
+        {% csrf_token %}
+        {% include "accounts/_field.html" with field=form.employee %}
+        {% include "accounts/_field.html" with field=form.file_reference %}
+        {% include "accounts/_field.html" with field=form.approved_on %}
+        <div>
+            {% include "accounts/_field.html" with field=form.approval_document %}
+            {% if loan and loan.approval_document %}
+                <p class="mt-1 text-xs text-text-mute">
+                    On file: <a href="{% url 'payroll_loan_document' loan.pk %}" target="_blank" rel="noopener"
+                                class="text-brand hover:underline dark:text-brand-accent">open document</a>. Choose a file to replace it.
+                </p>
+            {% endif %}
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+            <div x-on:input="principal = $event.target.value">{% include "accounts/_field.html" with field=form.principal %}</div>
+            <div x-on:input="count = $event.target.value">{% include "accounts/_field.html" with field=form.installment_count %}</div>
+        </div>
+        <div>
+            {% include "accounts/_field.html" with field=form.installment_amount %}
+            <p class="mt-1 text-xs text-text-mute" x-show="suggested()" x-cloak>Suggested: <span class="font-medium tabular-nums" x-text="suggested()"></span> per month.</p>
+        </div>
+        {% include "accounts/_field.html" with field=form.first_deduction_month %}
+        {% if form.opening_recovered %}
+            {% include "accounts/_field.html" with field=form.opening_recovered %}
+        {% endif %}
+        {% include "accounts/_field.html" with field=form.note %}
+    </form>
+</div>
+
+<div class="drawer-footer justify-end">
+    <button type="button" class="btn-secondary" @click="close()">Cancel</button>
+    <button type="submit" form="loan-form" class="btn-primary">
+        <i data-lucide="save" class="w-4 h-4"></i><span>{% if loan %}Save{% else %}Record loan{% endif %}</span>
+    </button>
+</div>

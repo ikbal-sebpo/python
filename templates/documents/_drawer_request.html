@@ -1,0 +1,37 @@
+{% comment %}
+Drawer body for a new request. Posts via htmx; success returns 204 with
+`HX-Trigger: orbis:drawer-close` + `HX-Redirect: <request_detail>`, so the
+employee lands straight on the new request's page.
+{% endcomment %}
+<form method="post" action="{{ action_url }}"
+      hx-post="{{ action_url }}"
+      class="flex flex-col h-full">
+  {% csrf_token %}
+
+  <div class="drawer-body space-y-4">
+    {% if form.non_field_errors %}
+      <div class="rounded border border-red-200 bg-red-50 text-red-700 px-3 py-2 text-sm">
+        {{ form.non_field_errors|striptags }}
+      </div>
+    {% endif %}
+    {% for field in form %}
+      <div>
+        <label class="text-sm font-medium text-text-main dark:text-white block mb-1">{{ field.label }}</label>
+        {{ field }}
+        {% if field.help_text %}
+          <p class="text-xs text-text-soft dark:text-white/60 mt-1">{{ field.help_text }}</p>
+        {% endif %}
+        {% if field.errors %}
+          <p class="text-xs text-red-600 mt-1">{{ field.errors|join:" " }}</p>
+        {% endif %}
+      </div>
+    {% endfor %}
+  </div>
+
+  <div class="drawer-footer justify-end">
+    <button type="button" class="btn-secondary" @click="close()">Cancel</button>
+    <button type="submit" class="btn-primary">
+      <i data-lucide="send" class="w-4 h-4"></i><span>Submit</span>
+    </button>
+  </div>
+</form>

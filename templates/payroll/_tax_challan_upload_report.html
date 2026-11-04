@@ -1,0 +1,91 @@
+{# Result fragment for /payroll/tax-challans/upload/ — swapped in by HTMX on each submit. #}
+<div class="card mb-4">
+    <h2 class="text-sm font-semibold mb-3">Result</h2>
+
+    {% if inline_error %}
+        <div class="mb-3 px-3 py-2 rounded border border-red-300 bg-red-50 text-red-800
+                    dark:border-red-700/50 dark:bg-red-900/20 dark:text-red-200 text-sm">
+            {{ inline_error }}
+        </div>
+    {% endif %}
+
+    {% if report %}
+        {% if aborted %}
+            <div class="mb-3 px-3 py-2 rounded border border-red-300 bg-red-50 text-red-800
+                        dark:border-red-700/50 dark:bg-red-900/20 dark:text-red-200 text-sm">
+                Upload aborted. Nothing was written. Fix the errors below and re-upload.
+            </div>
+        {% elif preview %}
+            <div class="mb-3 px-3 py-2 rounded border border-blue-300 bg-blue-50 text-blue-800
+                        dark:border-blue-700/50 dark:bg-blue-900/20 dark:text-blue-200 text-sm">
+                Preview only — nothing was written. <span class="font-medium">{{ parsed.challans|length }}</span> challan(s) would be written.
+                Click <span class="font-medium">Upload</span> to commit the same file.
+            </div>
+        {% else %}
+            <div class="mb-3 px-3 py-2 rounded border border-emerald-300 bg-emerald-50 text-emerald-800
+                        dark:border-emerald-700/50 dark:bg-emerald-900/20 dark:text-emerald-200 text-sm">
+                <span class="font-medium">{{ report.created }}</span> challan(s) created,
+                <span class="font-medium">{{ report.updated }}</span> updated,
+                <span class="font-medium">{{ report.linked_to_runs }}</span> linked to a calculated payroll run.
+            </div>
+        {% endif %}
+
+        {% if report.warnings %}
+            <h3 class="text-xs font-semibold uppercase tracking-wide text-amber-700 dark:text-amber-300 mt-4 mb-2">
+                Warnings ({{ report.warnings|length }}) — accepted, worth a look
+            </h3>
+            <ul class="text-sm list-disc pl-5 space-y-1 text-amber-800 dark:text-amber-200">
+                {% for w in report.warnings %}<li>{{ w }}</li>{% endfor %}
+            </ul>
+        {% endif %}
+
+        {% if report.parse_errors %}
+            <h3 class="text-xs font-semibold uppercase tracking-wide text-red-700 dark:text-red-300 mt-4 mb-2">
+                Errors ({{ report.parse_errors|length }})
+            </h3>
+            <div class="overflow-x-auto">
+                <table class="table-simple text-sm">
+                    <thead><tr><th class="w-12">Row</th><th>Challan No</th><th>Date</th><th>Error</th></tr></thead>
+                    <tbody>
+                        {% for err in report.parse_errors %}
+                            <tr class="text-red-700 dark:text-red-300">
+                                <td>{{ err.line_no }}</td>
+                                <td>{{ err.raw.Challan_No|default:"—" }}</td>
+                                <td>{{ err.raw.Date|default:"—" }}</td>
+                                <td>{{ err.message }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endif %}
+
+        {% if parsed and parsed.challans %}
+            <details class="mt-4" open>
+                <summary class="cursor-pointer text-xs font-semibold uppercase tracking-wide text-text-soft dark:text-white/70">
+                    {% if preview %}Would be written{% else %}Written{% endif %} ({{ parsed.challans|length }} challan(s))
+                </summary>
+                <div class="overflow-x-auto mt-2">
+                    <table class="table-simple text-sm">
+                        <thead><tr><th class="w-12">Row</th><th>Challan No</th><th>Date</th><th>Bank</th><th>Total</th><th>Tax year</th><th>Payroll month</th><th>Linked run</th><th>Note</th></tr></thead>
+                        <tbody>
+                            {% for c in parsed.challans %}
+                                <tr>
+                                    <td>{{ c.line_no }}</td>
+                                    <td>{{ c.challan_number }}</td>
+                                    <td>{{ c.deposit_date|date:"Y-m-d" }}</td>
+                                    <td>{{ c.bank.name }}</td>
+                                    <td>{{ c.total_amount|taka }}</td>
+                                    <td>{{ c.tax_year.code }}</td>
+                                    <td>{{ c.month_label|default:"—" }}</td>
+                                    <td>{% if c.run %}{{ c.run.period }}{% elif c.period_year %}<span class="text-amber-700 dark:text-amber-300">not yet</span>{% else %}—{% endif %}</td>
+                                    <td>{{ c.note|default:"—" }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </details>
+        {% endif %}
+    {% endif %}
+</div>

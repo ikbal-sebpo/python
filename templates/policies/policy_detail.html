@@ -1,0 +1,249 @@
+{% extends "base.html" %}
+{% block title %}{{ policy.key }} · Policies · Orbis{% endblock %}
+
+{% block content %}
+<div x-data="{
+        tab: 'overview',
+        drawer: false,
+        drawerTitle: '',
+        open(title) { this.drawerTitle = title || ''; this.drawer = true; },
+        close() {
+            this.drawer = false;
+            this.drawerTitle = '';
+            const body = document.getElementById('drawer-body');
+            if (body) body.innerHTML = '';
+        },
+     }"
+     x-on:orbis:drawer-close.window="close()"
+     x-on:keydown.escape.window="close()"
+     class="space-y-6">
+
+  {# --- Header --- #}
+  <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div class="min-w-0">
+      <div class="flex items-center gap-2 text-sm text-text-soft dark:text-white/60">
+        <a href="{% url 'policies:list' %}" class="hover:underline">Policies</a>
+        <span>/</span>
+        <span class="font-mono">{{ policy.key }}</span>
+      </div>
+      <h1 class="text-2xl font-semibold text-text-main dark:text-white mt-1">{{ policy.title }}</h1>
+      <div class="flex flex-wrap items-center gap-3 mt-2 text-xs">
+        {% if policy.is_active %}<span class="badge badge-success">Active</span>
+          {% if not policy.is_circulated %}<span class="badge badge-muted">Not yet circulated</span>{% endif %}
+        {% elif policy.is_draft %}<span class="badge badge-muted">Draft</span>
+        {% else %}<span class="badge badge-info">Retired</span>{% endif %}
+        {% if policy.category %}<span class="badge badge-muted">{{ policy.category }}</span>{% endif %}
+        <span class="text-text-soft dark:text-white/60">Department: {{ policy.department.name }}</span>
+        <span class="text-text-soft dark:text-white/60">Owner: {{ policy.owner.display_name }}</span>
+        {% if policy.current_version %}<span class="text-text-soft dark:text-white/60">Current: v{{ policy.current_version.version }}</span>{% endif %}
+      </div>
+    </div>
+
+    <div class="flex flex-wrap items-center gap-2">
+      <button type="button" class="btn-secondary"
+              hx-get="{% url 'policies:edit' policy.pk %}"
+              hx-target="#drawer-body" hx-swap="innerHTML"
+              @click="open('Edit policy')">
+        <i data-lucide="pencil" class="w-4 h-4"></i><span>Edit</span>
+      </button>
+      <button type="button" class="btn-secondary"
+              hx-get="{% url 'policies:upload_version' policy.pk %}"
+              hx-target="#drawer-body" hx-swap="innerHTML"
+              @click="open('Upload new version')">
+        <i data-lucide="upload" class="w-4 h-4"></i><span>Upload version</span>
+      </button>
+      {% if policy.is_draft %}
+        <form method="post" action="{% url 'policies:activate' policy.pk %}">
+          {% csrf_token %}
+          <button type="submit" class="btn-primary"{% if not policy.current_version %} disabled title="Upload a PDF first"{% endif %}>
+            <i data-lucide="check" class="w-4 h-4"></i><span>Activate</span>
+          </button>
+        </form>
+      {% elif policy.is_active and not policy.is_circulated %}
+        <form method="post" action="{% url 'policies:circulate' policy.pk %}"
+              onsubmit="return confirm('Circulate {{ policy.key }} to {{ target_count }} employee{{ target_count|pluralize }}? They will be notified to sign.');">
+          {% csrf_token %}
+          <button type="submit" class="btn-primary">
+            <i data-lucide="send" class="w-4 h-4"></i><span>Circulate to employees</span>
+          </button>
+        </form>
+        <form method="post" action="{% url 'policies:retire' policy.pk %}"
+              onsubmit="return confirm('Retire {{ policy.key }}? Reminders stop and it leaves everyone\'s To-sign list{% if policy.outstanding_count %} ({{ policy.outstanding_count }} still pending — use Reset signing data afterwards to clear them){% endif %}.');">
+          {% csrf_token %}
+          <button type="submit" class="btn-secondary">
+            <i data-lucide="archive" class="w-4 h-4"></i><span>Retire</span>
+          </button>
+        </form>
+      {% elif policy.is_circulated %}
+        <form method="post" action="{% url 'policies:send_reminders' policy.pk %}">
+          {% csrf_token %}
+          <button type="submit" class="btn-secondary">
+            <i data-lucide="bell" class="w-4 h-4"></i><span>Send reminders</span>
+          </button>
+        </form>
+        <form method="post" action="{% url 'policies:retire' policy.pk %}"
+              onsubmit="return confirm('Retire {{ policy.key }}? Reminders stop and it leaves everyone\'s To-sign list{% if policy.outstanding_count %} ({{ policy.outstanding_count }} still pending — use Reset signing data afterwards to clear them){% endif %}.');">
+          {% csrf_token %}
+          <button type="submit" class="btn-secondary">
+            <i data-lucide="archive" class="w-4 h-4"></i><span>Retire</span>
+          </button>
+        </form>
+      {% elif policy.is_retired %}
+        <form method="post" action="{% url 'policies:reset' policy.pk %}"
+              onsubmit="return confirm('Reset signing data for {{ policy.key }}? This permanently deletes {{ policy.adherent_count }} acknowledgement{{ policy.adherent_count|pluralize }} ({{ policy.signed_count }} signed) and returns the policy to Draft. Title and PDFs are kept.');">
+          {% csrf_token %}
+          <button type="submit" class="btn-secondary"{% if not policy.adherent_count %} disabled title="Nothing to reset"{% endif %}>
+            <i data-lucide="rotate-ccw" class="w-4 h-4"></i><span>Reset signing data</span>
+          </button>
+        </form>
+      {% endif %}
+    </div>
+  </div>
+
+  {# --- Stat cards --- #}
+  <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+    <div class="card"><div class="text-xs text-text-soft dark:text-white/50">Adherents</div><div class="text-2xl font-semibold text-text-main dark:text-white">{{ policy.adherent_count }}</div></div>
+    <div class="card"><div class="text-xs text-text-soft dark:text-white/50">Signed</div><div class="text-2xl font-semibold text-emerald-600 dark:text-emerald-400">{{ policy.signed_count }}</div></div>
+    <div class="card"><div class="text-xs text-text-soft dark:text-white/50">Outstanding</div><div class="text-2xl font-semibold text-amber-600 dark:text-amber-400">{{ policy.outstanding_count }}</div></div>
+    <div class="card"><div class="text-xs text-text-soft dark:text-white/50">Versions</div><div class="text-2xl font-semibold text-text-main dark:text-white">{{ versions|length }}</div></div>
+  </div>
+
+  {# --- Tabs --- #}
+  <div class="flex gap-1 border-b border-bg-soft dark:border-white/10">
+    <button class="px-4 py-2 text-sm font-medium -mb-px border-b-2"
+            :class="tab === 'overview' ? 'border-brand-accent text-text-main dark:text-white' : 'border-transparent text-text-soft dark:text-white/50'"
+            @click="tab = 'overview'">Overview</button>
+    <button class="px-4 py-2 text-sm font-medium -mb-px border-b-2"
+            :class="tab === 'acceptance' ? 'border-brand-accent text-text-main dark:text-white' : 'border-transparent text-text-soft dark:text-white/50'"
+            @click="tab = 'acceptance'">Acceptance</button>
+  </div>
+
+  {# --- Overview tab --- #}
+  <div x-show="tab === 'overview'" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div class="card space-y-3 lg:col-span-2" id="who-must-sign">
+      <div class="flex flex-wrap items-center justify-between gap-2">
+        <h2 class="font-semibold text-text-main dark:text-white">Who must sign</h2>
+        <span class="text-sm text-text-soft dark:text-white/60">
+          {% if policy.is_circulated %}Currently targets{% else %}Circulate will reach{% endif %}
+          <strong class="text-text-main dark:text-white">{{ target_count }}</strong>
+          active employee{{ target_count|pluralize }}
+        </span>
+      </div>
+      <dl class="text-sm grid grid-cols-3 gap-y-2">
+        <dt class="text-text-soft dark:text-white/50">Groups</dt>
+        <dd class="col-span-2 text-text-main dark:text-white">
+          {% for g in target_groups %}<span class="badge badge-muted">{{ g.name }}</span> {% empty %}<span class="text-text-soft dark:text-white/50">None — no group is targeted</span>{% endfor %}
+        </dd>
+        <dt class="text-text-soft dark:text-white/50">Named individuals</dt>
+        <dd class="col-span-2 text-text-main dark:text-white">
+          {% for u in custom_adherents %}{{ u.display_name }}{% if not forloop.last %}, {% endif %}{% empty %}<span class="text-text-soft dark:text-white/50">None</span>{% endfor %}
+        </dd>
+      </dl>
+      {% if target_count == 0 %}
+        <p class="text-xs text-amber-600 dark:text-amber-400">Nobody is targeted — circulating now would notify no one. Edit the policy to pick groups or individuals.</p>
+      {% endif %}
+    </div>
+    <div class="card space-y-3">
+      <h2 class="font-semibold text-text-main dark:text-white">Details</h2>
+      {% if policy.description %}<p class="text-sm text-text-soft dark:text-white/70">{{ policy.description|linebreaksbr }}</p>{% endif %}
+      <dl class="text-sm grid grid-cols-3 gap-y-2">
+        <dt class="text-text-soft dark:text-white/50">Department</dt><dd class="col-span-2 text-text-main dark:text-white">{{ policy.department.name }}</dd>
+        <dt class="text-text-soft dark:text-white/50">Owner</dt><dd class="col-span-2 text-text-main dark:text-white">{{ policy.owner.display_name }}</dd>
+        <dt class="text-text-soft dark:text-white/50">Published</dt><dd class="col-span-2 text-text-main dark:text-white">{{ policy.published_at|date:"Y-m-d H:i"|default:"—" }}</dd>
+        <dt class="text-text-soft dark:text-white/50">Due window</dt><dd class="col-span-2 text-text-main dark:text-white">{% if policy.due_days %}{{ policy.due_days }} day(s){% else %}—{% endif %}</dd>
+      </dl>
+      {% if policy.current_version %}
+        <div class="pt-2">
+          <a href="{% url 'policies:preview' policy.pk %}" target="_blank" class="text-sm text-brand-accent hover:underline inline-flex items-center gap-1">
+            <i data-lucide="file-text" class="w-4 h-4"></i> View current PDF (v{{ policy.current_version.version }})
+          </a>
+        </div>
+      {% else %}
+        <p class="text-sm text-amber-600 dark:text-amber-400">No PDF uploaded yet — upload a version before publishing.</p>
+      {% endif %}
+    </div>
+
+    <div class="card">
+      <h2 class="font-semibold text-text-main dark:text-white mb-3">Versions</h2>
+      {% if versions %}
+        <ul class="divide-y divide-bg-soft dark:divide-white/10 text-sm">
+          {% for v in versions %}
+            <li class="py-2 flex items-center justify-between gap-3">
+              <div class="min-w-0">
+                <span class="font-medium text-text-main dark:text-white">v{{ v.version }}</span>
+                {% if v.is_current %}<span class="badge badge-success ml-2">Current</span>{% endif %}
+                {% if v.requires_reack %}<span class="badge badge-muted ml-1">Re-ack</span>{% endif %}
+                {% if v.change_note %}<div class="text-xs text-text-soft dark:text-white/50 truncate">{{ v.change_note }}</div>{% endif %}
+              </div>
+              <a href="{% url 'policies:preview' policy.pk %}?v={{ v.version }}" target="_blank" class="text-brand-accent hover:underline text-xs whitespace-nowrap">Open</a>
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p class="text-sm text-text-soft dark:text-white/60">No versions uploaded.</p>
+      {% endif %}
+    </div>
+  </div>
+
+  {# --- Acceptance tab --- #}
+  <div x-show="tab === 'acceptance'" x-cloak class="space-y-6">
+    <div class="card">
+      <h2 class="font-semibold text-text-main dark:text-white mb-3">
+        Outstanding ({{ outstanding|length }})
+      </h2>
+      {% if outstanding %}
+        <table class="min-w-full text-sm">
+          <thead>
+            <tr class="text-left text-xs uppercase tracking-wide text-text-soft dark:text-white/50 border-b border-bg-soft dark:border-white/10">
+              <th class="py-2 pr-4">Employee</th><th class="py-2 pr-4">Status</th>
+              <th class="py-2 pr-4 text-right">Reminders</th><th class="py-2 pr-4">Last notified</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-bg-soft dark:divide-white/10">
+            {% for a in outstanding %}
+              <tr>
+                <td class="py-2 pr-4 text-text-main dark:text-white">{{ a.employee.display_name }}<div class="text-xs text-text-soft dark:text-white/50">{{ a.employee.email }}</div></td>
+                <td class="py-2 pr-4">
+                  {% if a.status == 'SUPERSEDED' %}<span class="badge badge-info">Re-sign due</span>{% else %}<span class="badge badge-muted">Pending</span>{% endif %}
+                </td>
+                <td class="py-2 pr-4 text-right">{{ a.reminder_count }}</td>
+                <td class="py-2 pr-4 text-text-soft dark:text-white/60">{{ a.notified_at|date:"Y-m-d H:i"|default:"—" }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      {% else %}
+        <p class="text-sm text-emerald-600 dark:text-emerald-400">Everyone has signed. 🎉</p>
+      {% endif %}
+    </div>
+
+    <div class="card">
+      <h2 class="font-semibold text-text-main dark:text-white mb-3">Signed ({{ signed|length }})</h2>
+      {% if signed %}
+        <table class="min-w-full text-sm">
+          <thead>
+            <tr class="text-left text-xs uppercase tracking-wide text-text-soft dark:text-white/50 border-b border-bg-soft dark:border-white/10">
+              <th class="py-2 pr-4">Employee</th><th class="py-2 pr-4">Version</th>
+              <th class="py-2 pr-4">Signed at</th><th class="py-2 pr-4">IP</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-bg-soft dark:divide-white/10">
+            {% for a in signed %}
+              <tr>
+                <td class="py-2 pr-4 text-text-main dark:text-white">{{ a.employee.display_name }}<div class="text-xs text-text-soft dark:text-white/50">{{ a.employee.email }}</div></td>
+                <td class="py-2 pr-4">{% if a.version %}v{{ a.version.version }}{% else %}—{% endif %}</td>
+                <td class="py-2 pr-4 text-text-soft dark:text-white/60">{{ a.signed_at|date:"Y-m-d H:i" }}</td>
+                <td class="py-2 pr-4 text-text-soft dark:text-white/50 font-mono text-xs">{{ a.signed_ip|default:"—" }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      {% else %}
+        <p class="text-sm text-text-soft dark:text-white/60">No signatures yet.</p>
+      {% endif %}
+    </div>
+  </div>
+
+  {% include "partials/_drawer_shell.html" %}
+</div>
+{% endblock %}

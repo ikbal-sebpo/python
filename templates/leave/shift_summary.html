@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}{{ page_title }} · Orbis{% endblock %}
+
+{% block content %}
+<div class="page-fill">
+    <div class="card shrink-0 flex flex-col gap-4">
+        <form method="get" class="flex flex-wrap items-end gap-3">
+            {% include "partials/_employee_filter_controls.html" %}
+            <div>
+                <label for="start_date" class="block text-xs font-medium uppercase tracking-wider text-text-mute mb-1">Start date</label>
+                <input id="start_date" name="start_date" type="text" class="form-input w-40"
+                       value="{{ start_date|date:'Y-m-d' }}"
+                       data-flatpickr placeholder="YYYY-MM-DD" autocomplete="off" required>
+            </div>
+            <div>
+                <label for="end_date" class="block text-xs font-medium uppercase tracking-wider text-text-mute mb-1">End date</label>
+                <input id="end_date" name="end_date" type="text" class="form-input w-40"
+                       value="{{ end_date|date:'Y-m-d' }}"
+                       data-flatpickr placeholder="YYYY-MM-DD" autocomplete="off" required>
+            </div>
+            <button type="submit" class="btn-primary h-10 justify-center">
+                <i data-lucide="search" class="w-4 h-4"></i><span>Search</span>
+            </button>
+            <button type="submit" name="export" value="xlsx" class="btn-secondary h-10 justify-center"
+                    title="Download everything the current filters match as .xlsx">
+                <i data-lucide="download" class="w-4 h-4"></i><span>Export Excel</span>
+            </button>
+        </form>
+
+        {% if errors %}
+            <div class="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-200">
+                {% for error in errors %}
+                    <div>{{ error }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+
+    {# The report is built by a second (htmx) request so this shell renders #}
+    {# immediately — see ShiftSummaryView. Pager links inside the fragment  #}
+    {# are boosted into the same target; the overlay covers every fetch.     #}
+    {# The load trigger sits on a placeholder the first swap replaces, so a  #}
+    {# history-restored snapshot can't re-fire it and fetch the wrong page.  #}
+    <div class="relative flex-1 min-h-0 flex flex-col">
+        <div id="{{ results_target }}" class="flex-1 min-h-0 flex flex-col gap-4"
+             hx-target="#{{ results_target }}" hx-indicator="#shift-summary-loading">
+            {% if errors %}
+                <div class="card text-text-mute italic text-center text-sm">Fix the filters to run the summary.</div>
+            {% else %}
+                <div hx-get="{{ request.get_full_path }}" hx-trigger="load" class="min-h-48"></div>
+            {% endif %}
+        </div>
+        <div id="shift-summary-loading" role="status" aria-live="polite"
+             class="htmx-indicator pointer-events-none absolute inset-0 flex items-start justify-center pt-24 rounded-lg bg-white/60 dark:bg-black/40">
+            <span class="inline-flex items-center gap-2 text-sm text-text-mute">
+                <i data-lucide="loader-2" class="w-5 h-5 animate-spin"></i>Building summary…
+            </span>
+        </div>
+    </div>
+</div>
+{% endblock %}

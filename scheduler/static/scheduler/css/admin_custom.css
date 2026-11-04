@@ -1,0 +1,13 @@
+/* The Enabled checkbox is the one field on this form with immediate
+   production consequences (unticking it stops a nightly job), so it gets
+   the only piece of custom styling here. */
+.form-row.field-enabled label {
+    font-weight: bold !important;
+    color: #cf222e !important;
+}
+
+/* Keep the pretty Schedule / Command columns from wrapping mid-value. */
+.column-format_schedule,
+.column-format_command {
+    white-space: nowrap;
+}

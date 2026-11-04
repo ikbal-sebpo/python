@@ -1,0 +1,31 @@
+{% comment %}
+    One Supervisor/HR/Finance note cell on the Support Info table.
+    Required context: note ({"text": str, "can_write": bool}), role (one of
+    PayrollRunEmployeeNote.Role's values, e.g. "SUPERVISOR" — used only to
+    build this cell's stable id), role_label (for the aria-label, e.g.
+    "supervisor"), run, row (employee_pk, name).
+
+    Always carries the same id, whether rendered as part of the normal table
+    (oob unset/False) or as a standalone out-of-band fragment after saving a
+    note (oob=True, adds hx-swap-oob so htmx finds and replaces this exact
+    cell wherever it lives on the page — see
+    PayrollRunEmployeeNoteEditView.post()).
+{% endcomment %}
+<td id="note-cell-{{ role }}-{{ row.employee_pk }}" {% if oob %}hx-swap-oob="true"{% endif %} class="px-2 py-1.5">
+    <div class="flex items-center gap-1.5">
+        <span class="truncate max-w-[160px] inline-block align-middle" title="{{ note.text }}">
+            {% if note.text %}{{ note.text }}{% else %}<span class="text-text-mute italic">—</span>{% endif %}
+        </span>
+        {% if note.can_write %}
+            <button type="button"
+                    class="shrink-0 p-1 rounded hover:bg-bg-soft dark:hover:bg-white/10 text-brand dark:text-brand-accent"
+                    hx-get="{% url 'payroll_run_employee_note_edit' run.pk row.employee_pk %}"
+                    hx-target="#drawer-body"
+                    hx-swap="innerHTML"
+                    @click="open('Notes — {{ row.name|escapejs }}')"
+                    aria-label="{% if note.text %}Edit{% else %}Add{% endif %} {{ role_label }} note">
+                <i data-lucide="{% if note.text %}pencil{% else %}plus{% endif %}" class="w-3.5 h-3.5"></i>
+            </button>
+        {% endif %}
+    </div>
+</td>

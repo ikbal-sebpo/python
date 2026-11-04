@@ -1,0 +1,47 @@
+<div class="card" id="section-card-roster-pattern">
+    <div class="flex items-start justify-between gap-3 mb-3">
+        <div class="flex items-center gap-2">
+            <i data-lucide="calendar-clock" class="w-4 h-4 text-brand-accent"></i>
+            <h3 class="text-sm font-semibold uppercase tracking-wider text-text-mute">Default roster</h3>
+        </div>
+        {% if can_edit_pattern %}
+            <a href="{% url 'roster_pattern' employee.pk %}"
+               class="text-xs text-brand hover:underline dark:text-brand-accent inline-flex items-center gap-1">
+                <i data-lucide="pencil" class="w-3.5 h-3.5"></i>Edit
+            </a>
+        {% endif %}
+    </div>
+    <dl class="grid grid-cols-1 gap-y-1 text-sm">
+        {% for row in pattern_rows %}
+            <div class="flex items-start justify-between gap-3 py-1">
+                <dt class="text-text-mute text-xs w-20 shrink-0 pt-0.5">{{ row.label }}</dt>
+                <dd class="flex-1 text-right">
+                    {% if row.shift_type %}
+                        {% if row.shift_type.category == 'WORK' %}
+                            <span class="badge badge-success">
+                                {% if row.shift_attribute %}{{ row.shift_attribute.name }}{% else %}{{ row.shift_type.name }}{% endif %}
+                            </span>
+                        {% elif row.shift_type.category == 'OFF' %}
+                            <span class="badge badge-muted">{{ row.shift_type.name }}</span>
+                        {% else %}
+                            <span class="badge badge-info">
+                                {% if row.shift_attribute %}{{ row.shift_attribute.name }}{% else %}{{ row.shift_type.name }}{% endif %}
+                            </span>
+                        {% endif %}
+                        {% if row.shift_attribute and row.shift_attribute.start_time %}
+                            <div class="text-[10px] text-text-mute mt-0.5">
+                                {{ row.shift_attribute.start_time|date:"H:i" }}–{{ row.shift_attribute.end_time|date:"H:i" }}
+                            </div>
+                        {% elif row.shift_type.shift_start_time %}
+                            <div class="text-[10px] text-text-mute mt-0.5">
+                                {{ row.shift_type.shift_start_time|date:"H:i" }}–{{ row.shift_type.shift_end_time|date:"H:i" }}
+                            </div>
+                        {% endif %}
+                    {% else %}
+                        <span class="text-text-mute italic text-xs">—</span>
+                    {% endif %}
+                </dd>
+            </div>
+        {% endfor %}
+    </dl>
+</div>

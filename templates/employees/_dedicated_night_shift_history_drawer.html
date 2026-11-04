@@ -1,0 +1,20 @@
+{% comment %}
+    Drawer body for one assignment's audit timeline. Read-only — no form,
+    so no footer actions beyond Close.
+{% endcomment %}
+<div class="drawer-body space-y-4">
+    <div class="rounded border-l-4 border-brand-accent bg-bg-soft/40 dark:bg-white/5 px-3 py-2 text-sm">
+        For <strong>{{ target_employee.display_name }}</strong>
+        <span class="text-text-mute">({{ target_employee.email }})</span>
+        <div class="mt-1 text-xs tabular-nums text-text-soft dark:text-white/60">
+            Current window: {{ assignment.start_date|date:"Y-m-d" }} → {{ assignment.end_date|date:"Y-m-d" }}
+            · {{ assignment.get_status_display }}
+        </div>
+    </div>
+
+    {% include "employees/_dedicated_night_shift_timeline.html" %}
+</div>
+
+<div class="drawer-footer justify-end">
+    <button type="button" class="btn-secondary" @click="close()">Close</button>
+</div>

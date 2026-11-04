@@ -1,0 +1,356 @@
+{% extends "base.html" %}
+{% block title %}Offboarding · {{ case.employee.display_name }}{% endblock %}
+
+{% block content %}
+<div class="space-y-6 max-w-6xl">
+  <div>
+    <a href="{% url 'offboarding:case_list' %}" class="text-sm text-text-soft hover:underline">← All cases</a>
+    <h1 class="mt-2 text-2xl font-semibold text-text-main dark:text-white">Offboarding · {{ case.employee.display_name }}</h1>
+    <div class="mt-1 text-sm text-text-soft">
+      {{ case.resignation.get_separation_type_display }} · LWD <strong>{{ case.resignation.last_working_date }}</strong> ·
+      <span class="badge badge-muted">{{ case.get_status_display }}</span>
+    </div>
+  </div>
+
+  <div class="card space-y-4">
+    <div class="flex flex-wrap items-center justify-between gap-3">
+      <div class="text-sm text-text-soft">
+        Notice {{ case.resignation.notice_start_date }} → {{ case.resignation.last_working_date }} ({{ case.resignation.notice_period_days }} days)
+        {% if case.resignation.fell_short_of_notice %}
+          <span class="badge badge-warning">Short by {{ case.resignation.notice_shortfall_days }} day(s)</span>
+        {% endif %}
+      </div>
+      <div class="text-sm font-medium text-text-main dark:text-white">{{ progress_done }} / {{ progress_total }} completed</div>
+    </div>
+    <div class="h-3 overflow-hidden rounded-full bg-bg-soft dark:bg-white/10">
+      <div class="h-full rounded-full bg-brand-accent" style="width: {{ progress_percent }}%;"></div>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
+    <div class="space-y-6 lg:col-span-1">
+      <section class="card">
+        <h2 class="mb-3 font-semibold">Resignation</h2>
+        <dl class="grid gap-2 text-sm">
+          <div><dt class="text-xs uppercase text-text-soft">Status</dt><dd>{{ case.resignation.get_status_display }}</dd></div>
+          <div><dt class="text-xs uppercase text-text-soft">Applied</dt><dd>{{ case.resignation.applied_at|date:"Y-m-d H:i" }}</dd></div>
+          {% if case.resignation.processed_at %}
+            <div><dt class="text-xs uppercase text-text-soft">Processed by</dt><dd>{{ case.resignation.processed_by|default:"—" }} on {{ case.resignation.processed_at|date:"Y-m-d H:i" }}</dd></div>
+          {% endif %}
+        </dl>
+        {% if case.resignation.hr_notes %}
+          <div class="mt-3 rounded bg-bg-soft p-3 text-xs whitespace-pre-line dark:bg-white/5"><strong>HR notes:</strong> {{ case.resignation.hr_notes }}</div>
+        {% endif %}
+      </section>
+
+      <section class="card">
+        <h2 class="mb-3 font-semibold">Letters</h2>
+        {% if letters %}
+          <ul class="space-y-2 text-sm">
+            {% for l in letters %}
+              <li class="flex items-center justify-between gap-2">
+                <a href="{% url 'documents:request_detail' l.id %}" class="hover:underline">{{ l.document_type.display_name }}</a>
+                <span class="badge badge-muted text-xs">{{ l.get_status_display }}</span>
+              </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <p class="text-sm text-text-soft">No letters issued yet.</p>
+        {% endif %}
+      </section>
+    </div>
+
+    <section class="card lg:col-span-2">
+      <div class="mb-4 flex items-center justify-between gap-3">
+        <h2 class="font-semibold">Workflow steps</h2>
+        {% if can_issue_letters %}
+          <form method="post" action="{% url 'offboarding:case_issue_letters' case.pk %}">
+            {% csrf_token %}
+            <button class="btn-secondary text-xs" type="submit">Issue letters now</button>
+          </form>
+        {% endif %}
+      </div>
+
+      <div class="space-y-3">
+        {% for s in steps %}
+          <details id="step-{{ s.pk }}" class="group rounded-xl border border-bg-soft bg-white shadow-sm dark:border-white/10 dark:bg-white/5" {% if s.pk == active_step_id or s.order == case.current_step_order %}open{% endif %}>
+            <summary class="flex cursor-pointer list-none items-start justify-between gap-4 p-4">
+              <div>
+                <div class="flex flex-wrap items-center gap-2">
+                  <div class="font-medium text-text-main dark:text-white">{{ s.order }}. {{ s.step_name }}</div>
+                  <span class="badge {% if s.status == 'DONE' or s.status == 'SKIPPED' %}badge-success{% elif s.status == 'IN_PROGRESS' %}badge-warning{% elif s.status == 'REJECTED' %}badge-danger{% else %}badge-muted{% endif %}">{{ s.get_status_display }}</span>
+                  {% if s.assigned_user %}<span class="badge badge-muted">{{ s.assigned_user.display_name }}</span>{% elif s.assigned_group %}<span class="badge badge-muted">{{ s.assigned_group.name }}</span>{% endif %}
+                </div>
+                {% if s.remarks %}<p class="mt-2 text-sm text-text-soft whitespace-pre-line">{{ s.remarks }}</p>{% endif %}
+              </div>
+              {% if s.can_act %}
+                <span class="mt-1 inline-flex items-center rounded-md border border-brand-accent/30 bg-brand-accent/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-brand-accent shadow-sm shadow-brand-accent/15 dark:border-brand-accent/40 dark:bg-brand-accent/15 dark:text-brand-accent">
+                  Open action
+                </span>
+              {% endif %}
+            </summary>
+
+            <div class="border-t border-bg-soft p-4 dark:border-white/10">
+              {% if s.can_act %}
+                <p class="mb-4 text-sm text-text-soft dark:text-white/80">Use the form below to change status, update remarks, and add attachments.</p>
+              {% endif %}
+              <div class="grid gap-4 md:grid-cols-2">
+                <div>
+                  <div class="text-xs uppercase text-text-main dark:text-white">Data</div>
+                  {% if s.data_json %}
+                    <div class="mt-2 flex flex-wrap gap-2 text-xs text-text-main dark:text-white/90">
+                      {% for k, v in s.data_json.items %}
+                        <span class="rounded bg-bg-soft px-2 py-1 text-text-main dark:bg-white/10 dark:text-white/90"><strong>{{ k }}:</strong> {{ v }}</span>
+                      {% endfor %}
+                    </div>
+                  {% else %}
+                    <p class="mt-2 text-sm text-text-main dark:text-white/80">No structured data yet.</p>
+                  {% endif %}
+                </div>
+                <div>
+                  <div class="text-xs uppercase text-text-soft">Files</div>
+                  {% if step_attachments_supported and s.attachments.all %}
+                    <ul class="mt-2 space-y-1 text-sm">
+                      {% for a in s.attachments.all %}
+                        <li class="flex items-center justify-between gap-2">
+                          <a class="hover:underline" href="{{ a.file.url }}" target="_blank" rel="noopener">{{ a.original_name }}</a>
+                          <span class="text-xs text-text-soft">{{ a.uploaded_at|date:"Y-m-d H:i" }}</span>
+                        </li>
+                      {% endfor %}
+                    </ul>
+                  {% else %}
+                    <p class="mt-2 text-sm text-text-soft">No attachments.</p>
+                  {% endif %}
+                </div>
+              </div>
+
+              {% if s.can_act %}
+                <form method="post" enctype="multipart/form-data" class="mt-4 space-y-4">
+                  {% csrf_token %}
+                  <input type="hidden" name="action" value="step">
+                  <input type="hidden" name="step_id" value="{{ s.pk }}">
+
+                  <div class="grid gap-4 md:grid-cols-2">
+                    <div>
+                      <label class="mb-1 block text-xs uppercase text-text-main dark:text-white">Status</label>
+                      {{ s.inline_form.status }}
+                      {% if s.inline_form.status.errors %}<p class="mt-1 text-xs text-red-600">{{ s.inline_form.status.errors|striptags }}</p>{% endif %}
+                    </div>
+                    <div>
+                      <label for="attachments-{{ s.pk }}" class="mb-1 block text-xs uppercase text-text-main dark:text-white cursor-pointer">Attachments</label>
+                      <div class="relative group">
+                        <input type="file" name="attachments" id="attachments-{{ s.pk }}" multiple 
+                               class="absolute inset-0 z-10 h-full w-full cursor-pointer opacity-0"
+                               onchange="updateFileList(this, 'file-list-{{ s.pk }}')">
+                        <div class="flex items-center gap-3 rounded-lg border-2 border-dashed border-bg-soft bg-white px-4 py-2.5 transition-colors group-hover:border-brand-accent/40 dark:border-white/10 dark:bg-white/5">
+                          <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-bg-soft text-text-soft dark:bg-white/10">
+                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
+                          </div>
+                          <div class="text-xs">
+                            <span class="font-medium text-brand-accent">Click to upload</span>
+                          <span class="text-text-soft dark:text-white/80"> or drag multiple files</span>
+                          </div>
+                        </div>
+                      </div>
+                      <div id="file-list-{{ s.pk }}" class="mt-2 space-y-1 text-[10px] text-text-soft dark:text-white/80"></div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label class="mb-1 block text-xs uppercase text-text-main dark:text-white">Remarks</label>
+                    {{ s.inline_form.remarks }}
+                    {% if s.inline_form.remarks.errors %}<p class="mt-1 text-xs text-red-600">{{ s.inline_form.remarks.errors|striptags }}</p>{% endif %}
+                  </div>
+
+                  {% for field in s.inline_form.visible_fields %}
+                    {% if field.name != "status" and field.name != "remarks" %}
+                      <div>
+                        <label class="mb-1 block text-xs uppercase text-text-main dark:text-white">{{ field.label }}</label>
+                        {{ field }}
+                        {% if field.errors %}<p class="mt-1 text-xs text-red-600">{{ field.errors|striptags }}</p>{% endif %}
+                      </div>
+                    {% endif %}
+                  {% endfor %}
+
+                  <div class="flex flex-wrap gap-3">
+                    <button class="btn-primary" type="submit">Save action</button>
+                  </div>
+                </form>
+              {% endif %}
+            </div>
+          </details>
+        {% endfor %}
+      </div>
+    </section>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  const attachmentSelectionState = {};
+
+  function formatFileSize(bytes) {
+    const units = ['B', 'KB', 'MB', 'GB'];
+    let size = Math.max(bytes, 0);
+    let unitIndex = 0;
+
+    while (size >= 1024 && unitIndex < units.length - 1) {
+      size /= 1024;
+      unitIndex += 1;
+    }
+
+    return `${size % 1 === 0 ? size.toString() : size.toFixed(1)} ${units[unitIndex]}`;
+  }
+
+  function getFileExtension(fileName) {
+    const idx = fileName.lastIndexOf('.');
+    if (idx === -1) {
+      return 'file';
+    }
+    return fileName.substring(idx + 1).toUpperCase();
+  }
+
+  function getFileKey(file) {
+    return `${file.name}|${file.size}|${file.lastModified}`;
+  }
+
+  function setInputFiles(input, files) {
+    const dataTransfer = new DataTransfer();
+    files.forEach(file => dataTransfer.items.add(file));
+    input.files = dataTransfer.files;
+  }
+
+  function renderFileList(list, listId, input, files) {
+    const parent = input.closest('.relative').querySelector('.border-dashed');
+    const selectedFiles = files || [];
+
+    list.innerHTML = '';
+
+    if (selectedFiles.length > 0) {
+      const header = document.createElement('div');
+      header.className = 'mb-2 flex items-center gap-2 text-xs font-medium text-text-main dark:text-white';
+      header.innerHTML = `<span>Selected ${selectedFiles.length} file${selectedFiles.length === 1 ? '' : 's'}</span><span class="text-xs text-text-soft dark:text-white/70">drag more or replace</span>`;
+      list.appendChild(header);
+
+      const chipWrap = document.createElement('div');
+      chipWrap.className = 'flex flex-wrap gap-2';
+
+      selectedFiles.forEach((file, index) => {
+        const chip = document.createElement('span');
+        chip.className = 'inline-flex items-center gap-2 rounded-full border border-bg-soft bg-white px-3 py-1 text-xs text-text-main shadow-sm dark:border-white/10 dark:bg-white/5 dark:text-white';
+
+        const ext = document.createElement('span');
+        ext.className = 'rounded-full border border-brand-accent/30 bg-brand-accent/10 px-1.5 py-0.5 text-[10px] font-semibold uppercase text-brand-accent';
+        ext.textContent = getFileExtension(file.name);
+
+        const name = document.createElement('span');
+        name.className = 'max-w-[240px] truncate';
+        name.textContent = file.name;
+
+        const size = document.createElement('span');
+        size.className = 'rounded-full bg-bg-soft px-1.5 py-0.5 text-[10px] text-text-soft dark:text-white/80 dark:bg-white/10';
+        size.textContent = formatFileSize(file.size);
+
+        const removeBtn = document.createElement('button');
+        removeBtn.type = 'button';
+        removeBtn.className = 'ml-1 inline-flex h-4 w-4 items-center justify-center rounded-full border border-white/20 bg-white/80 text-text-main transition hover:border-red-500 hover:text-red-500 dark:border-white/30 dark:bg-white/15 dark:text-white';
+        removeBtn.setAttribute('aria-label', `Remove ${file.name}`);
+        removeBtn.setAttribute('data-offboarding-file-remove', '1');
+        removeBtn.setAttribute('data-offboarding-file-list', listId);
+        removeBtn.setAttribute('data-offboarding-file-index', index);
+        removeBtn.innerHTML = '&times;';
+
+        chip.appendChild(ext);
+        chip.appendChild(name);
+        chip.appendChild(size);
+        chip.appendChild(removeBtn);
+        chipWrap.appendChild(chip);
+      });
+
+      list.appendChild(chipWrap);
+      parent.classList.add('border-brand-accent', 'bg-brand-accent/5');
+      return;
+    }
+
+    parent.classList.remove('border-brand-accent', 'bg-brand-accent/5');
+
+    const emptyHint = document.createElement('p');
+    emptyHint.className = 'text-xs text-text-soft dark:text-white/70';
+    emptyHint.textContent = 'No files selected yet';
+    list.appendChild(emptyHint);
+  }
+
+  function removeAttachmentFile(listId, input, index) {
+    const selected = attachmentSelectionState[listId] || [];
+    selected.splice(index, 1);
+    attachmentSelectionState[listId] = selected;
+    setInputFiles(input, selected);
+    const list = document.getElementById(listId);
+    renderFileList(list, listId, input, selected);
+  }
+
+  function updateFileList(input, listId) {
+    const list = document.getElementById(listId);
+    const current = attachmentSelectionState[listId] || [];
+    const incoming = Array.from(input.files || []);
+
+    const nextSelectionMap = new Map();
+    const mergedSelection = [];
+
+    current.forEach(file => {
+      const key = getFileKey(file);
+      if (!nextSelectionMap.has(key)) {
+        nextSelectionMap.set(key, true);
+        mergedSelection.push(file);
+      }
+    });
+
+    incoming.forEach(file => {
+      const key = getFileKey(file);
+      if (!nextSelectionMap.has(key)) {
+        nextSelectionMap.set(key, true);
+        mergedSelection.push(file);
+      }
+    });
+
+    attachmentSelectionState[listId] = mergedSelection;
+    setInputFiles(input, mergedSelection);
+    renderFileList(list, listId, input, mergedSelection);
+  }
+
+  document.addEventListener('click', function(e) {
+    const removeBtn = e.target.closest('[data-offboarding-file-remove="1"]');
+    if (!removeBtn) {
+      return;
+    }
+
+    const listId = removeBtn.getAttribute('data-offboarding-file-list');
+    const index = Number(removeBtn.getAttribute('data-offboarding-file-index'));
+
+    const input = document.getElementById(listId.replace('file-list-', 'attachments-'));
+    if (!input || Number.isNaN(index)) {
+      return;
+    }
+
+    removeAttachmentFile(listId, input, index);
+  });
+
+  // Add simple drag/drop visual cues
+  document.addEventListener('dragover', function(e) {
+    if (e.target.tagName === 'INPUT' && e.target.type === 'file') {
+      const dropzone = e.target.closest('.relative').querySelector('.border-dashed');
+      dropzone.classList.add('border-brand-accent', 'bg-brand-accent/5');
+    }
+  });
+
+  document.addEventListener('dragleave', function(e) {
+    if (e.target.tagName === 'INPUT' && e.target.type === 'file') {
+      const dropzone = e.target.closest('.relative').querySelector('.border-dashed');
+      if (e.target.files.length === 0) {
+        dropzone.classList.remove('border-brand-accent', 'bg-brand-accent/5');
+      }
+    }
+  });
+</script>
+{% endblock %}

@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}{{ page_title }} · Orbis{% endblock %}
+
+{% block content %}
+<div class="page-fill">
+
+    <div class="card shrink-0 flex items-start justify-between gap-4">
+        <div>
+            <h1 class="text-xl font-semibold text-text-main dark:text-white">
+                Leave balance — {{ year }}
+            </h1>
+            <div class="text-sm text-text-mute mt-1">
+                {% if is_self %}
+                    Your balances by leave type. Click a row for transaction history.
+                {% else %}
+                    Viewing for <strong>{{ target.display_name }}</strong>
+                    ({{ target.email }}).
+                {% endif %}
+            </div>
+        </div>
+        <div class="flex gap-2">
+            <a href="{% url 'leave_apply' %}" class="btn-primary">
+                <i data-lucide="plus" class="w-4 h-4"></i><span>Apply for leave</span>
+            </a>
+            <a href="{% url 'encashment_request' %}" class="btn-secondary">
+                <i data-lucide="banknote" class="w-4 h-4"></i><span>Request encashment</span>
+            </a>
+            <a href="{% url 'cpl_grant_list' %}" class="btn-secondary">
+                <i data-lucide="list" class="w-4 h-4"></i><span>CpL register</span>
+            </a>
+            {% if can_add_cpl_grant %}
+                <a href="{% url 'cpl_grant_manual_create' %}?for={{ target.pk }}" class="btn-secondary">
+                    <i data-lucide="calendar-plus" class="w-4 h-4"></i><span>Add CpL grant</span>
+                </a>
+            {% endif %}
+        </div>
+    </div>
+
+    {% include "leave/_balance_table.html" %}
+</div>
+{% endblock %}

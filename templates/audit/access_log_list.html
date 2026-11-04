@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+{% load menu_extras %}
+{% block title %}Access log · Orbis{% endblock %}
+
+{% block content %}
+<div class="page-fill">
+    <div class="card shrink-0">
+        <form method="get" class="flex flex-wrap items-center gap-2">
+            <input type="text" name="from" value="{{ date_from|date:'Y-m-d' }}"
+                   data-flatpickr placeholder="From" autocomplete="off"
+                   aria-label="From date" class="form-input w-32">
+            <span class="text-xs text-text-mute">to</span>
+            <input type="text" name="to" value="{{ date_to|date:'Y-m-d' }}"
+                   data-flatpickr placeholder="To" autocomplete="off"
+                   aria-label="To date" class="form-input w-32">
+            <input type="text" name="actor" value="{{ filters.actor }}" placeholder="Actor (email / ID)"
+                   aria-label="Actor" class="form-input w-44">
+            <input type="text" name="subject" value="{{ filters.subject }}" placeholder="Subject (name / ID)"
+                   aria-label="Subject employee" class="form-input w-44">
+            <select name="data_class" class="form-input w-40" aria-label="Data class">
+                <option value="">All data</option>
+                {% for value, label in data_classes %}
+                    <option value="{{ value }}" {% if filters.data_class == value %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+            <select name="action" class="form-input w-36" aria-label="Action">
+                <option value="">All actions</option>
+                {% for value, label in actions %}
+                    <option value="{{ value }}" {% if filters.action == value %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+            <input type="text" name="route" value="{{ filters.route }}" placeholder="Route contains"
+                   aria-label="Route" class="form-input w-36">
+            <input type="text" name="path" value="{{ filters.path }}" placeholder="Path contains"
+                   aria-label="Path" class="form-input w-36">
+            <label class="inline-flex items-center gap-1 text-xs text-text-mute">
+                <input type="checkbox" name="fragments" value="1" class="form-checkbox" {% if filters.fragments %}checked{% endif %}>
+                Include fragments
+            </label>
+            <button type="submit" class="btn-secondary">Search</button>
+            <button type="submit" name="export" value="xlsx" class="btn-secondary"
+                    title="Downloads the filtered rows (up to {{ export_cap }})">
+                <i data-lucide="download" class="w-4 h-4"></i><span>Export Excel</span>
+            </button>
+            <a href="{% url 'audit_access_log' %}" class="text-xs text-text-mute hover:underline">Reset</a>
+        </form>
+        <p class="mt-3 text-xs text-text-mute">
+            Every signed-in request is recorded with who made it, which page or data it touched and whose record it concerned.
+            Fragments are htmx drawer and panel loads inside a page; hidden by default. Times are Asia/Dhaka.
+        </p>
+    </div>
+
+    {% include "partials/_result_count.html" with count_noun="entries" %}
+
+    <div class="card p-0 table-scroll">
+        <table class="table-simple table-sticky min-w-full text-sm">
+            <thead>
+                <tr>
+                    <th class="text-left">Time</th>
+                    <th class="text-left">Actor</th>
+                    <th class="text-left">Action</th>
+                    <th class="text-left">Data</th>
+                    <th class="text-left">Subject</th>
+                    <th class="text-left">Page</th>
+                    <th class="text-left">Object</th>
+                    <th class="text-right">Status</th>
+                    <th class="text-left">IP</th>
+                    <th class="text-right">ms</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in rows %}
+                <tr>
+                    <td class="whitespace-nowrap">{{ row.occurred_at|date:"Y-m-d H:i:s" }}</td>
+                    <td>
+                        {% if row.actor %}
+                            <a href="{% url 'employee_detail' row.actor.pk %}" class="hover:underline">{{ row.actor_label }}</a>
+                        {% else %}{{ row.actor_label }}{% endif %}
+                    </td>
+                    <td>
+                        {% if row.action == "DENIED" or row.action == "LOGIN_FAILED" %}
+                            <span class="badge badge-danger">{{ row.get_action_display }}</span>
+                        {% elif row.action == "EXPORT" or row.action == "DOWNLOAD" %}
+                            <span class="badge badge-warning">{{ row.get_action_display }}</span>
+                        {% elif row.action == "WRITE" %}
+                            <span class="badge badge-info">{{ row.get_action_display }}</span>
+                        {% else %}
+                            <span class="badge badge-muted">{{ row.get_action_display }}</span>
+                        {% endif %}
+                    </td>
+                    <td class="whitespace-nowrap">{{ row.get_data_class_display }}</td>
+                    <td>
+                        {% if row.subject %}
+                            <a href="{% url 'employee_detail' row.subject.pk %}" class="hover:underline">{{ row.subject_label }}</a>
+                        {% else %}{{ row.subject_label }}{% endif %}
+                    </td>
+                    <td class="max-w-xs">
+                        <div class="font-mono text-xs">{{ row.route|default:"—" }}</div>
+                        <div class="text-xs text-text-mute truncate" title="{{ row.path }}{% if row.query %}?{{ row.query }}{% endif %}">
+                            {{ row.method }} {{ row.path }}{% if row.query %}?{{ row.query }}{% endif %}
+                        </div>
+                        {% if row.detail %}
+                            <details class="text-xs text-text-mute">
+                                <summary class="cursor-pointer">detail</summary>
+                                <code class="break-all">{{ row.detail }}</code>
+                            </details>
+                        {% endif %}
+                    </td>
+                    <td class="text-xs whitespace-nowrap">{% if row.object_type %}{{ row.object_type }} {{ row.object_id }}{% endif %}</td>
+                    <td class="text-right">{{ row.status_code }}</td>
+                    <td class="text-xs whitespace-nowrap">{{ row.ip_address|default:"" }}</td>
+                    <td class="text-right text-xs">{{ row.duration_ms }}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="10" class="text-center text-text-mute py-6">No entries match these filters.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% include "partials/_pagination.html" %}
+</div>
+{% endblock %}

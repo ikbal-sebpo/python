@@ -1,0 +1,18 @@
+Hello {{ recipient.first_name|default:recipient.email }},
+
+{{ resignation.applied_by.display_name }} has initiated a separation record
+for your Orbis account on your behalf.
+
+Type:               {{ resignation.get_separation_type_display }}
+Notice start:       {{ resignation.notice_start_date }}
+Last working day:   {{ resignation.last_working_date }}
+Status:             {{ resignation.get_status_display }}
+
+{% if resignation.process_note %}HR note: {{ resignation.process_note }}
+{% endif %}
+You will retain Orbis access until end of day on {{ resignation.last_working_date }}.
+Your account is deactivated automatically the morning after that.
+
+If you believe this was created in error, please contact HR immediately.
+
+— Orbis

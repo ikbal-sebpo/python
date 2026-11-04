@@ -1,0 +1,203 @@
+{% extends "base.html" %}
+{% load menu_extras %}
+{% block title %}Timesheet · Orbis{% endblock %}
+
+{% block content %}
+<div x-data="{
+        drawer: false,
+        drawerTitle: '',
+        open(title) { this.drawerTitle = title || ''; this.drawer = true; },
+        close() {
+            this.drawer = false;
+            this.drawerTitle = '';
+            const body = document.getElementById('drawer-body');
+            if (body) body.innerHTML = '';
+        },
+     }"
+     x-on:orbis:drawer-close.window="close()"
+     x-on:keydown.escape.window="close()"
+     class="page-fill">
+    <div class="card shrink-0">
+    <div class="flex flex-wrap items-center gap-3">
+        <form method="get" class="flex flex-wrap items-center gap-2 flex-1 min-w-[240px]">
+            <div class="flex items-center gap-1">
+                <input type="text" name="from" value="{{ date_from|date:'Y-m-d' }}"
+                       data-flatpickr placeholder="YYYY-MM-DD" autocomplete="off"
+                       aria-label="Date from" class="form-input w-36">
+                <span class="text-xs text-text-mute">to</span>
+                <input type="text" name="to" value="{{ date_to|date:'Y-m-d' }}"
+                       data-flatpickr placeholder="YYYY-MM-DD" autocomplete="off"
+                       aria-label="Date to" class="form-input w-36">
+            </div>
+            {% include "partials/_employee_filter_controls.html" with search_placeholder="Employee ID" %}
+            <label class="flex items-center gap-1.5 text-xs text-text-mute whitespace-nowrap">
+                <input type="checkbox" name="flagged" value="1" class="form-checkbox"
+                       {% if flagged_only %}checked{% endif %} onchange="this.form.submit()">
+                Unaccounted only
+                {% if unaccounted_count %}<span class="badge badge-warning">{{ unaccounted_count }}</span>{% endif %}
+            </label>
+            <button type="submit" class="btn-secondary">Search</button>
+            <button type="submit" name="export" value="xlsx" class="btn-secondary" title="Download everything the current filters match as .xlsx">
+                <i data-lucide="download" class="w-4 h-4"></i><span>Export Excel</span>
+            </button>
+        </form>
+        {% if my_pending_correction %}
+            <span class="badge badge-info">Timesheet pending</span>
+            <button type="button"
+                    class="p-1.5 rounded text-text-mute hover:bg-bg-soft hover:text-brand dark:hover:bg-white/5 dark:hover:text-brand-accent"
+                    title="Edit request"
+                    hx-get="{% url 'attendance_correction_edit' my_pending_correction.pk %}"
+                    hx-target="#drawer-body"
+                    hx-swap="innerHTML"
+                    @click="open('Edit correction request — {{ selected_date|date:'Y-m-d' }}')">
+                <i data-lucide="pencil" class="w-4 h-4"></i>
+            </button>
+        {% else %}
+            <button type="button"
+                    class="btn-secondary"
+                    hx-get="{% url 'attendance_correction_request' %}?date={{ selected_date|date:'Y-m-d' }}"
+                    hx-target="#drawer-body"
+                    hx-swap="innerHTML"
+                    @click="open('Add timesheet — {{ selected_date|date:'Y-m-d' }}')">
+                <i data-lucide="clock-plus" class="w-4 h-4"></i><span>Add timesheet</span>
+            </button>
+        {% endif %}
+        <a href="{% url 'attendance_correction_list' %}" class="btn-secondary">
+            <i data-lucide="pencil-line" class="w-4 h-4"></i><span>Corrections</span>
+        </a>
+    </div>
+
+    {% if date_errors %}
+        <div class="mt-3 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-200">
+            {% for error in date_errors %}
+                <div>{{ error }}</div>
+            {% endfor %}
+        </div>
+    {% endif %}
+    </div>
+
+    {% if range_mode %}
+        <div class="shrink-0 flex flex-wrap items-center justify-between gap-2">
+            <div class="text-sm text-text-main dark:text-white">
+                Viewing:
+                <span class="font-semibold">{{ range_employee.display_name }}</span>
+                <span class="text-text-mute">({{ range_employee.employee_id|default:"—" }})</span>
+                <span class="text-text-mute">· {{ date_from|date:'Y-m-d' }} → {{ date_to|date:'Y-m-d' }}</span>
+            </div>
+            <a href="{% url 'attendance_list' %}?date={{ date_to|date:'Y-m-d' }}"
+               class="text-xs text-brand hover:underline dark:text-brand-accent">
+                View my team
+            </a>
+        </div>
+        {% include "partials/_result_count.html" with count_noun="days" %}
+    {% elif group_range_mode %}
+        <div class="shrink-0 flex flex-wrap items-center justify-between gap-2">
+            <div class="text-sm text-text-main dark:text-white">
+                Viewing:
+                <span class="font-semibold">{{ scope_label }}</span>
+                <span class="text-text-mute">· {{ date_from|date:'Y-m-d' }} → {{ date_to|date:'Y-m-d' }}</span>
+            </div>
+            <a href="{% url 'attendance_list' %}?{% qs_replace from=date_to|date:'Y-m-d' to=date_to|date:'Y-m-d' page=None %}"
+               class="text-xs text-brand hover:underline dark:text-brand-accent">
+                View {{ date_to|date:'Y-m-d' }} only
+            </a>
+        </div>
+        {% include "partials/_result_count.html" with count_noun="records" %}
+    {% else %}
+        {% include "partials/_result_count.html" with count_noun="employees" %}
+    {% endif %}
+
+    <div class="card p-0 table-scroll">
+        <table class="table-simple table-sticky min-w-full text-sm">
+            <thead>
+                <tr>
+                    {% if range_mode %}
+                        <th class="text-left">Date</th>
+                    {% elif group_range_mode %}
+                        <th class="text-left">Emp ID</th>
+                        <th class="text-left">Name</th>
+                        <th class="text-left">Team</th>
+                        <th class="text-left">Designation</th>
+                        <th class="text-left">Date</th>
+                    {% else %}
+                        <th class="text-left">Emp ID</th>
+                        <th class="text-left">Name</th>
+                        <th class="text-left">Team</th>
+                        <th class="text-left">Designation</th>
+                    {% endif %}
+                    <th class="text-left">Shift</th>
+                    <th class="text-left">Office</th>
+                    <th class="text-left">Punch in</th>
+                    <th class="text-left">Punch out</th>
+                    <th class="text-left">Time in office</th>
+                    <th class="text-left">Status</th>
+                    <th class="text-right">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if range_mode %}
+                    {% for row in rows %}
+                        <tr>
+                            <td class="tabular-nums whitespace-nowrap">
+                                {{ row.date|date:'Y-m-d' }}
+                                <span class="text-text-mute">{{ row.date|date:'D' }}</span>
+                            </td>
+                            {% include "attendance/_timesheet_cells.html" with r=row d=row.date target_pk=range_employee.pk target_name=range_employee.display_name %}
+                        </tr>
+                    {% empty %}
+                        <tr><td colspan="8" class="text-center italic text-text-mute py-4">No dates in this range.</td></tr>
+                    {% endfor %}
+                {% elif group_range_mode %}
+                    {% for row in rows %}
+                        <tr>
+                            <td class="tabular-nums">{{ row.employee.employee_id|default:"—" }}</td>
+                            <td class="font-medium whitespace-nowrap">
+                                {% if row.employee.employee_id %}
+                                    <a href="{% url 'attendance_list' %}?q={{ row.employee.employee_id|urlencode }}&from={{ date_from|date:'Y-m-d' }}&to={{ date_to|date:'Y-m-d' }}"
+                                       class="hover:underline text-brand dark:text-brand-accent"
+                                       title="Day-by-day timesheet for {{ row.employee.display_name }}">{{ row.employee.display_name }}</a>
+                                {% else %}
+                                    {{ row.employee.display_name }}
+                                {% endif %}
+                            </td>
+                            <td class="whitespace-nowrap">{{ row.employee.team|default:"—" }}</td>
+                            <td class="whitespace-nowrap">{{ row.employee.designation|default:"—" }}</td>
+                            <td class="tabular-nums whitespace-nowrap">
+                                {{ row.date|date:'Y-m-d' }}
+                                <span class="text-text-mute">{{ row.date|date:'D' }}</span>
+                            </td>
+                            {% include "attendance/_timesheet_cells.html" with r=row d=row.date target_pk=row.employee.pk target_name=row.employee.display_name %}
+                        </tr>
+                    {% empty %}
+                        <tr><td colspan="12" class="text-center italic text-text-mute py-4">No employees found.</td></tr>
+                    {% endfor %}
+                {% else %}
+                    {% for emp in employees %}
+                        <tr>
+                            <td class="tabular-nums">{{ emp.employee_id|default:"—" }}</td>
+                            <td class="font-medium whitespace-nowrap">
+                                {% if emp.employee_id %}
+                                    <a href="{% url 'attendance_list' %}?q={{ emp.employee_id|urlencode }}"
+                                       class="hover:underline text-brand dark:text-brand-accent"
+                                       title="Day-by-day timesheet for {{ emp.display_name }}">{{ emp.display_name }}</a>
+                                {% else %}
+                                    {{ emp.display_name }}
+                                {% endif %}
+                            </td>
+                            <td class="whitespace-nowrap">{{ emp.team|default:"—" }}</td>
+                            <td class="whitespace-nowrap">{{ emp.designation|default:"—" }}</td>
+                            {% include "attendance/_timesheet_cells.html" with r=emp d=selected_date target_pk=emp.pk target_name=emp.display_name %}
+                        </tr>
+                    {% empty %}
+                        <tr><td colspan="11" class="text-center italic text-text-mute py-4">No employees found.</td></tr>
+                    {% endfor %}
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+
+    {% include "partials/_pagination.html" %}
+
+    {% include "partials/_drawer_shell.html" %}
+</div>
+{% endblock %}

@@ -1,0 +1,30 @@
+{% comment %}
+    Context:
+      employee            CustomUser
+      off_count           int — how many OFF shifts in the visible week
+      can_manage_patterns bool
+      oob                 True on out-of-band swap after a cell save
+
+    Renders as a <td> with stable id so HTMX can OOB-swap it after a cell
+    edit changes the OFF count (and therefore the warning color).
+{% endcomment %}
+<td id="emp-name-{{ employee.pk }}"
+    {% if oob %}hx-swap-oob="true"{% endif %}
+    class="align-top">
+    <div class="flex items-center gap-2">
+        <span class="font-medium {% if off_count > 2 %}text-red-600 dark:text-red-400{% endif %}"
+              {% if off_count > 2 %}title="{{ off_count }} OFF days this week — review balance"{% endif %}>
+            {{ employee.display_name }}
+        </span>
+        {% if can_manage_patterns %}
+            <a href="{% url 'roster_pattern' employee.pk %}"
+               title="Edit weekly pattern"
+               class="text-text-mute hover:text-brand dark:hover:text-brand-accent">
+                <i data-lucide="pencil" class="w-3 h-3"></i>
+            </a>
+        {% endif %}
+    </div>
+    <div class="text-xs text-text-soft dark:text-white/60">
+        {{ employee.designation|default:"—" }}{% if employee.team %} · {{ employee.team }}{% endif %}
+    </div>
+</td>

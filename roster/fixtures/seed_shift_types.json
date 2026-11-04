@@ -1,0 +1,105 @@
+[
+    {"model": "roster.shifttype", "pk": 1, "fields": {
+        "name": "Morning",  "description": "09:00 – 18:00 shift",
+        "category": "WORK", "is_working_shift": true,
+        "shift_timezone": "Asia/Dhaka",
+        "shift_start_time": "09:00:00", "shift_end_time": "18:00:00",
+        "color": "brand-accent", "has_attribute": false, "is_active": true,
+        "added_at": "2026-04-24T00:00:00Z", "updated_at": "2026-04-24T00:00:00Z"
+    }},
+    {"model": "roster.shifttype", "pk": 2, "fields": {
+        "name": "Evening",  "description": "14:00 – 23:00 shift",
+        "category": "WORK", "is_working_shift": true,
+        "shift_timezone": "Asia/Dhaka",
+        "shift_start_time": "14:00:00", "shift_end_time": "23:00:00",
+        "color": "brand-blue", "has_attribute": false, "is_active": true,
+        "added_at": "2026-04-24T00:00:00Z", "updated_at": "2026-04-24T00:00:00Z"
+    }},
+    {"model": "roster.shifttype", "pk": 3, "fields": {
+        "name": "Night",    "description": "22:00 – 07:00 shift",
+        "category": "WORK", "is_working_shift": true,
+        "shift_timezone": "Asia/Dhaka",
+        "shift_start_time": "22:00:00", "shift_end_time": "07:00:00",
+        "color": "brand-navy", "has_attribute": false, "is_active": true,
+        "added_at": "2026-04-24T00:00:00Z", "updated_at": "2026-04-24T00:00:00Z"
+    }},
+    {"model": "roster.shifttype", "pk": 4, "fields": {
+        "name": "WFH",      "description": "Work from home — hours match assigned shift",
+        "category": "WORK", "is_working_shift": true,
+        "shift_timezone": "Asia/Dhaka",
+        "shift_start_time": "09:00:00", "shift_end_time": "18:00:00",
+        "color": "brand-teal", "has_attribute": false, "is_active": true,
+        "added_at": "2026-04-24T00:00:00Z", "updated_at": "2026-04-24T00:00:00Z"
+    }},
+
+    {"model": "roster.shifttype", "pk": 10, "fields": {
+        "name": "Weekly Off", "description": "Scheduled day off",
+        "category": "OFF", "is_working_shift": false,
+        "shift_timezone": "", "shift_start_time": null, "shift_end_time": null,
+        "color": "text-mute", "has_attribute": false, "is_active": true,
+        "added_at": "2026-04-24T00:00:00Z", "updated_at": "2026-04-24T00:00:00Z"
+    }},
+
+    {"model": "roster.shifttype", "pk": 20, "fields": {
+        "name": "Casual Leave", "description": "Planned casual leave",
+        "category": "LEAVE", "is_working_shift": false,
+        "shift_timezone": "", "shift_start_time": null, "shift_end_time": null,
+        "color": "brand-gold", "has_attribute": false, "is_active": true,
+        "added_at": "2026-04-24T00:00:00Z", "updated_at": "2026-04-24T00:00:00Z"
+    }},
+    {"model": "roster.shifttype", "pk": 21, "fields": {
+        "name": "Sick Leave", "description": "Medical leave",
+        "category": "LEAVE", "is_working_shift": false,
+        "shift_timezone": "", "shift_start_time": null, "shift_end_time": null,
+        "color": "brand-gold", "has_attribute": false, "is_active": true,
+        "added_at": "2026-04-24T00:00:00Z", "updated_at": "2026-04-24T00:00:00Z"
+    }},
+    {"model": "roster.shifttype", "pk": 22, "fields": {
+        "name": "Annual Leave",
+        "description": "Earned at 1 day per 18 worked days; 50% carries forward, 50% encashable.",
+        "category": "LEAVE", "is_working_shift": false,
+        "shift_timezone": "", "shift_start_time": null, "shift_end_time": null,
+        "color": "brand-gold", "has_attribute": false, "is_active": true,
+        "added_at": "2026-04-24T00:00:00Z", "updated_at": "2026-04-24T00:00:00Z"
+    }},
+    {"model": "roster.shifttype", "pk": 23, "fields": {
+        "name": "Maternity Leave",
+        "description": "16 weeks (8 pre + 8 post delivery) for eligible female employees.",
+        "category": "LEAVE", "is_working_shift": false,
+        "shift_timezone": "", "shift_start_time": null, "shift_end_time": null,
+        "color": "brand-gold", "has_attribute": false, "is_active": true,
+        "added_at": "2026-04-24T00:00:00Z", "updated_at": "2026-04-24T00:00:00Z"
+    }},
+    {"model": "roster.shifttype", "pk": 24, "fields": {
+        "name": "Compensatory Leave",
+        "description": "Auto-granted +1 day when an employee works on a Holiday-tagged date.",
+        "category": "LEAVE", "is_working_shift": false,
+        "shift_timezone": "", "shift_start_time": null, "shift_end_time": null,
+        "color": "brand-gold", "has_attribute": false, "is_active": true,
+        "added_at": "2026-04-24T00:00:00Z", "updated_at": "2026-04-24T00:00:00Z"
+    }},
+    {"model": "roster.shifttype", "pk": 25, "fields": {
+        "name": "Leave Without Pay",
+        "description": "Unpaid leave — extension of maternity, or discretionary regularisation of unauthorised absence.",
+        "category": "LEAVE", "is_working_shift": false,
+        "shift_timezone": "", "shift_start_time": null, "shift_end_time": null,
+        "color": "brand-gold", "has_attribute": false, "is_active": true,
+        "added_at": "2026-04-24T00:00:00Z", "updated_at": "2026-04-24T00:00:00Z"
+    }},
+    {"model": "roster.shifttype", "pk": 26, "fields": {
+        "name": "Half Day Leave",
+        "description": "Half-day off with half-basic-salary deduction. Single date, AM or PM.",
+        "category": "LEAVE", "is_working_shift": false,
+        "shift_timezone": "", "shift_start_time": null, "shift_end_time": null,
+        "color": "brand-gold", "has_attribute": false, "is_active": true,
+        "added_at": "2026-04-24T00:00:00Z", "updated_at": "2026-04-24T00:00:00Z"
+    }},
+
+    {"model": "roster.shifttype", "pk": 30, "fields": {
+        "name": "Holiday", "description": "Company or national holiday",
+        "category": "HOLIDAY", "is_working_shift": false,
+        "shift_timezone": "", "shift_start_time": null, "shift_end_time": null,
+        "color": "brand-blue", "has_attribute": false, "is_active": true,
+        "added_at": "2026-04-24T00:00:00Z", "updated_at": "2026-04-24T00:00:00Z"
+    }}
+]

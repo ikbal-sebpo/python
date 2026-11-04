@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Request a document · Orbis{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+  <h1 class="text-2xl font-semibold text-text-main dark:text-white">Request a document</h1>
+
+  {% if doc_types %}
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      {% for dt in doc_types %}
+        <a href="{% url 'documents:request_form' dt.id %}"
+           class="card hover:border-brand-accent transition flex items-start gap-3">
+          <div class="w-10 h-10 rounded-full bg-brand-accent/15 flex items-center justify-center text-brand shrink-0">
+            <i data-lucide="file-text" class="w-5 h-5"></i>
+          </div>
+          <div class="min-w-0">
+            <h2 class="font-semibold text-text-main dark:text-white">{{ dt.display_name }}</h2>
+            {% if dt.description %}
+              <p class="text-sm text-text-soft dark:text-white/60 mt-1">{{ dt.description }}</p>
+            {% endif %}
+          </div>
+        </a>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="card">
+      <p class="text-sm text-text-soft dark:text-white/60">No document types are configured. Ask an admin.</p>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,36 @@
+row_number,missing_fields,ADM1_PCODE,ADM1_EN,ADM2_PCODE,ADM2_EN,ADM3_PCODE,ADM3_EN,ADM4_PCODE,ADM4_EN
+1,"ADM1_EN, ADM1_PCODE, ADM2_EN, ADM2_PCODE, ADM3_EN, ADM3_PCODE, ADM4_EN, ADM4_PCODE",,,,,,,,
+2,"ADM1_EN, ADM1_PCODE, ADM2_EN, ADM2_PCODE, ADM3_EN, ADM3_PCODE, ADM4_EN, ADM4_PCODE",,,,,,,,
+3,"ADM1_EN, ADM1_PCODE, ADM2_EN, ADM2_PCODE, ADM3_EN, ADM3_PCODE, ADM4_EN, ADM4_PCODE",,,,,,,,
+1470,ADM4_EN,BD30,Dhaka,BD3026,Dhaka,BD302604,Badda,BD30260413,
+4020,ADM4_PCODE,BD50,Rajshahi,BD5081,Rajshahi,BD508110,Bagha,,Chak Rajapur
+4095,"ADM1_PCODE, ADM2_PCODE, ADM3_PCODE, ADM4_PCODE",,Rajshahi,,Rajshahi City Coperation,,Zone 1,,Ward 1
+4096,"ADM1_PCODE, ADM2_PCODE, ADM3_PCODE, ADM4_PCODE",,Rajshahi,,Rajshahi City Coperation,,Zone 1,,Ward 2
+4097,"ADM1_PCODE, ADM2_PCODE, ADM3_PCODE, ADM4_PCODE",,Rajshahi,,Rajshahi City Coperation,,Zone 1,,Ward 3
+4098,"ADM1_PCODE, ADM2_PCODE, ADM3_PCODE, ADM4_PCODE",,Rajshahi,,Rajshahi City Coperation,,Zone 1,,Ward 6
+4099,"ADM1_PCODE, ADM2_PCODE, ADM3_PCODE, ADM4_PCODE",,Rajshahi,,Rajshahi City Coperation,,Zone 2,,Ward 4
+4100,"ADM1_PCODE, ADM2_PCODE, ADM3_PCODE, ADM4_PCODE",,Rajshahi,,Rajshahi City Coperation,,Zone 2,,Ward 5
+4101,"ADM1_PCODE, ADM2_PCODE, ADM3_PCODE, ADM4_PCODE",,Rajshahi,,Rajshahi City Coperation,,Zone 2,,Ward 7
+4102,"ADM1_PCODE, ADM2_PCODE, ADM3_PCODE, ADM4_PCODE",,Rajshahi,,Rajshahi City Coperation,,Zone 3,,Ward 10
+4103,"ADM1_PCODE, ADM2_PCODE, ADM3_PCODE, ADM4_PCODE",,Rajshahi,,Rajshahi City Coperation,,Zone 3,,Ward 11
+4104,"ADM1_PCODE, ADM2_PCODE, ADM3_PCODE, ADM4_PCODE",,Rajshahi,,Rajshahi City Coperation,,Zone 3,,Ward 12
+4105,"ADM1_PCODE, ADM2_PCODE, ADM3_PCODE, ADM4_PCODE",,Rajshahi,,Rajshahi City Coperation,,Zone 3,,Ward 13
+4106,"ADM1_PCODE, ADM2_PCODE, ADM3_PCODE, ADM4_PCODE",,Rajshahi,,Rajshahi City Coperation,,Zone 3,,Ward 14
+4107,"ADM1_PCODE, ADM2_PCODE, ADM3_PCODE, ADM4_PCODE",,Rajshahi,,Rajshahi City Coperation,,Zone 3,,Ward 20
+4108,"ADM1_PCODE, ADM2_PCODE, ADM3_PCODE, ADM4_PCODE",,Rajshahi,,Rajshahi City Coperation,,Zone 3,,Ward 21
+4109,"ADM1_PCODE, ADM2_PCODE, ADM3_PCODE, ADM4_PCODE",,Rajshahi,,Rajshahi City Coperation,,Zone 3,,Ward 22
+4110,"ADM1_PCODE, ADM2_PCODE, ADM3_PCODE, ADM4_PCODE",,Rajshahi,,Rajshahi City Coperation,,Zone 3,,Ward 8
+4111,"ADM1_PCODE, ADM2_PCODE, ADM3_PCODE, ADM4_PCODE",,Rajshahi,,Rajshahi City Coperation,,Zone 3,,Ward 9
+4112,"ADM1_PCODE, ADM2_PCODE, ADM3_PCODE, ADM4_PCODE",,Rajshahi,,Rajshahi City Coperation,,Zone 4,,Ward 15
+4113,"ADM1_PCODE, ADM2_PCODE, ADM3_PCODE, ADM4_PCODE",,Rajshahi,,Rajshahi City Coperation,,Zone 4,,Ward 16
+4114,"ADM1_PCODE, ADM2_PCODE, ADM3_PCODE, ADM4_PCODE",,Rajshahi,,Rajshahi City Coperation,,Zone 4,,Ward 17
+4115,"ADM1_PCODE, ADM2_PCODE, ADM3_PCODE, ADM4_PCODE",,Rajshahi,,Rajshahi City Coperation,,Zone 4,,Ward 18
+4116,"ADM1_PCODE, ADM2_PCODE, ADM3_PCODE, ADM4_PCODE",,Rajshahi,,Rajshahi City Coperation,,Zone 4,,Ward 19
+4117,"ADM1_PCODE, ADM2_PCODE, ADM3_PCODE, ADM4_PCODE",,Rajshahi,,Rajshahi City Coperation,,Zone 5,,Ward 23
+4118,"ADM1_PCODE, ADM2_PCODE, ADM3_PCODE, ADM4_PCODE",,Rajshahi,,Rajshahi City Coperation,,Zone 5,,Ward 24
+4119,"ADM1_PCODE, ADM2_PCODE, ADM3_PCODE, ADM4_PCODE",,Rajshahi,,Rajshahi City Coperation,,Zone 5,,Ward 25
+4120,"ADM1_PCODE, ADM2_PCODE, ADM3_PCODE, ADM4_PCODE",,Rajshahi,,Rajshahi City Coperation,,Zone 5,,Ward 27
+4121,"ADM1_PCODE, ADM2_PCODE, ADM3_PCODE, ADM4_PCODE",,Rajshahi,,Rajshahi City Coperation,,Zone 5,,Ward 28
+4122,"ADM1_PCODE, ADM2_PCODE, ADM3_PCODE, ADM4_PCODE",,Rajshahi,,Rajshahi City Coperation,,Zone 5,,Ward 29
+4123,"ADM1_PCODE, ADM2_PCODE, ADM3_PCODE, ADM4_PCODE",,Rajshahi,,Rajshahi City Coperation,,Zone 6,,Ward 26
+4124,"ADM1_PCODE, ADM2_PCODE, ADM3_PCODE, ADM4_PCODE",,Rajshahi,,Rajshahi City Coperation,,Zone 6,,Ward 30

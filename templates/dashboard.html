@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard · Orbis{% endblock %}
+
+{% block content %}
+<div class="mb-6 flex flex-col md:flex-row md:items-end md:justify-between gap-4">
+    <div>
+        <h1 class="text-2xl font-semibold text-text-main dark:text-white">
+            Welcome{% if request.user.first_name %}, {{ request.user.first_name }}{% endif %}
+        </h1>
+        <p class="text-sm text-text-soft dark:text-white/60 mt-1">
+            {% if active_tab == 'me' %}
+                Your shifts, leave, and what's coming up.
+            {% elif active_tab == 'team' %}
+                Your team — who reports to you, who's out, and what needs your sign-off.
+            {% elif active_tab == 'org' %}
+                Org-wide pulse — headcount, leave queue, joiners, and data quality.
+            {% endif %}
+        </p>
+    </div>
+
+    {% if tabs|length > 1 %}
+        <div class="flex items-center gap-1" role="tablist" aria-label="Dashboard scope">
+            {% for tab in tabs %}
+                <a href="?tab={{ tab }}"
+                   role="tab"
+                   aria-selected="{% if active_tab == tab %}true{% else %}false{% endif %}"
+                   class="btn-secondary {% if active_tab == tab %}!bg-brand !text-white{% endif %}">
+                    {% if tab == 'me' %}Me{% elif tab == 'team' %}Team{% else %}Org{% endif %}
+                </a>
+            {% endfor %}
+        </div>
+    {% endif %}
+</div>
+
+{% if active_tab == 'me' %}
+    {% include "dashboard/_tab_me.html" with me=me %}
+{% elif active_tab == 'team' %}
+    {% include "dashboard/_tab_team.html" with team=team %}
+{% elif active_tab == 'org' %}
+    {% include "dashboard/_tab_org.html" with org=org %}
+{% endif %}
+{% endblock %}

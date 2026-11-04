@@ -1,0 +1,64 @@
+{% comment %}Read-only audit trail for one loan: instalments (from calculated runs), adjustments, skips, cutover opening.{% endcomment %}
+<div class="drawer-body space-y-4">
+    <dl class="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1.5 text-sm">
+        <dt class="text-text-mute">Employee</dt>
+        <dd class="font-medium">{{ loan.employee.display_name }}{% if loan.employee.employee_id %} <span class="text-text-mute">· {{ loan.employee.employee_id }}</span>{% endif %}</dd>
+        <dt class="text-text-mute">Approved</dt>
+        <dd>{{ loan.approved_on|date:"Y-m-d" }}
+            {% if loan.approval_document %}· <a href="{% url 'payroll_loan_document' loan.pk %}" target="_blank" rel="noopener" class="text-brand hover:underline dark:text-brand-accent">document</a>{% endif %}</dd>
+        <dt class="text-text-mute">Disbursed</dt>
+        <dd>{% if loan.disbursed_on %}{{ loan.disbursed_on|date:"Y-m-d" }}{% if loan.disbursed_by %} by {{ loan.disbursed_by.display_name }}{% endif %}{% else %}<span class="text-text-mute">not yet</span>{% endif %}</dd>
+        <dt class="text-text-mute">Terms</dt>
+        <dd class="tabular-nums">{{ loan.principal|taka }} · {{ loan.installment_amount|taka }} × {{ loan.installment_count }}</dd>
+        <dt class="text-text-mute">First deduction</dt>
+        <dd>{% if loan.first_deduction_period %}{{ loan.first_deduction_period }} <span class="text-text-mute">({{ loan.first_deduction_period.start_date|date:"M j" }} – {{ loan.first_deduction_period.end_date|date:"M j, Y" }})</span>{% else %}<span class="text-text-mute">set at disbursement — the payroll after the disbursement month</span>{% endif %}</dd>
+        <dt class="text-text-mute">Recovered</dt>
+        <dd class="tabular-nums">{{ balance.recovered|taka }} <span class="text-text-mute">({{ balance.instalments_deducted }} instalment{{ balance.instalments_deducted|pluralize }})</span></dd>
+        <dt class="text-text-mute">Outstanding</dt>
+        <dd class="tabular-nums font-semibold {% if balance.is_settled %}text-emerald-600 dark:text-emerald-400{% endif %}">{{ balance.outstanding|taka }}{% if balance.is_settled %} · settled{% endif %}</dd>
+        {% if loan.note %}
+            <dt class="text-text-mute">Note</dt>
+            <dd class="text-text-soft dark:text-white/70">{{ loan.note }}</dd>
+        {% endif %}
+    </dl>
+
+    <h4 class="text-xs font-semibold uppercase tracking-wider text-text-mute mt-2">History</h4>
+    {% if history %}
+        <ul class="divide-y divide-border dark:divide-white/10 text-sm">
+            {% for h in history %}
+                <li class="py-2 flex items-start justify-between gap-3">
+                    <div class="min-w-0">
+                        <div class="flex items-center gap-2">
+                            {% if h.kind == "instalment" %}<i data-lucide="minus-circle" class="w-3.5 h-3.5 text-brand-accent"></i>
+                            {% elif h.kind == "skip" %}<i data-lucide="calendar-off" class="w-3.5 h-3.5 text-amber-500"></i>
+                            {% elif h.kind == "opening" %}<i data-lucide="archive" class="w-3.5 h-3.5 text-text-mute"></i>
+                            {% else %}<i data-lucide="scale" class="w-3.5 h-3.5 text-brand"></i>{% endif %}
+                            <span class="font-medium">{{ h.label }}</span>
+                            {% if h.run_pk %}<a href="{% url 'payroll_run_detail' h.run_pk %}" class="text-xs text-brand hover:underline dark:text-brand-accent">run</a>{% endif %}
+                        </div>
+                        <div class="text-xs text-text-mute">{{ h.occurred_on|date:"Y-m-d" }}{% if h.extra.by %} · {{ h.extra.by }}{% endif %}{% if h.note %} · {{ h.note }}{% endif %}</div>
+                    </div>
+                    <div class="tabular-nums shrink-0 {% if h.kind == 'skip' %}text-text-mute{% endif %}">{% if h.kind == "skip" %}—{% else %}{{ h.amount|taka }}{% endif %}</div>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p class="text-sm text-text-mute italic">Nothing recovered yet.</p>
+    {% endif %}
+
+    {% if skips and can_disburse %}
+        <div class="text-xs text-text-mute">
+            {% for skip in skips %}
+                {% if skip.pk in skips_open %}
+                    <form method="post" action="{% url 'payroll_loan_skip_delete' loan.pk skip.pk %}" class="inline">
+                        {% csrf_token %}
+                        <button type="submit" class="text-brand hover:underline dark:text-brand-accent">Undo skip for {{ skip.period }}</button>
+                    </form>
+                {% endif %}
+            {% endfor %}
+        </div>
+    {% endif %}
+</div>
+<div class="drawer-footer justify-end">
+    <button type="button" class="btn-secondary" @click="close()">Close</button>
+</div>

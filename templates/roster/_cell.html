@@ -1,0 +1,139 @@
+{% load roster_tags %}
+{% comment %}
+    Context:
+      employee      CustomUser
+      date          date
+      shift         Shift instance or None
+      holiday       Holiday instance or None
+      shift_choice_groups grouped visible shift options
+      filter_qs     querystring appended to hx-post URL
+      oob           True on OOB replacement
+      can_edit_cell viewer may edit this row (can_edit_roster_pattern) —
+                    False renders read-only text + a "Request change" link
+                    for the viewer's own row (docs/SHIFT_CHANGE_REQUEST_PLAN.md)
+      pending_change_pk  pk of a PENDING ShiftChangeRequest for this cell, or None
+      night_window  date sits in an APPROVED dedicated night shift window
+      night_locked  …and the viewer isn't the department head, so working
+                    shifts other than NIG/CUST are disabled (roster/night_window.py)
+
+    Option value scheme (single select, dispatched server-side):
+      shift_ref:
+        ""               → clear the cell
+        "type:<pk>"      → shift_type alone (ShiftType.has_attribute == False)
+        "attr:<pk>"      → specific attribute (ShiftType.has_attribute == True)
+      location_ref:
+        ""               → use employee default (no per-day override)
+        "MHK"/"MBD"/"RAOWA"/"WFH" → set per-day office/mode
+{% endcomment %}
+<td id="cell-{{ employee.pk }}-{{ date|date:'Ymd' }}"
+    {% if oob %}hx-swap-oob="true"{% endif %}
+    class="p-0 align-top">
+    <div class="flex flex-col gap-1">
+        {% if not can_edit_cell %}
+            {% resolved_location_choice shift employee as ro_loc %}
+            <div class="px-2 py-1.5 text-xs">
+                {% if shift %}
+                    <span class="font-medium">{% if shift.shift_attribute_id %}{{ shift.shift_attribute.name }}{% else %}{{ shift.shift_type.name }}{% endif %}</span>
+                    {% if ro_loc %}<span class="ml-1 {% if ro_loc == 'WFH' %}text-brand-blue{% else %}text-brand-accent{% endif %}">{{ ro_loc }}</span>{% endif %}
+                {% else %}
+                    <span class="text-text-mute">—</span>
+                {% endif %}
+            </div>
+            {% if employee.pk == request.user.pk and not pending_change_pk %}
+                <a href="{% url 'shift_change_apply' %}?date={{ date|date:'Y-m-d' }}"
+                   class="px-2 pb-1 text-[10px] text-brand hover:underline dark:text-brand-accent">Request change</a>
+            {% endif %}
+        {% else %}
+        <form>
+            {% csrf_token %}
+            <select name="shift_ref"
+                    hx-post="{% url 'roster_cell_update' employee.pk date|date:'Y-m-d' %}{% if filter_qs %}?{{ filter_qs }}{% endif %}"
+                    hx-trigger="change"
+                    hx-target="#cell-{{ employee.pk }}-{{ date|date:'Ymd' }}"
+                    hx-swap="outerHTML"
+                    class="form-input text-xs py-1.5 rounded-none border-0 w-full bg-transparent focus:bg-bg-soft dark:focus:bg-white/5">
+                {# Placeholder only — a shift must always carry a value, so #}
+                {# blank is non-selectable. It stays shown (selected) for a  #}
+                {# cell with no shift yet; you can only ever move it TO a     #}
+                {# real value, never back to blank.                          #}
+                <option value="" disabled {% if not shift %}selected{% endif %}>—</option>
+                {% comment %}
+                    A leave Shift carries a shift_type but no shift_attribute
+                    (set by leave materialisation). When that type has attributes
+                    its only options are attribute-options, none of which match —
+                    so the cell would render blank. Surface the current shift as
+                    a display-only selected option so approved leave is visible.
+                    It's `disabled` (not user-reselectable) since leave days are
+                    owned by the leave module; a real option below still overrides.
+                {% endcomment %}
+                {% if shift and shift.shift_type.has_attribute and not shift.shift_attribute_id %}
+                    <option value="type:{{ shift.shift_type_id }}" selected disabled>
+                        {{ shift.shift_type.name }}
+                    </option>
+                {% endif %}
+                {% for group in shift_choice_groups %}
+                    <optgroup label="{{ group.label }}">
+                        {% for option in group.options %}
+                            <option value="{{ option.value }}"
+                                    {% if night_locked and option.night_restricted %}disabled{% endif %}
+                                    {% if shift and shift.shift_attribute_id == option.shift_attribute_id and option.shift_attribute_id %}selected{% elif shift and shift.shift_type_id == option.shift_type_id and not shift.shift_attribute_id and not option.shift_attribute_id %}selected{% endif %}>
+                                {{ option.label }}
+                            </option>
+                        {% endfor %}
+                    </optgroup>
+                {% endfor %}
+            </select>
+        </form>
+        {% if shift %}
+            {% resolved_location_choice shift employee as cell_loc %}
+            <form>
+                {% csrf_token %}
+                <select name="location_ref"
+                        hx-post="{% url 'roster_cell_update' employee.pk date|date:'Y-m-d' %}{% if filter_qs %}?{{ filter_qs }}{% endif %}"
+                        hx-trigger="change"
+                        hx-target="#cell-{{ employee.pk }}-{{ date|date:'Ymd' }}"
+                        hx-swap="outerHTML"
+                        class="form-input text-xs py-1.5 rounded-none border-0 w-full bg-transparent focus:bg-bg-soft dark:focus:bg-white/5
+                               {% if cell_loc == 'WFH' %}text-brand-blue
+                               {% elif cell_loc %}text-brand-accent
+                               {% else %}text-text-mute
+                               {% endif %}">
+                    <option value="MHK"   {% if cell_loc == 'MHK' %}selected{% endif %}>MHK</option>
+                    <option value="MBD"   {% if cell_loc == 'MBD' %}selected{% endif %}>MBD</option>
+                    <option value="RAOWA" {% if cell_loc == 'RAOWA' %}selected{% endif %}>RAOWA</option>
+                    <option value="WFH"   {% if cell_loc == 'WFH' %}selected{% endif %}>WFH</option>
+                </select>
+            </form>
+        {% endif %}
+        {% endif %}
+        {% if night_window %}
+            <span class="mx-1 badge badge-info self-start"
+                  title="Dedicated night shift window — {% if night_locked %}only NIG or CUST here; other working shifts need the department head{% else %}you approve working shifts other than NIG/CUST here{% endif %}">
+                <i data-lucide="moon" class="w-3 h-3"></i>Night
+            </span>
+        {% endif %}
+        {% if pending_change_pk %}
+            <a href="{% url 'shift_change_detail' pending_change_pk %}"
+               class="mx-1 mb-1 badge badge-info self-start" title="A shift change request is awaiting approval">
+                <i data-lucide="clock" class="w-3 h-3"></i>Change pending
+            </a>
+        {% endif %}
+    </div>
+    {% if shift %}
+        {# Lazy: only fetches on first open (x-effect no-ops until `open` #}
+        {# flips true), so a full grid of cells never fires 100+ requests #}
+        {# up front the way leave/balance.html's eager x-init would here. #}
+        <div class="px-1 pb-1 text-[10px]" x-data="{ open: false, loaded: false }">
+            <button type="button" class="text-text-mute hover:underline" @click="open = !open">History</button>
+            <div x-show="open" x-cloak class="mt-1"
+                 x-effect="if (open && !loaded) { loaded = true; fetch('{% url 'roster_shift_history' employee.pk date|date:'Y-m-d' %}').then(r => r.json()).then(d => { $el.innerHTML = !d.results.length ? '<em>No history yet.</em>' : '<table class=\'min-w-full\'><thead><tr class=\'text-text-mute\'><th class=\'text-left pr-2\'>When</th><th class=\'text-left pr-2\'>Action</th><th class=\'text-left pr-2\'>By</th><th class=\'text-left\'>Change</th></tr></thead><tbody>' + d.results.map(r => '<tr><td class=\'pr-2 tabular-nums\'>' + r.changed_at.slice(0,16).replace('T',' ') + '</td><td class=\'pr-2\'>' + r.action_type + '</td><td class=\'pr-2\'>' + r.changed_by + '</td><td>' + (r.previous_shift || '—') + ' → ' + (r.new_shift || '—') + '</td></tr>').join('') + '</tbody></table>'; }); }">
+                <span class="text-text-mute italic">Loading…</span>
+            </div>
+        </div>
+    {% endif %}
+    {% if not shift and holiday %}
+        <div class="text-[10px] text-brand-blue px-2 pb-1 truncate" title="{{ holiday.name }}">
+            Holiday: {{ holiday.name }}
+        </div>
+    {% endif %}
+</td>

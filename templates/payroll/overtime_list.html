@@ -1,0 +1,293 @@
+{% extends "base.html" %}
+{% load payroll_extras menu_extras %}
+{% block title %}Overtime · Orbis{% endblock %}
+
+{% block content %}
+<div x-data="{
+        drawer: false,
+        drawerTitle: '',
+        selected: 0,
+        allMatching: false,
+        open(title) { this.drawerTitle = title || ''; this.drawer = true; },
+        close() {
+            this.drawer = false;
+            this.drawerTitle = '';
+            const body = document.getElementById('drawer-body');
+            if (body) body.innerHTML = '';
+        },
+        recount() {
+            this.allMatching = false;
+            this.selected = document.querySelectorAll('.row-check:checked').length;
+        },
+        toggleAll(on) {
+            document.querySelectorAll('.row-check').forEach(c => { c.checked = on; });
+            this.recount();
+        },
+        pageChecks() { return document.querySelectorAll('.row-check').length; },
+     }"
+     x-on:orbis:drawer-close.window="close()"
+     x-on:keydown.escape.window="close()"
+     class="page-fill">
+
+    {% comment %}
+        One row: dates, filters, Search, and both actions. The buttons live
+        inside the form element so they share its single flex line rather
+        than sitting in a second flex container that wraps independently.
+
+        {% templatetag openvariable %}# #{% templatetag closevariable %} comments must be ONE line in Django —
+        a multi-line one renders as literal text, and any markup inside it
+        becomes real elements. Use this tag for anything longer.
+    {% endcomment %}
+    <div class="card shrink-0">
+        <form method="get" class="flex flex-wrap items-center gap-2">
+            <input type="text" name="from" value="{{ date_from|date:'Y-m-d' }}"
+                   data-flatpickr placeholder="From" autocomplete="off"
+                   aria-label="Work date from" class="form-input w-32">
+            <span class="text-xs text-text-mute">to</span>
+            <input type="text" name="to" value="{{ date_to|date:'Y-m-d' }}"
+                   data-flatpickr placeholder="To" autocomplete="off"
+                   aria-label="Work date to" class="form-input w-32">
+            {% include "partials/_employee_filter_controls.html" %}
+            <select name="overtime_type" class="form-input w-36" onchange="this.form.submit()"
+                    aria-label="Overtime type">
+                <option value="">All OT types</option>
+                {% for t in overtime_types %}
+                    <option value="{{ t.pk }}" {% if selected_overtime_type_id == t.pk|stringformat:'s' %}selected{% endif %}>{{ t.name }}</option>
+                {% endfor %}
+            </select>
+            <select name="status" class="form-input w-32" onchange="this.form.submit()" aria-label="Status">
+                <option value="">All statuses</option>
+                {% for value, label in status_choices %}
+                    <option value="{{ value }}" {% if selected_status == value %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+            <label class="inline-flex items-center gap-1 text-xs whitespace-nowrap" title="Only entries waiting on your review or approval">
+                <input type="checkbox" name="awaiting" value="me" class="form-checkbox"
+                       {% if awaiting_me %}checked{% endif %} onchange="this.form.submit()">
+                <span>Awaiting me</span>
+            </label>
+            <button type="submit" class="btn-secondary">Search</button>
+            <button type="submit" name="export" value="xlsx" class="btn-secondary">
+                <i data-lucide="download" class="w-4 h-4"></i><span>Export Excel</span>
+            </button>
+            <button type="button" class="btn-secondary"
+                    hx-get="{% url 'payroll_overtime_create' %}?{% qs_replace %}"
+                    hx-target="#drawer-body"
+                    hx-swap="innerHTML"
+                    @click="open('Add overtime entry')">
+                <i data-lucide="plus" class="w-4 h-4"></i><span>Add entry</span>
+            </button>
+            <a href="{% url 'payroll_overtime_upload' %}" class="btn-primary">
+                <i data-lucide="upload" class="w-4 h-4"></i><span>Upload overtime</span>
+            </a>
+            {% if request.user.is_superuser %}
+                <a href="{% url 'payroll_overtime_generate_gh' %}" class="btn-secondary"
+                   title="Auto-create GH OT for Software/Creative Development or General BPO (superuser only)">
+                    <i data-lucide="calendar-check" class="w-4 h-4"></i><span>Generate GH OT</span>
+                </a>
+            {% endif %}
+        </form>
+        <p class="mt-3 text-xs text-text-mute">
+            Overtime can be filed for work dates
+            <span class="font-medium">{{ window.floor|date:"Y-m-d" }}</span> –
+            <span class="font-medium">{{ window.today|date:"Y-m-d" }}</span> (today).
+            Earlier dates belong to a payroll period that has already closed.
+            Every entry starts as <span class="font-medium">Pending review</span>: a manager (APM/PM or above)
+            reviews it, then the department head approves it before it is paid.
+            {% if window.current_period_locked %}
+                This period's payroll inputs are locked, so the run must also be recalculated after approval.
+            {% endif %}
+        </p>
+        {% if pending_total or reviewed_total %}
+            <p class="mt-2 text-xs flex flex-wrap items-center gap-2">
+                {% if pending_total %}
+                    <a href="?status=PENDING" class="badge badge-warning hover:underline">
+                        {{ pending_total }} entr{{ pending_total|pluralize:"y,ies" }} pending review
+                    </a>
+                {% endif %}
+                {% if reviewed_total %}
+                    <a href="?status=REVIEWED" class="badge badge-info hover:underline">
+                        {{ reviewed_total }} reviewed, awaiting approval
+                    </a>
+                {% endif %}
+                <span class="text-text-mute">
+                    {% if can_approve_any %}Approve or reject them, then recalculate the run if its inputs are locked.
+                    {% elif can_review_any %}Review the ones waiting on you; the department head approves them.
+                    {% else %}Not paid until reviewed and approved.{% endif %}
+                </span>
+            </p>
+        {% endif %}
+    </div>
+
+    {% if can_decide %}
+        {% comment %} The checkboxes live in the table, so this form is bound to them by the HTML5 form= attribute rather than wrapping them — the per-row single-action forms can't be nested inside a wrapping one. Same shape as attendance/correction_list.html. {% endcomment %}
+        <form method="post" id="bulk-overtime-form"
+              action="{% url 'payroll_overtime_bulk_decide' %}?{% qs_replace %}" class="shrink-0">
+            {% csrf_token %}
+            {% comment %} Django-admin style "select all N matching": when set, the server acts on every entry the current filters match (all pages), not the checked ids. Any manual checkbox change clears it. {% endcomment %}
+            <input type="hidden" name="select_all" :value="allMatching ? '1' : ''">
+        </form>
+        <div class="shrink-0 flex items-center gap-2 mt-2" x-show="selected > 0" x-cloak>
+            <span class="text-xs text-text-mute">
+                <template x-if="allMatching">
+                    <span>All <span class="font-medium">{{ paginator.count }}</span> matching entr{{ paginator.count|pluralize:"y,ies" }} selected
+                        <button type="button" class="underline ml-1" @click="allMatching = false">Clear</button></span>
+                </template>
+                <template x-if="!allMatching">
+                    <span><span x-text="selected"></span> selected{% if is_paginated %}<template x-if="selected === pageChecks()">
+                        <button type="button" class="underline ml-1" @click="allMatching = true"
+                                title="Act on every entry matching the current filters, across all {{ paginator.num_pages }} pages">
+                            Select all {{ paginator.count }} matching entr{{ paginator.count|pluralize:"y,ies" }}</button>
+                    </template>{% endif %}</span>
+                </template>
+            </span>
+            {% if can_review_any %}
+                <button type="submit" form="bulk-overtime-form" name="decision" value="review"
+                        class="btn-secondary text-xs" title="Mark the selected pending entries as reviewed">Review selected</button>
+            {% endif %}
+            {% if can_approve_any %}
+                <button type="submit" form="bulk-overtime-form" name="decision" value="approve"
+                        class="btn-secondary text-xs">Approve selected</button>
+            {% endif %}
+            <button type="submit" form="bulk-overtime-form" name="decision" value="reject"
+                    class="btn-secondary text-xs">Reject selected</button>
+            <span class="text-xs text-text-mute">Entries you can't act on are skipped.</span>
+        </div>
+    {% endif %}
+
+    {% include "partials/_result_count.html" with count_noun="entries" %}
+
+    <div class="card p-0 table-scroll">
+        <table class="table-simple table-sticky min-w-full text-sm">
+            <thead>
+                <tr>
+                    {% if can_decide %}
+                        <th class="w-8">
+                            <input type="checkbox" class="form-checkbox" title="Select every entry on this page you can act on"
+                                   x-on:change="toggleAll($event.target.checked)">
+                        </th>
+                    {% endif %}
+                    <th class="text-left">Work date</th>
+                    <th class="text-left">Emp ID</th>
+                    <th class="text-left">Name</th>
+                    <th class="text-left">Department</th>
+                    <th class="text-left">Team</th>
+                    <th class="text-left">Worked in</th>
+                    <th class="text-left">Overtime type</th>
+                    <th class="text-right">OT hours</th>
+                    <th class="text-left">Period</th>
+                    <th class="text-left">Status</th>
+                    <th class="text-left">Added by</th>
+                    <th class="text-right">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for entry in entries %}
+                    <tr class="{% if entry.status == 'VOID' %}opacity-60{% endif %}">
+                        {% if can_decide %}
+                            <td class="w-8">
+                                {% if entry.can_decide %}
+                                    <input type="checkbox" name="entry_ids" value="{{ entry.pk }}"
+                                           form="bulk-overtime-form" class="form-checkbox row-check"
+                                           x-on:change="recount()">
+                                {% endif %}
+                            </td>
+                        {% endif %}
+                        <td class="whitespace-nowrap tabular-nums">{{ entry.work_date|date:"Y-m-d" }}</td>
+                        <td class="tabular-nums">{{ entry.employee.employee_id|default:"—" }}</td>
+                        <td class="font-medium whitespace-nowrap">{{ entry.employee.display_name }}</td>
+                        <td class="whitespace-nowrap">{{ entry.employee.department|default:"—" }}</td>
+                        <td class="whitespace-nowrap">{{ entry.employee.team|default:"—" }}</td>
+                        <td class="whitespace-nowrap">{{ entry.worked_in|default:"—" }}</td>
+                        <td class="whitespace-nowrap">{{ entry.overtime_type.name }}</td>
+                        <td class="text-right tabular-nums font-semibold">{{ entry.seconds|hhmmss }}</td>
+                        <td class="whitespace-nowrap text-text-mute">{{ entry.period }}</td>
+                        <td class="whitespace-nowrap">
+                            {% if entry.status == 'VOID' %}
+                                <span class="badge badge-muted" title="{% if entry.processed_by %}Rejected/voided by {{ entry.processed_by.display_name }} on {{ entry.processed_at|date:'Y-m-d' }}{% else %}Voided{% endif %}">Void</span>
+                            {% elif entry.is_pending %}
+                                <span class="badge badge-warning" title="Waiting for a manager (APM/PM or above) to review it">Pending review</span>
+                            {% elif entry.is_reviewed %}
+                                <span class="badge badge-info" title="Reviewed by {{ entry.reviewed_by.display_name|default:'—' }} on {{ entry.reviewed_at|date:'Y-m-d' }} — waiting for the department head to approve">Reviewed</span>
+                            {% else %}
+                                <span class="badge badge-success" title="Approved by {{ entry.processed_by.display_name|default:'—' }}{% if entry.processed_at %} on {{ entry.processed_at|date:'Y-m-d' }}{% endif %}{% if entry.reviewed_by %}; reviewed by {{ entry.reviewed_by.display_name }}{% endif %}">Approved</span>
+                            {% endif %}
+                            {% if entry.is_locked and not entry.is_unapproved %}
+                                <span class="badge badge-muted" title="This period's payroll inputs are locked">Inputs locked</span>
+                            {% endif %}
+                        </td>
+                        <td class="whitespace-nowrap text-text-mute">{{ entry.added_by.display_name|default:"—" }}</td>
+                        <td class="text-right whitespace-nowrap">
+                            {% if entry.can_review %}
+                                <form method="post" action="{% url 'payroll_overtime_decide' entry.pk 'review' %}?{% qs_replace %}" class="inline">
+                                    {% csrf_token %}
+                                    <button type="submit"
+                                            class="p-1.5 rounded text-text-mute hover:bg-bg-soft hover:text-sky-600 dark:hover:bg-white/5"
+                                            title="Mark reviewed — the department head still has to approve it">
+                                        <i data-lucide="eye" class="w-4 h-4"></i>
+                                    </button>
+                                </form>
+                            {% endif %}
+                            {% if entry.can_approve %}
+                                <form method="post" action="{% url 'payroll_overtime_decide' entry.pk 'approve' %}?{% qs_replace %}" class="inline">
+                                    {% csrf_token %}
+                                    <button type="submit"
+                                            class="p-1.5 rounded text-text-mute hover:bg-bg-soft hover:text-emerald-600 dark:hover:bg-white/5"
+                                            title="Approve — counts towards payroll{% if entry.is_locked %} once the run is recalculated{% endif %}">
+                                        <i data-lucide="check" class="w-4 h-4"></i>
+                                    </button>
+                                </form>
+                            {% endif %}
+                            {% if entry.can_reject %}
+                                <form method="post" action="{% url 'payroll_overtime_decide' entry.pk 'reject' %}?{% qs_replace %}" class="inline">
+                                    {% csrf_token %}
+                                    <button type="submit"
+                                            class="p-1.5 rounded text-text-mute hover:bg-bg-soft hover:text-red-600 dark:hover:bg-white/5"
+                                            title="Reject — this entry will not be paid">
+                                        <i data-lucide="x" class="w-4 h-4"></i>
+                                    </button>
+                                </form>
+                            {% endif %}
+                            {% if entry.can_edit %}
+                                <button type="button"
+                                        class="p-1.5 rounded text-text-mute hover:bg-bg-soft hover:text-brand dark:hover:bg-white/5 dark:hover:text-brand-accent"
+                                        title="Edit entry"
+                                        hx-get="{% url 'payroll_overtime_edit' entry.pk %}?{% qs_replace %}"
+                                        hx-target="#drawer-body"
+                                        hx-swap="innerHTML"
+                                        @click="open('Edit overtime — {{ entry.employee.display_name|escapejs }}')">
+                                    <i data-lucide="pencil" class="w-4 h-4"></i>
+                                </button>
+                                <form method="post" action="{% url 'payroll_overtime_void' entry.pk %}?{% qs_replace %}" class="inline">
+                                    {% csrf_token %}
+                                    <button type="submit"
+                                            class="p-1.5 rounded text-text-mute hover:bg-bg-soft hover:text-amber-600 dark:hover:bg-white/5"
+                                            title="{% if entry.status == 'VOID' %}Restore this entry{% else %}Void — keeps the row, drops it from payroll{% endif %}">
+                                        <i data-lucide="{% if entry.status == 'VOID' %}rotate-ccw{% else %}ban{% endif %}" class="w-4 h-4"></i>
+                                    </button>
+                                </form>
+                                <button type="button"
+                                        class="p-1.5 rounded text-text-mute hover:bg-bg-soft hover:text-red-600 dark:hover:bg-white/5"
+                                        title="Delete permanently"
+                                        hx-get="{% url 'payroll_overtime_delete' entry.pk %}?{% qs_replace %}"
+                                        hx-target="#drawer-body"
+                                        hx-swap="innerHTML"
+                                        @click="open('Delete overtime — {{ entry.employee.display_name|escapejs }}')">
+                                    <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                </button>
+                            {% else %}
+                                <span class="text-xs text-text-mute" title="This period's payroll inputs are locked">—</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr><td colspan="{% if can_decide %}13{% else %}12{% endif %}" class="text-center italic text-text-mute py-4">No overtime entries in this range.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% include "partials/_pagination.html" %}
+    {% include "partials/_drawer_shell.html" %}
+</div>
+{% endblock %}

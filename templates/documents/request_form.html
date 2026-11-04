@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}{{ doc_type.display_name }} · Orbis{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl space-y-6">
+  <div>
+    <a href="{% url 'documents:request_start' %}" class="text-sm text-text-soft hover:underline">
+      ← Back to document types
+    </a>
+    <h1 class="text-2xl font-semibold text-text-main dark:text-white mt-2">{{ doc_type.display_name }}</h1>
+    {% if doc_type.description %}
+      <p class="text-text-soft dark:text-white/60 mt-1">{{ doc_type.description }}</p>
+    {% endif %}
+  </div>
+
+  <form method="post" action="{{ action_url }}" class="card space-y-4">
+    {% csrf_token %}
+    {% for field in form %}
+      <div>
+        <label class="text-sm font-medium text-text-main dark:text-white block mb-1">{{ field.label }}</label>
+        {{ field }}
+        {% if field.help_text %}
+          <p class="text-xs text-text-soft dark:text-white/60 mt-1">{{ field.help_text }}</p>
+        {% endif %}
+        {% if field.errors %}
+          <p class="text-xs text-red-600 mt-1">{{ field.errors|join:" " }}</p>
+        {% endif %}
+      </div>
+    {% endfor %}
+    <div class="flex justify-end gap-2 pt-2">
+      <a href="{% url 'documents:dashboard' %}" class="btn-secondary">Cancel</a>
+      <button type="submit" class="btn-primary">
+        <i data-lucide="send" class="w-4 h-4"></i><span>Submit</span>
+      </button>
+    </div>
+  </form>
+</div>
+{% endblock %}

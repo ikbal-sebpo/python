@@ -1,0 +1,49 @@
+{% if can_view_leaves %}
+<div class="card" id="section-card-leave-history">
+    <div class="flex items-start justify-between gap-3 mb-3">
+        <div class="flex items-center gap-2">
+            <i data-lucide="plane" class="w-4 h-4 text-brand-accent"></i>
+            <h3 class="text-sm font-semibold uppercase tracking-wider text-text-mute">Leave history</h3>
+        </div>
+        <div class="flex items-center gap-2">
+            <a href="{% url 'leave_apply' %}?for={{ employee.pk }}"
+               class="text-xs text-brand hover:underline dark:text-brand-accent inline-flex items-center gap-1">
+                <i data-lucide="plus" class="w-3.5 h-3.5"></i>Apply
+            </a>
+            <a href="{% url 'leave_balance' %}?for={{ employee.pk }}"
+               class="text-xs text-brand hover:underline dark:text-brand-accent">Balance</a>
+            <a href="{% url 'leave_list' %}"
+               class="text-xs text-brand hover:underline dark:text-brand-accent">View all</a>
+        </div>
+    </div>
+    {% if recent_leaves %}
+        <ul class="space-y-2 text-sm">
+            {% for l in recent_leaves %}
+                <li class="flex items-start justify-between gap-3">
+                    <div class="min-w-0">
+                        <a href="{% url 'leave_detail' l.pk %}" class="font-medium text-text-main dark:text-white hover:underline">
+                            {{ l.leave_type.name }}
+                        </a>
+                        <div class="text-xs text-text-soft dark:text-white/60">
+                            {{ l.start_date|date:"Y-m-d" }} → {{ l.end_date|date:"Y-m-d" }} · {{ l.day_count }} day{{ l.day_count|pluralize }}
+                        </div>
+                    </div>
+                    <div class="shrink-0">
+                        {% if l.status == 'PENDING' %}
+                            <span class="badge badge-info text-[10px]">Pending</span>
+                        {% elif l.status == 'APPROVED' %}
+                            <span class="badge badge-success text-[10px]">Approved</span>
+                        {% elif l.status == 'DECLINED' %}
+                            <span class="badge text-[10px]" style="background:rgba(239,68,68,.15); color:#dc2626;">Declined</span>
+                        {% else %}
+                            <span class="badge badge-muted text-[10px]">Cancelled</span>
+                        {% endif %}
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p class="text-sm text-text-mute dark:text-white/40 italic">No leave requests yet.</p>
+    {% endif %}
+</div>
+{% endif %}

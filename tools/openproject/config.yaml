@@ -1,0 +1,74 @@
+# Settings for tools/openproject/{sync,timelog}.py — see docs/OPENPROJECT.md.
+base_url: https://op.sebpo.net
+project: orbis                 # project identifier (URL slug)
+
+# Inventory type → OpenProject type name (must be enabled in Project settings → Types)
+types:
+  Epic: Epic
+  Feature: Feature
+  Task: Task
+  Milestone: Milestone
+  Bug: Bug
+
+# Inventory status → OpenProject status name
+statuses:
+  New: New
+  In progress: In progress
+  On hold: On hold
+  Closed: Resolved           # this instance has no "Closed"; Resolved is its closed (isClosed) status
+
+# Inventory category key → OpenProject category name (Project settings → Work package categories).
+# A category that doesn't exist in OpenProject is skipped with a warning, never fatal.
+categories:
+  accounts: Accounts
+  employees: Employees
+  roster: Roster
+  leave: Leave
+  attendance: Timesheet
+  core: Dashboard
+  dynamic_menu: Menu & access
+  theme: UI & theme
+  documents: Documents
+  offboarding: Offboarding
+  policies: Policies
+  scheduler: Scheduler
+  audit: Access log
+  future: Future
+  media_store: Media store
+  payroll: Payroll
+  infra: Infrastructure
+
+timelog:
+  activity: Development        # OpenProject time-entry activity name
+  start: 2026-04-24            # first commit — nothing is logged before this
+  # Days up to and including this date log the actual punched time (9h only when a
+  # working shift has no punch). Later days log max(9h, actual) on working shifts.
+  actual_until: 2026-11-03
+  default_hours: 9
+  fallback_key: infra.planning-support   # days with no commit
+  orbis_ssh: orbis-prod        # SSH alias used by --from-orbis
+  orbis_punches_from: 2026-09-01   # first date Orbis's AttendancePunch history covers
+  # Roster "Shift Status" values that are NOT a working day.
+  non_working: ["OFF", "GH", "AL", "CL", "SL", "CPL", "LWP", "HDL", "ABS", "ML", "PL"]  # quoted: YAML reads a bare OFF as false
+
+# Contributors. Each person's hours follow their own commits only (git author
+# emails), from their own roster + TimeLy exports. `op_login` is their OpenProject
+# login — fill it in once the account exists; entries for someone else need the
+# "Log time for other users" permission (or run timelog.py from their own --login).
+people:
+  smrashel:
+    employee_id: "539"
+    git_emails: [smrashel.sebpo@gmail.com]
+    op_login: null               # null = the signed-in user
+    # Work done before a batch of commits: gap days in [from, to] are split across
+    # this person's commits dated [commits_from, commits_to], by commit count.
+    gap_windows:
+      - {from: 2026-07-03, to: 2026-07-15, commits_from: 2026-07-16, commits_to: 2026-07-21}  # decided 2026-11-03
+  iftesamulohy:
+    employee_id: null            # TODO: fill in when their account is created
+    git_emails: [iftesamulohi@gmail.com, 64037194+iftesamulohy@users.noreply.github.com]
+    op_login: null
+  eftear:
+    employee_id: null            # TODO
+    git_emails: [eftrahman@gmail.com, 83782669+eftrahman@users.noreply.github.com]
+    op_login: null

@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% block title %}Encashment · Orbis{% endblock %}
+
+{% block content %}
+<div class="page-fill">
+    <div class="card shrink-0 flex items-start justify-between gap-4">
+        <div>
+            <h1 class="text-xl font-semibold text-text-main dark:text-white">Encashment</h1>
+            <div class="text-sm text-text-mute mt-1">
+                {% if can_decide %}
+                    All encashment requests across the company.
+                {% else %}
+                    Your encashment requests.
+                {% endif %}
+            </div>
+        </div>
+        <div class="flex gap-2">
+            <a href="{% url 'encashment_request' %}" class="btn-primary">
+                <i data-lucide="plus" class="w-4 h-4"></i><span>New request</span>
+            </a>
+            <a href="{% url 'leave_balance' %}" class="btn-secondary">
+                <i data-lucide="arrow-left" class="w-4 h-4"></i><span>Balance</span>
+            </a>
+        </div>
+    </div>
+
+    {% include "partials/_result_count.html" with count_noun="requests" %}
+
+    <div class="card p-0 table-scroll">
+        <table class="table-sticky min-w-full text-sm">
+            <thead>
+                <tr class="text-text-mute text-xs uppercase tracking-wider border-b border-bg-soft dark:border-white/10">
+                    <th class="px-3 py-2 text-left">Employee</th>
+                    <th class="px-3 py-2 text-left">Leave type</th>
+                    <th class="px-3 py-2 text-left">Year</th>
+                    <th class="px-3 py-2 text-right">Requested</th>
+                    <th class="px-3 py-2 text-right">Approved</th>
+                    <th class="px-3 py-2 text-left">Status</th>
+                    <th class="px-3 py-2 text-left">When</th>
+                    {% if can_decide %}<th class="px-3 py-2"></th>{% endif %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for r in requests %}
+                    <tr class="border-b border-bg-soft/50 dark:border-white/5">
+                        <td class="px-3 py-2">{{ r.employee.display_name }}</td>
+                        <td class="px-3 py-2">{{ r.leave_policy.shift_type.name }}</td>
+                        <td class="px-3 py-2">{{ r.year }}</td>
+                        <td class="px-3 py-2 text-right tabular-nums">{{ r.days_requested }}</td>
+                        <td class="px-3 py-2 text-right tabular-nums">{{ r.days_approved|default:"—" }}</td>
+                        <td class="px-3 py-2">
+                            {% if r.status == 'PENDING' %}<span class="badge badge-info">Pending</span>
+                            {% elif r.status == 'APPROVED' %}<span class="badge badge-success">Approved</span>
+                            {% elif r.status == 'REJECTED' %}<span class="badge" style="background:rgba(239,68,68,.15);color:#dc2626;">Rejected</span>
+                            {% else %}<span class="badge badge-muted">Paid</span>{% endif %}
+                        </td>
+                        <td class="px-3 py-2 text-text-mute text-xs">{{ r.requested_at|date:"Y-m-d H:i" }}</td>
+                        {% if can_decide %}
+                            <td class="px-3 py-2 text-right whitespace-nowrap">
+                                {% if r.status == 'PENDING' %}
+                                    <form method="post" action="{% url 'encashment_decide' r.pk %}" class="inline">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="action" value="approve">
+                                        <button type="submit" class="text-xs text-brand hover:underline dark:text-brand-accent">Approve</button>
+                                    </form>
+                                    <form method="post" action="{% url 'encashment_decide' r.pk %}" class="inline ml-2">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="action" value="reject">
+                                        <button type="submit" class="text-xs text-red-600 dark:text-red-400 hover:underline">Reject</button>
+                                    </form>
+                                {% elif r.status == 'APPROVED' %}
+                                    <form method="post" action="{% url 'encashment_decide' r.pk %}" class="inline">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="action" value="mark_paid">
+                                        <button type="submit" class="text-xs text-brand hover:underline dark:text-brand-accent">Mark paid</button>
+                                    </form>
+                                {% endif %}
+                            </td>
+                        {% endif %}
+                    </tr>
+                {% empty %}
+                    <tr><td colspan="{% if can_decide %}8{% else %}7{% endif %}" class="px-3 py-4 text-text-mute italic text-center">
+                        No encashment requests yet.
+                    </td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% include "partials/_pagination.html" %}
+</div>
+{% endblock %}

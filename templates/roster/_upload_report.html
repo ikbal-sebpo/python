@@ -1,0 +1,381 @@
+{# Result fragment for /roster/upload/ — swapped in by HTMX on each submit. #}
+<div class="card mb-4">
+    <h2 class="text-sm font-semibold mb-3">Result</h2>
+
+    {% if inline_error %}
+        <div class="mb-3 px-3 py-2 rounded border border-red-300 bg-red-50 text-red-800
+                    dark:border-red-700/50 dark:bg-red-900/20 dark:text-red-200 text-sm">
+            {{ inline_error }}
+        </div>
+    {% endif %}
+
+    {% if report %}
+        {% if aborted %}
+            <div class="mb-3 px-3 py-2 rounded border border-red-300 bg-red-50 text-red-800
+                        dark:border-red-700/50 dark:bg-red-900/20 dark:text-red-200 text-sm">
+                Upload aborted. Nothing was written. Fix the errors below and re-upload.
+            </div>
+        {% elif preview %}
+            <div class="mb-3 px-3 py-2 rounded border border-blue-300 bg-blue-50 text-blue-800
+                        dark:border-blue-700/50 dark:bg-blue-900/20 dark:text-blue-200 text-sm">
+                Preview only — nothing was written. Click <span class="font-medium">Apply upload</span>
+                to commit the same file.
+            </div>
+        {% else %}
+            <div class="mb-3 px-3 py-2 rounded border border-emerald-300 bg-emerald-50 text-emerald-800
+                        dark:border-emerald-700/50 dark:bg-emerald-900/20 dark:text-emerald-200 text-sm">
+                <span class="font-medium">{{ report.created|length }}</span> created ·
+                <span class="font-medium">{{ report.updated|length }}</span> updated ·
+                <span class="font-medium">{{ report.skipped_scope|length }}</span> scope-skipped ·
+                <span class="font-medium">{{ report.skipped_leave|length }}</span> leave-protected
+                {% if report.skipped_past_lwd %}
+                    · <span class="font-medium">{{ report.skipped_past_lwd|length }}</span> past last working date
+                {% endif %}
+                {% if report.skipped_before_joining %}
+                    · <span class="font-medium">{{ report.skipped_before_joining|length }}</span> before joining date
+                {% endif %}
+                {% if report.skipped_night_window %}
+                    · <span class="font-medium">{{ report.skipped_night_window|length }}</span> night-window protected
+                {% endif %}
+                {% if report.overridden_leave %}
+                    · <span class="font-medium">{{ report.overridden_leave|length }}</span> leave-overridden
+                {% endif %}
+            </div>
+        {% endif %}
+
+        {% if report.parse_errors %}
+            <h3 class="text-xs font-semibold uppercase tracking-wide text-red-700 dark:text-red-300 mt-4 mb-2">
+                Errors ({{ report.parse_errors|length }})
+            </h3>
+            <div class="overflow-x-auto">
+                <table class="table-simple text-sm">
+                    <thead>
+                        <tr>
+                            <th class="w-12">Row</th>
+                            <th class="w-12">Col</th>
+                            <th>Employee ID</th>
+                            <th>Date</th>
+                            <th>Shift</th>
+                            <th>Reason</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for err in report.parse_errors %}
+                            <tr class="text-red-700 dark:text-red-300">
+                                <td>{{ err.line_no }}</td>
+                                <td>{{ err.col_letter|default:"—" }}</td>
+                                <td>{{ err.raw|stringformat:"s" }}</td>
+                                <td>{{ err.raw.Date|default:"—" }}</td>
+                                <td>{{ err.raw.Shift|default:"—" }}</td>
+                                <td>{{ err.message }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endif %}
+
+        {% if report.duplicates %}
+            <h3 class="text-xs font-semibold uppercase tracking-wide text-red-700 dark:text-red-300 mt-4 mb-2">
+                Duplicates within file ({{ report.duplicates|length }})
+            </h3>
+            <div class="overflow-x-auto">
+                <table class="table-simple text-sm">
+                    <thead>
+                        <tr>
+                            <th class="w-12">Row</th>
+                            <th>Employee ID</th>
+                            <th>Date</th>
+                            <th>Shift</th>
+                            <th>Reason</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for err in report.duplicates %}
+                            <tr class="text-red-700 dark:text-red-300">
+                                <td>{{ err.line_no }}</td>
+                                <td>{{ err.raw.Employee_ID|default:err.raw|stringformat:"s" }}</td>
+                                <td>{{ err.raw.Date }}</td>
+                                <td>{{ err.raw.Shift }}</td>
+                                <td>{{ err.message }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endif %}
+
+        {% if report.skipped_scope %}
+            <h3 class="text-xs font-semibold uppercase tracking-wide text-amber-700 dark:text-amber-300 mt-4 mb-2">
+                Outside your scope ({{ report.skipped_scope|length }})
+            </h3>
+            <div class="overflow-x-auto">
+                <table class="table-simple text-sm">
+                    <thead>
+                        <tr>
+                            <th class="w-12">Row</th>
+                            <th>Employee ID</th>
+                            <th>Date</th>
+                            <th>Shift</th>
+                            <th>Reason</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for err in report.skipped_scope %}
+                            <tr class="text-amber-700 dark:text-amber-300">
+                                <td>{{ err.line_no }}</td>
+                                <td>{{ err.raw.Employee_ID|default:err.raw|stringformat:"s" }}</td>
+                                <td>{{ err.raw.Date }}</td>
+                                <td>{{ err.raw.Shift }}</td>
+                                <td>{{ err.message }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endif %}
+
+        {% if report.skipped_leave %}
+            <h3 class="text-xs font-semibold uppercase tracking-wide text-amber-700 dark:text-amber-300 mt-4 mb-2">
+                Protected by approved leave ({{ report.skipped_leave|length }})
+            </h3>
+            <div class="overflow-x-auto">
+                <table class="table-simple text-sm">
+                    <thead>
+                        <tr>
+                            <th class="w-12">Row</th>
+                            <th>Employee ID</th>
+                            <th>Date</th>
+                            <th>Shift</th>
+                            <th>Reason</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for err in report.skipped_leave %}
+                            <tr class="text-amber-700 dark:text-amber-300">
+                                <td>{{ err.line_no }}</td>
+                                <td>{{ err.raw.Employee_ID|default:err.raw|stringformat:"s" }}</td>
+                                <td>{{ err.raw.Date }}</td>
+                                <td>{{ err.raw.Shift }}</td>
+                                <td>{{ err.message }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endif %}
+
+        {% if report.skipped_past_lwd %}
+            <h3 class="text-xs font-semibold uppercase tracking-wide text-amber-700 dark:text-amber-300 mt-4 mb-2">
+                Past last working date ({{ report.skipped_past_lwd|length }})
+            </h3>
+            <div class="overflow-x-auto">
+                <table class="table-simple text-sm">
+                    <thead>
+                        <tr>
+                            <th class="w-12">Row</th>
+                            <th>Employee ID</th>
+                            <th>Date</th>
+                            <th>Shift</th>
+                            <th>Reason</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for err in report.skipped_past_lwd %}
+                            <tr class="text-amber-700 dark:text-amber-300">
+                                <td>{{ err.line_no }}</td>
+                                <td>{{ err.raw.Employee_ID|default:err.raw|stringformat:"s" }}</td>
+                                <td>{{ err.raw.Date }}</td>
+                                <td>{{ err.raw.Shift }}</td>
+                                <td>{{ err.message }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endif %}
+
+        {% if report.skipped_before_joining %}
+            <h3 class="text-xs font-semibold uppercase tracking-wide text-amber-700 dark:text-amber-300 mt-4 mb-2">
+                Before joining date ({{ report.skipped_before_joining|length }})
+            </h3>
+            <div class="overflow-x-auto">
+                <table class="table-simple text-sm">
+                    <thead>
+                        <tr>
+                            <th class="w-12">Row</th>
+                            <th>Employee ID</th>
+                            <th>Date</th>
+                            <th>Shift</th>
+                            <th>Reason</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for err in report.skipped_before_joining %}
+                            <tr class="text-amber-700 dark:text-amber-300">
+                                <td>{{ err.line_no }}</td>
+                                <td>{{ err.raw.Employee_ID|default:err.raw|stringformat:"s" }}</td>
+                                <td>{{ err.raw.Date }}</td>
+                                <td>{{ err.raw.Shift }}</td>
+                                <td>{{ err.message }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endif %}
+
+        {% if report.skipped_night_window %}
+            <h3 class="text-xs font-semibold uppercase tracking-wide text-amber-700 dark:text-amber-300 mt-4 mb-2">
+                Dedicated night shift window ({{ report.skipped_night_window|length }})
+            </h3>
+            <div class="overflow-x-auto">
+                <table class="table-simple text-sm">
+                    <thead>
+                        <tr>
+                            <th class="w-12">Row</th>
+                            <th>Employee ID</th>
+                            <th>Date</th>
+                            <th>Shift</th>
+                            <th>Reason</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for err in report.skipped_night_window %}
+                            <tr class="text-amber-700 dark:text-amber-300">
+                                <td>{{ err.line_no }}</td>
+                                <td>{{ err.raw.Employee_ID|default:err.raw|stringformat:"s" }}</td>
+                                <td>{{ err.raw.Date }}</td>
+                                <td>{{ err.raw.Shift }}</td>
+                                <td>{{ err.message }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endif %}
+
+        {% if report.overridden_leave %}
+            <h3 class="text-xs font-semibold uppercase tracking-wide text-amber-700 dark:text-amber-300 mt-4 mb-2">
+                Overrode approved leave ({{ report.overridden_leave|length }})
+            </h3>
+            <div class="overflow-x-auto">
+                <table class="table-simple text-sm">
+                    <thead>
+                        <tr>
+                            <th class="w-12">Row</th>
+                            <th>Employee ID</th>
+                            <th>Date</th>
+                            <th>New shift</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in report.overridden_leave %}
+                            <tr class="text-amber-700 dark:text-amber-300">
+                                <td>{{ row.line_no }}</td>
+                                <td>{{ row.employee_id }}</td>
+                                <td>{{ row.date|date:"Y-m-d" }}</td>
+                                <td>{% if row.shift_attribute %}{{ row.shift_attribute.name }}{% else %}{{ row.shift_type.name }}{% endif %}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endif %}
+
+        {% if preview and parsed_preview %}
+            <details class="mt-4">
+                <summary class="cursor-pointer text-xs font-semibold uppercase tracking-wide text-text-soft dark:text-white/70">
+                    Rows that would be applied ({{ parsed_preview|length }})
+                </summary>
+                <div class="overflow-x-auto mt-2">
+                    <table class="table-simple text-sm">
+                        <thead>
+                            <tr>
+                                <th class="w-12">Row</th>
+                                <th>Employee ID</th>
+                                <th>Date</th>
+                                <th>Shift</th>
+                                <th>Location</th>
+                                <th>Holiday?</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in parsed_preview %}
+                                <tr>
+                                    <td>{{ row.line_no }}</td>
+                                    <td>{{ row.employee_id }}</td>
+                                    <td>{{ row.date|date:"Y-m-d" }}</td>
+                                    <td>
+                                        {% if row.shift_attribute %}
+                                            {{ row.shift_attribute.name }}
+                                        {% else %}
+                                            {{ row.shift_type.name }}
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if row.work_location %}WFH{% elif row.job_location %}{{ row.job_location.code|default:row.job_location.name }}{% else %}<span class="text-text-mute">default</span>{% endif %}
+                                    </td>
+                                    <td>
+                                        {% if row.is_holiday %}
+                                            <span class="badge badge-warning"><i data-lucide="calendar-x" class="w-3 h-3"></i>Holiday</span>
+                                        {% else %}—{% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </details>
+        {% endif %}
+
+        {% if not preview and not aborted %}
+            {% if report.created or report.updated %}
+                <details class="mt-4" open>
+                    <summary class="cursor-pointer text-xs font-semibold uppercase tracking-wide text-emerald-700 dark:text-emerald-300">
+                        Applied rows ({{ report.created|length|add:report.updated|length }})
+                    </summary>
+                    <div class="overflow-x-auto mt-2">
+                        <table class="table-simple text-sm">
+                            <thead>
+                                <tr>
+                                    <th class="w-12">Row</th>
+                                    <th>Status</th>
+                                    <th>Employee ID</th>
+                                    <th>Date</th>
+                                    <th>Shift</th>
+                                    <th>Location</th>
+                                    <th>Holiday?</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for row in report.created %}
+                                    <tr class="text-emerald-700 dark:text-emerald-300">
+                                        <td>{{ row.line_no }}</td>
+                                        <td><span class="badge badge-success">Created</span></td>
+                                        <td>{{ row.employee_id }}</td>
+                                        <td>{{ row.date|date:"Y-m-d" }}</td>
+                                        <td>{% if row.shift_attribute %}{{ row.shift_attribute.name }}{% else %}{{ row.shift_type.name }}{% endif %}</td>
+                                        <td>{% if row.work_location %}WFH{% elif row.job_location %}{{ row.job_location.code|default:row.job_location.name }}{% else %}<span class="text-text-mute">default</span>{% endif %}</td>
+                                        <td>{% if row.is_holiday %}<span class="badge badge-warning">Holiday</span>{% else %}—{% endif %}</td>
+                                    </tr>
+                                {% endfor %}
+                                {% for row in report.updated %}
+                                    <tr>
+                                        <td>{{ row.line_no }}</td>
+                                        <td><span class="badge badge-info">Updated</span></td>
+                                        <td>{{ row.employee_id }}</td>
+                                        <td>{{ row.date|date:"Y-m-d" }}</td>
+                                        <td>{% if row.shift_attribute %}{{ row.shift_attribute.name }}{% else %}{{ row.shift_type.name }}{% endif %}</td>
+                                        <td>{% if row.work_location %}WFH{% elif row.job_location %}{{ row.job_location.code|default:row.job_location.name }}{% else %}<span class="text-text-mute">default</span>{% endif %}</td>
+                                        <td>{% if row.is_holiday %}<span class="badge badge-warning">Holiday</span>{% else %}—{% endif %}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </details>
+            {% endif %}
+        {% endif %}
+    {% endif %}
+</div>

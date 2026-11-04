@@ -1,0 +1,12 @@
+Hello {{ recipient.first_name|default:recipient.email }},
+
+This is a reminder that you have not yet acknowledged the following policy:
+
+  {{ policy.key }} — {{ policy.title }}{% if version %} (version {{ version.version }}){% endif %}
+{% if policy.due_days %}
+Please sign within {{ policy.due_days }} day(s) of assignment.
+{% endif %}
+Review and sign here (Orbis login required):
+  {{ sign_url }}
+
+— Orbis

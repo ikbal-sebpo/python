@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}Gross salary · Orbis{% endblock %}
+
+{% block content %}
+<div class="page-fill">
+    <div class="card shrink-0 flex flex-wrap items-center gap-3">
+        <form method="get" class="flex flex-wrap items-center gap-2 flex-1 min-w-[240px]">
+            {% include "partials/_employee_filter_controls.html" %}
+            <button type="submit" class="btn-secondary">Search</button>
+        </form>
+        <a href="{% url 'payroll_salary_upload_history' %}" class="btn-secondary">
+            <i data-lucide="history" class="w-4 h-4"></i><span>Import history</span>
+        </a>
+        <a href="{% url 'payroll_salary_upload' %}" class="btn-primary">
+            <i data-lucide="upload" class="w-4 h-4"></i><span>Upload salary</span>
+        </a>
+    </div>
+
+    {% include "partials/_result_count.html" with count_noun="employees" %}
+
+    <div class="card p-0 table-scroll">
+        <table class="table-simple table-sticky min-w-full text-sm">
+            <thead>
+                <tr>
+                    <th class="text-left">Emp ID</th>
+                    <th class="text-left">Name</th>
+                    <th class="text-left">Department</th>
+                    <th class="text-left">Team</th>
+                    <th class="text-right">Gross monthly</th>
+                    <th class="text-left">Effective from</th>
+                    <th class="text-left">Reason</th>
+                    <th class="text-left">Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for emp in employees %}
+                    {% with structure=emp.current_salary_list.0 %}
+                    <tr class="cursor-pointer hover:bg-bg-soft/40 dark:hover:bg-white/5"
+                        onclick="window.location='{% url 'payroll_salary_detail' emp.pk %}'">
+                        <td class="tabular-nums">{{ emp.employee_id|default:"—" }}</td>
+                        <td class="font-medium whitespace-nowrap">{{ emp.display_name }}</td>
+                        <td class="whitespace-nowrap">{{ emp.department|default:"—" }}</td>
+                        <td class="whitespace-nowrap">{{ emp.team|default:"—" }}</td>
+                        <td class="text-right tabular-nums font-semibold">{{ structure.gross_monthly|taka }}</td>
+                        <td class="whitespace-nowrap">{{ structure.effective_from|date:"Y-m-d" }}</td>
+                        <td class="whitespace-nowrap">{{ structure.get_reason_display }}</td>
+                        <td><span class="badge badge-success">{{ structure.get_status_display }}</span></td>
+                    </tr>
+                    {% endwith %}
+                {% empty %}
+                    <tr><td colspan="8" class="text-center italic text-text-mute py-4">No current salary structures yet.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% include "partials/_pagination.html" %}
+</div>
+{% endblock %}

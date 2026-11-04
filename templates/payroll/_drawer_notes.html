@@ -1,0 +1,47 @@
+{% comment %}
+    Drawer body for one employee's Supervisor/HR/Finance notes on a run.
+    Everyone who can open this sees all three; each field is editable only
+    for the role(s) this viewer is authorized to write (roles.*.can_write).
+{% endcomment %}
+<div class="drawer-body space-y-5">
+    <p class="text-xs text-text-mute dark:text-white/50">
+        {{ employee.get_full_name|default:employee.email }} · {{ run.period }}
+    </p>
+
+    <form method="post" id="notes-form" action="{{ action_url }}"
+          hx-post="{{ action_url }}"
+          hx-target="#drawer-body"
+          hx-swap="innerHTML"
+          class="flex flex-col gap-5">
+        {% csrf_token %}
+
+        {% for role_item in roles %}
+            <div>
+                <h3 class="text-xs font-semibold uppercase tracking-wider text-text-mute mb-1">{{ role_item.label }} note</h3>
+                {% if role_item.updated_by %}
+                    <p class="text-[11px] text-text-mute mb-1">
+                        Last updated by {{ role_item.updated_by.get_full_name|default:role_item.updated_by.email }} · {{ role_item.updated_at|date:"Y-m-d H:i" }}
+                    </p>
+                {% endif %}
+                {% if role_item.can_write %}
+                    <textarea name="{{ role_item.field_name }}" rows="3" class="form-input w-full"
+                              placeholder="Add a note…">{{ role_item.note }}</textarea>
+                {% else %}
+                    {# Plain read-only text, not an input of any kind — a viewer #}
+                    {# without write access to this role shouldn't see anything #}
+                    {# that looks editable, disabled or otherwise. #}
+                    <p class="text-sm rounded border border-bg-soft dark:border-white/10 bg-bg-soft/30 dark:bg-white/5 px-3 py-2 whitespace-pre-wrap min-h-[4.5rem]">
+                        {% if role_item.note %}{{ role_item.note }}{% else %}<span class="italic text-text-mute">No note yet.</span>{% endif %}
+                    </p>
+                {% endif %}
+            </div>
+        {% endfor %}
+    </form>
+</div>
+
+<div class="drawer-footer justify-end">
+    <button type="button" class="btn-secondary" @click="close()">Close</button>
+    <button type="submit" form="notes-form" class="btn-primary">
+        <i data-lucide="save" class="w-4 h-4"></i><span>Save</span>
+    </button>
+</div>

@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Pending acknowledgements · Orbis{% endblock %}
+{% block content %}
+<div class="page-fill">
+  <h1 class="shrink-0 text-2xl font-semibold text-text-main dark:text-white">Pending acknowledgements</h1>
+
+  {% if pending_steps %}
+    <div class="card p-0 table-scroll">
+      <table class="table-sticky w-full text-sm">
+        <thead class="text-left text-xs uppercase text-text-soft border-b border-bg-soft dark:border-white/10">
+          <tr>
+            <th class="py-2 px-3">Employee</th>
+            <th class="py-2 px-3">LWD</th>
+            <th class="py-2 px-3">Step</th>
+            <th class="py-2 px-3"></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for s in pending_steps %}
+            <tr class="border-b border-bg-soft dark:border-white/5">
+              <td class="py-2 px-3">
+                <div class="font-medium">{{ s.case.resignation.employee.display_name }}</div>
+                <div class="text-xs text-text-soft">{{ s.case.resignation.employee.email }}</div>
+              </td>
+              <td class="py-2 px-3 text-text-soft">{{ s.case.resignation.last_working_date }}</td>
+              <td class="py-2 px-3">{{ s.step_name }}</td>
+              <td class="py-2 px-3 text-right">
+                <a href="{% url 'offboarding:clearance_step_action' s.pk %}" class="btn-primary text-xs">Acknowledge</a>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <div class="card"><p class="text-sm text-text-soft">Nothing waiting on you.</p></div>
+  {% endif %}
+</div>
+{% endblock %}

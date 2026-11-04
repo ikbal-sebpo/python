@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block title %}{{ bucket_label }} · Orbis{% endblock %}
+
+{% block content %}
+<div class="card mb-4">
+    <div class="flex items-center justify-between flex-wrap gap-3">
+        <div>
+            <div class="flex items-center gap-2">
+                <a href="{% url 'home' %}?tab={{ back_tab|default:'org' }}" class="text-xs text-text-mute hover:text-brand-accent inline-flex items-center gap-1">
+                    <i data-lucide="chevron-left" class="w-3.5 h-3.5"></i>
+                    <span>Back to dashboard</span>
+                </a>
+            </div>
+            <h1 class="text-lg font-semibold text-text-main dark:text-white mt-1">
+                {{ bucket_label }}{% if header_subtitle %} · <span class="text-text-mute font-normal">{{ header_subtitle }}</span>{% endif %}
+            </h1>
+            <div class="text-xs text-text-mute mt-0.5">
+                {{ row_count }} of {{ total_active }} {{ count_noun|default:"active employees" }}
+            </div>
+        </div>
+        {% if show_attendance_link %}
+            <a href="{% url 'attendance_list' %}?date={{ attendance_history_date|date:'Y-m-d' }}" class="text-xs text-brand hover:underline dark:text-brand-accent inline-flex items-center gap-1">
+                <span>View full history</span><i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+            </a>
+        {% endif %}
+        {% if tabs %}
+            <div class="flex items-center gap-2">
+                {% for t in tabs %}
+                    <a href="{% url 'dashboard_status_today' %}?scope={{ scope }}&bucket={{ t.bucket }}"
+                       class="text-xs px-3 py-1.5 rounded {% if t.active %}bg-brand-accent/15 text-brand-accent{% else %}text-text-mute hover:bg-bg-soft/40 dark:hover:bg-white/5{% endif %}">
+                        {{ t.label }}
+                    </a>
+                {% endfor %}
+            </div>
+        {% elif show_shift_pills %}
+            <div class="flex items-center gap-2">
+                <a href="{% url 'dashboard_status_today' %}?bucket=working"
+                   class="text-xs px-3 py-1.5 rounded {% if bucket == 'working' %}bg-brand-accent/15 text-brand-accent{% else %}text-text-mute hover:bg-bg-soft/40 dark:hover:bg-white/5{% endif %}">
+                    On working shift
+                </a>
+                <a href="{% url 'dashboard_status_today' %}?bucket=off"
+                   class="text-xs px-3 py-1.5 rounded {% if bucket == 'off' %}bg-brand-teal/15 text-brand-teal{% else %}text-text-mute hover:bg-bg-soft/40 dark:hover:bg-white/5{% endif %}">
+                    Day off
+                </a>
+                <a href="{% url 'dashboard_status_today' %}?bucket=leave"
+                   class="text-xs px-3 py-1.5 rounded {% if bucket == 'leave' %}bg-brand-blue/15 text-brand-blue{% else %}text-text-mute hover:bg-bg-soft/40 dark:hover:bg-white/5{% endif %}">
+                    On leave
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<div class="card">
+    {% for row in rows %}
+        <a href="{% url 'employee_detail' row.employee.pk %}"
+           class="flex items-center justify-between py-2 border-b border-bg-soft/50 dark:border-white/5 last:border-0 hover:bg-bg-soft/40 dark:hover:bg-white/5 -mx-2 px-2 rounded">
+            <div class="text-sm min-w-0">
+                <div class="font-medium truncate">{{ row.employee.display_name }}</div>
+                <div class="text-xs text-text-mute truncate">
+                    {{ row.employee.designation.name|default:"" }}{% if row.employee.department %} · {{ row.employee.department.name }}{% endif %}
+                </div>
+            </div>
+            {% if row.right_meta %}
+                <div class="text-xs text-text-mute tabular-nums whitespace-nowrap ml-3 max-w-[40%] truncate text-right">
+                    {{ row.right_meta }}
+                </div>
+            {% elif row.employee.employee_id %}
+                <div class="text-xs text-text-mute tabular-nums whitespace-nowrap">
+                    {{ row.employee.employee_id }}
+                </div>
+            {% endif %}
+        </a>
+    {% empty %}
+        <div class="text-sm text-text-mute italic py-6 text-center">
+            No employees in this bucket.
+        </div>
+    {% endfor %}
+</div>
+{% endblock %}

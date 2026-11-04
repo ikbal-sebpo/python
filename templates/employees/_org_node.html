@@ -1,0 +1,14 @@
+{% comment %}
+Recursive: one person plus (when `node.open`) their children. The Alpine
+scope here is what the card's Show/Hide button toggles; children are
+server-rendered when open on first paint and otherwise fetched once via
+htmx into #org-kids-<pk> (see _org_card.html).
+{% endcomment %}
+<div class="org-node" id="org-{{ node.pk }}" x-data="{ open: {% if node.open %}true{% else %}false{% endif %} }">
+    {% include "employees/_org_card.html" with node=node is_root=is_root %}
+    {% if node.children %}
+        <div class="org-kids" id="org-kids-{{ node.pk }}" x-show="open"{% if not node.open %} x-cloak{% endif %}>
+            {% if node.open %}{% include "employees/_org_children.html" with node=node %}{% endif %}
+        </div>
+    {% endif %}
+</div>

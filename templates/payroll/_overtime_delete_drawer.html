@@ -1,0 +1,82 @@
+{% load payroll_extras %}
+{% comment %}
+    htmx drawer body for delete confirmation — same shape as
+    employees/_drawer_confirm_delete.html (warning glyph, question heading,
+    Cancel + red confirm in the drawer footer), with the entry's own figures
+    spelled out: a browser confirm() can't show WHICH row is about to go.
+
+    Both buttons are plain POSTs, no htmx: the employees one swaps a single
+    profile section card in place, but either outcome here changes the list
+    behind the drawer, so the page has to re-render.
+
+    Void sits next to Delete on purpose — it's the reversible option, and
+    it's what most people actually want when they say "remove this".
+{% endcomment %}
+<div class="drawer-body space-y-4">
+    <div class="flex items-start gap-3">
+        <div class="w-10 h-10 rounded bg-red-500/15 text-red-600 dark:text-red-400 flex items-center justify-center shrink-0">
+            <i data-lucide="alert-triangle" class="w-5 h-5"></i>
+        </div>
+        <div>
+            <h3 class="text-base font-semibold text-text-main dark:text-white">Delete this overtime entry?</h3>
+            <p class="text-sm text-text-soft dark:text-white/60 mt-1">
+                Permanently removed — there's no undo and no record left behind.
+            </p>
+        </div>
+    </div>
+
+    <dl class="grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-sm">
+        <dt class="text-text-mute">Employee</dt>
+        <dd class="font-medium">
+            {{ entry.employee.display_name }}{% if entry.employee.employee_id %}
+                <span class="text-text-mute">· {{ entry.employee.employee_id }}</span>{% endif %}
+        </dd>
+        <dt class="text-text-mute">Work date</dt>
+        <dd class="tabular-nums">{{ entry.work_date|date:"Y-m-d" }}</dd>
+        <dt class="text-text-mute">Overtime type</dt>
+        <dd>{{ entry.overtime_type.name }}</dd>
+        <dt class="text-text-mute">OT hours</dt>
+        <dd class="tabular-nums font-semibold">{{ entry.seconds|hhmmss }}</dd>
+        <dt class="text-text-mute">Period</dt>
+        <dd>{{ entry.period }}</dd>
+        <dt class="text-text-mute">Status</dt>
+        <dd>
+            {% if entry.status == 'VOID' %}
+                <span class="badge badge-muted">Void</span>
+            {% else %}
+                <span class="badge badge-success">Approved</span>
+            {% endif %}
+        </dd>
+        {% if entry.added_by %}
+            <dt class="text-text-mute">Filed by</dt>
+            <dd>{{ entry.added_by.display_name }} · {{ entry.added_at|date:"Y-m-d" }}</dd>
+        {% endif %}
+        {% if entry.note %}
+            <dt class="text-text-mute">Note</dt>
+            <dd>{{ entry.note }}</dd>
+        {% endif %}
+    </dl>
+
+    {% if entry.status != 'VOID' %}
+        <p class="text-xs text-text-mute">
+            Only need it out of payroll? <span class="font-medium">Void</span> keeps the row and who filed it,
+            and can be undone.
+        </p>
+        <form method="post" action="{{ void_url }}" id="overtime-void-form">{% csrf_token %}</form>
+    {% endif %}
+</div>
+
+<div class="drawer-footer justify-end">
+    <button type="button" class="btn-secondary" @click="close()">Cancel</button>
+    {% if entry.status != 'VOID' %}
+        <button type="submit" form="overtime-void-form" class="btn-secondary">
+            <i data-lucide="ban" class="w-4 h-4"></i><span>Void instead</span>
+        </button>
+    {% endif %}
+    <form method="post" action="{{ action_url }}" class="inline">
+        {% csrf_token %}
+        <button type="submit" class="btn-primary bg-red-600 hover:bg-red-700 focus:ring-red-400">
+            <i data-lucide="trash-2" class="w-4 h-4"></i><span>Yes, delete</span>
+        </button>
+    </form>
+</div>

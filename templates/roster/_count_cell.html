@@ -1,0 +1,21 @@
+{% comment %}
+    Context:
+      day_header     {date, counts: [(ShiftType, int), ...]}
+      oob            True on OOB replacement after a cell save
+
+    OOB-safe because base.html sets htmx.config.useTemplateFragments = true,
+    which preserves bare <th>/<td> elements when parsing the response.
+{% endcomment %}
+<th id="shift-count-{{ day_header.date|date:'Ymd' }}"
+    {% if oob %}hx-swap-oob="true"{% endif %}
+    class="text-left px-3 py-2 text-[11px] font-normal normal-case tracking-normal
+           bg-bg-soft/50 dark:bg-white/5 border-b border-bg-soft dark:border-white/10 align-top">
+    {% for st, n in day_header.counts %}
+        <div class="flex items-center justify-between gap-2">
+            <span class="text-text-soft dark:text-white/70 truncate">{{ st.name }}</span>
+            <span class="font-medium {% if n %}text-brand dark:text-brand-accent{% else %}text-text-mute{% endif %}">{{ n }}</span>
+        </div>
+    {% empty %}
+        <div class="text-text-mute">—</div>
+    {% endfor %}
+</th>

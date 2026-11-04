@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% block title %}My Policies · Orbis{% endblock %}
+
+{% comment %}
+    Tabular "My Policies" view modelled on TeamMate: rows grouped by workflow
+    state (To sign / Accepted), columns = status icon · Name · Workflow State ·
+    Last Accepted Date. The page title shows in the topbar via `page_title`.
+{% endcomment %}
+
+{% block content %}
+<div class="page-fill">
+
+  <div class="card p-0 table-scroll">
+    <table class="table-sticky min-w-full text-sm">
+      <thead>
+        <tr class="text-left text-xs uppercase tracking-wide text-text-soft dark:text-white/50 border-b border-bg-soft dark:border-white/10">
+          <th class="w-10 py-2.5 pl-4"><i data-lucide="check" class="w-4 h-4"></i></th>
+          <th class="py-2.5 pr-4">Name</th>
+          <th class="py-2.5 pr-4">Workflow State</th>
+          <th class="py-2.5 pr-4 text-right">Last Accepted Date</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-bg-soft dark:divide-white/10">
+
+        {# --- To sign group --- #}
+        {% if outstanding %}
+          <tr class="bg-bg-soft/60 dark:bg-white/5">
+            <td colspan="4" class="py-1.5 pl-4 text-xs font-semibold uppercase tracking-wide text-text-soft dark:text-white/60">
+              To sign ({{ outstanding|length }})
+            </td>
+          </tr>
+          {% for a in outstanding %}
+            <tr class="hover:bg-bg-soft dark:hover:bg-white/5">
+              <td class="py-2.5 pl-4 align-top">
+                {% if a.status == 'SUPERSEDED' %}
+                  <i data-lucide="rotate-ccw" class="w-4 h-4 text-blue-500 dark:text-blue-400"></i>
+                {% else %}
+                  <i data-lucide="clock" class="w-4 h-4 text-amber-500 dark:text-amber-400"></i>
+                {% endif %}
+              </td>
+              <td class="py-2.5 pr-4">
+                <a href="{% url 'policies:sign' a.policy.pk %}" class="font-medium text-brand-accent hover:underline">
+                  {{ a.policy.key }}: {{ a.policy.title }}
+                </a>
+                {% if a.policy.due_days %}<div class="text-xs text-text-soft dark:text-white/50">Sign within {{ a.policy.due_days }} day(s)</div>{% endif %}
+              </td>
+              <td class="py-2.5 pr-4">
+                {% if a.status == 'SUPERSEDED' %}
+                  <span class="badge badge-info">Re-sign due</span>
+                {% else %}
+                  <span class="badge badge-muted">Pending</span>
+                {% endif %}
+              </td>
+              <td class="py-2.5 pr-4 text-right text-text-soft dark:text-white/50">—</td>
+            </tr>
+          {% endfor %}
+        {% endif %}
+
+        {# --- Accepted group --- #}
+        {% if signed %}
+          <tr class="bg-bg-soft/60 dark:bg-white/5">
+            <td colspan="4" class="py-1.5 pl-4 text-xs font-semibold uppercase tracking-wide text-text-soft dark:text-white/60">
+              Accepted ({{ signed|length }})
+            </td>
+          </tr>
+          {% for a in signed %}
+            <tr class="hover:bg-bg-soft dark:hover:bg-white/5">
+              <td class="py-2.5 pl-4 align-top">
+                <i data-lucide="check" class="w-4 h-4 text-emerald-500 dark:text-emerald-400"></i>
+              </td>
+              <td class="py-2.5 pr-4">
+                <a href="{% url 'policies:sign' a.policy.pk %}" class="font-medium text-brand-accent hover:underline">
+                  {{ a.policy.key }}: {{ a.policy.title }}
+                </a>
+                {% if a.version %}<div class="text-xs text-text-soft dark:text-white/50">Version {{ a.version.version }}</div>{% endif %}
+              </td>
+              <td class="py-2.5 pr-4"><span class="badge badge-success">Accepted</span></td>
+              <td class="py-2.5 pr-4 text-right text-text-main dark:text-white/80">{{ a.signed_at|date:"Y-m-d" }}</td>
+            </tr>
+          {% endfor %}
+        {% endif %}
+
+        {% if not outstanding and not signed %}
+          <tr>
+            <td colspan="4" class="py-8 text-center text-text-soft dark:text-white/60">
+              No policies are assigned to you.
+            </td>
+          </tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="shrink-0 text-right text-xs text-text-soft dark:text-white/50">
+    {{ total_count }} item{{ total_count|pluralize }}
+  </div>
+</div>
+{% endblock %}

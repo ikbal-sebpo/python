@@ -1,0 +1,18 @@
+{% if rows %}
+    <ul class="space-y-3 text-sm">
+        {% for row in rows %}
+            <li class="flex items-start justify-between gap-3">
+                <div class="min-w-0">
+                    <div class="font-medium">{{ row.nominee_name }}</div>
+                    <div class="text-text-soft dark:text-white/60 text-xs">
+                        {% if row.relation_with_nominee %}{{ row.relation_with_nominee }} · {% endif %}{{ row.nominee_contact_number }}
+                    </div>
+                    {% if row.nominee_occupation %}<div class="text-text-mute text-xs">{{ row.nominee_occupation }}</div>{% endif %}
+                </div>
+                {% include "employees/sections/_row_actions.html" %}
+            </li>
+        {% endfor %}
+    </ul>
+{% else %}
+    {% include "employees/sections/_empty.html" %}
+{% endif %}

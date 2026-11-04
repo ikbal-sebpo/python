@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+{% block title %}{{ current.title }} · Developer API · Orbis{% endblock %}
+
+{% comment %}
+    In-app copy of docs/ORBIS_API_GUIDE.md and its two references, rendered
+    from the repo Markdown by accounts/api/guide.py. Styles are scoped to
+    .api-guide and written here (not as Tailwind utilities) because the
+    Markdown's elements carry no classes.
+{% endcomment %}
+
+{% block extra_head %}
+<style>
+  .api-guide { --g-fg: #0A1A1A; --g-soft: #4B5C6B; --g-mute: #8A9AA6; --g-line: #E1E7EA; --g-chip: #ECEFF1;
+    --g-card: #ffffff; --g-accent: #0A4958; --g-link: #006F99; --g-code-bg: #0B333F; --g-code-fg: #E3F1F1; --g-code-mute: #8FB3B8; }
+  .dark .api-guide { --g-fg: #E6EEF0; --g-soft: #A9BCC3; --g-mute: #7E959E; --g-line: rgba(255,255,255,.1); --g-chip: rgba(255,255,255,.07);
+    --g-card: rgba(255,255,255,.03); --g-accent: #7FD3D3; --g-link: #6FD0CF; --g-code-bg: #06161B; --g-code-fg: #DDEEEE; --g-code-mute: #7FA3A8; }
+
+  .api-guide { color: var(--g-fg); }
+  .api-guide-tabs { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 20px; }
+  .api-guide-tabs a { padding: 6px 14px; border-radius: 999px; font-size: 14px; font-weight: 600; text-decoration: none;
+    color: var(--g-soft); background: var(--g-chip); }
+  .api-guide-tabs a[aria-current="page"] { background: var(--g-accent); color: #fff; }
+  .dark .api-guide-tabs a[aria-current="page"] { color: #0B333F; }
+
+  .api-guide-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 40px; align-items: start; }
+  .api-guide-toc { position: sticky; top: 0; font-size: 14px; }
+  .api-guide-toc p { font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--g-mute); margin: 0 0 8px; }
+  .api-guide-toc ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+  .api-guide-toc a { display: block; padding: 4px 8px; border-radius: 6px; color: var(--g-soft); text-decoration: none; line-height: 1.35; }
+  .api-guide-toc a:hover { background: var(--g-chip); color: var(--g-fg); }
+  .api-guide-toc-sub { margin: 2px 0 6px 10px !important; padding-left: 8px !important; border-left: 1px solid var(--g-line); }
+  .api-guide-toc-sub a { font-size: 13px; padding: 3px 8px; }
+  .api-guide-toc { max-height: calc(100vh - 140px); overflow-y: auto; }
+
+  .api-guide-body { min-width: 0; max-width: 860px; font-size: 15px; line-height: 1.65; }
+  .api-guide-body h1 { font-size: 30px; font-weight: 800; color: var(--g-accent); line-height: 1.15; margin: 0 0 14px; }
+  .api-guide-body h2 { font-size: 22px; font-weight: 700; margin: 36px 0 12px; padding-top: 22px; border-top: 1px solid var(--g-line); scroll-margin-top: 12px; }
+  .api-guide-body h3 { font-size: 17px; font-weight: 700; margin: 26px 0 8px; scroll-margin-top: 12px; }
+  .api-guide-body p, .api-guide-body ul, .api-guide-body ol { margin: 0 0 12px; max-width: 72ch; }
+  .api-guide-body ul { list-style: disc; padding-left: 22px; }
+  .api-guide-body ol { list-style: decimal; padding-left: 22px; }
+  .api-guide-body li { margin-bottom: 4px; }
+  .api-guide-body a { color: var(--g-link); text-decoration: underline; text-underline-offset: 2px; }
+  .api-guide-body hr { border: 0; margin: 0; }
+  .api-guide-body strong { font-weight: 600; }
+  .api-guide-body code { font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace; font-size: .86em;
+    background: var(--g-chip); padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere; }
+  .api-guide-body pre { position: relative; background: var(--g-code-bg); color: var(--g-code-fg); border-radius: 10px;
+    padding: 14px 16px; margin: 10px 0 18px; overflow-x: auto; font-size: 13px; line-height: 1.6; }
+  .api-guide-body pre code { background: none; padding: 0; font-size: inherit; color: inherit; overflow-wrap: normal; }
+  .api-guide-body .copy-code { position: absolute; top: 8px; right: 8px; font-size: 12px; font-weight: 600; padding: 2px 10px;
+    border-radius: 6px; border: 1px solid var(--g-code-mute); color: var(--g-code-fg); background: var(--g-code-bg); cursor: pointer; }
+  .api-guide-body .copy-code:hover { border-color: #41B3B3; color: #41B3B3; }
+  .api-guide-body .table-wrap { overflow-x: auto; margin: 10px 0 18px; border: 1px solid var(--g-line); border-radius: 10px; background: var(--g-card); }
+  .api-guide-body table { border-collapse: collapse; width: 100%; font-size: 14px; }
+  .api-guide-body th, .api-guide-body td { text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--g-line); vertical-align: top; }
+  .api-guide-body th { font-size: 12px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--g-mute); background: var(--g-chip); }
+  .api-guide-body tr:last-child td { border-bottom: 0; }
+
+  @media (max-width: 1024px) {
+    .api-guide-layout { grid-template-columns: minmax(0, 1fr); gap: 16px; }
+    .api-guide-toc { position: static; }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="api-guide pt-6">
+  <nav class="api-guide-tabs" aria-label="Developer documentation">
+    {% for tab in tabs %}
+      <a href="{{ tab.url }}"{% if tab.active %} aria-current="page"{% endif %}>{{ tab.title }}</a>
+    {% endfor %}
+  </nav>
+
+  <div class="api-guide-layout">
+    {% if contents %}
+      <nav class="api-guide-toc" aria-label="On this page">
+        <p>On this page</p>
+        <ol>
+          {% for item in contents %}
+            <li>
+              <a href="#{{ item.anchor }}">{{ item.text }}</a>
+              {% if item.children %}
+                <ol class="api-guide-toc-sub">
+                  {% for child in item.children %}
+                    <li><a href="#{{ child.anchor }}">{{ child.text }}</a></li>
+                  {% endfor %}
+                </ol>
+              {% endif %}
+            </li>
+          {% endfor %}
+        </ol>
+      </nav>
+    {% endif %}
+    <article class="api-guide-body">{{ body }}</article>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  (function () {
+    var body = document.querySelector(".api-guide-body");
+    if (!body) return;
+    body.querySelectorAll("table").forEach(function (table) {
+      var wrap = document.createElement("div");
+      wrap.className = "table-wrap";
+      table.parentNode.insertBefore(wrap, table);
+      wrap.appendChild(table);
+    });
+    body.querySelectorAll("pre").forEach(function (pre) {
+      var button = document.createElement("button");
+      button.type = "button";
+      button.className = "copy-code";
+      button.textContent = "Copy";
+      button.addEventListener("click", function () {
+        var text = pre.querySelector("code").innerText;
+        var reset = function () { setTimeout(function () { button.textContent = "Copy"; }, 1500); };
+        if (navigator.clipboard) {
+          navigator.clipboard.writeText(text).then(function () { button.textContent = "Copied"; reset(); });
+        }
+      });
+      pre.appendChild(button);
+    });
+  })();
+</script>
+{% endblock %}

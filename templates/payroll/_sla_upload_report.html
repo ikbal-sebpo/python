@@ -1,0 +1,221 @@
+{# Result fragment for /payroll/variable-pay/upload-sla/ — swapped in by HTMX on each submit. #}
+<div class="card mb-4">
+    <h2 class="text-sm font-semibold mb-3">Result</h2>
+
+    {% if inline_error %}
+        <div class="mb-3 px-3 py-2 rounded border border-red-300 bg-red-50 text-red-800
+                    dark:border-red-700/50 dark:bg-red-900/20 dark:text-red-200 text-sm">
+            {{ inline_error }}
+        </div>
+    {% endif %}
+
+    {% if report %}
+        {% if aborted %}
+            <div class="mb-3 px-3 py-2 rounded border border-red-300 bg-red-50 text-red-800
+                        dark:border-red-700/50 dark:bg-red-900/20 dark:text-red-200 text-sm">
+                Upload aborted. Nothing was written. Fix the errors below and re-upload.
+            </div>
+        {% elif preview %}
+            <div class="mb-3 px-3 py-2 rounded border border-blue-300 bg-blue-50 text-blue-800
+                        dark:border-blue-700/50 dark:bg-blue-900/20 dark:text-blue-200 text-sm">
+                Preview only — nothing was written. Amounts are resolved when you apply, so they
+                aren't shown here. Click <span class="font-medium">Apply upload</span> to commit.
+            </div>
+        {% else %}
+            <div class="mb-3 px-3 py-2 rounded border border-emerald-300 bg-emerald-50 text-emerald-800
+                        dark:border-emerald-700/50 dark:bg-emerald-900/20 dark:text-emerald-200 text-sm">
+                <span class="font-medium">{{ report.created|length }}</span> created ·
+                <span class="font-medium">{{ report.updated|length }}</span> updated ·
+                <span class="font-medium">{{ report.skipped_scope|length }}</span> scope-skipped
+                {% if report.skipped_no_rate %}· <span class="font-medium">{{ report.skipped_no_rate|length }}</span> no rate configured{% endif %}
+                {% if report.skipped_decided %}· <span class="font-medium">{{ report.skipped_decided|length }}</span> already decided{% endif %}
+                {% if report.total_writes %}
+                    — all pending the department head's approval.
+                {% endif %}
+            </div>
+        {% endif %}
+
+        {% if report.parse_errors %}
+            <h3 class="text-xs font-semibold uppercase tracking-wide text-red-700 dark:text-red-300 mt-4 mb-2">
+                Errors ({{ report.parse_errors|length }})
+            </h3>
+            <div class="overflow-x-auto">
+                <table class="table-simple text-sm">
+                    <thead>
+                        <tr><th class="w-12">Row</th><th>Employee ID</th><th>SLA month</th><th>Reason</th></tr>
+                    </thead>
+                    <tbody>
+                        {% for err in report.parse_errors %}
+                            <tr class="text-red-700 dark:text-red-300">
+                                <td>{{ err.line_no }}</td>
+                                <td>{{ err.raw.Employee_ID|default:"—" }}</td>
+                                <td>{{ err.raw.SLA_month|default:"—" }}</td>
+                                <td>{{ err.message }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endif %}
+
+        {% if report.duplicates %}
+            <h3 class="text-xs font-semibold uppercase tracking-wide text-red-700 dark:text-red-300 mt-4 mb-2">
+                Duplicates within file ({{ report.duplicates|length }})
+            </h3>
+            <div class="overflow-x-auto">
+                <table class="table-simple text-sm">
+                    <thead>
+                        <tr><th class="w-12">Row</th><th>Employee ID</th><th>SLA month</th><th>Reason</th></tr>
+                    </thead>
+                    <tbody>
+                        {% for err in report.duplicates %}
+                            <tr class="text-red-700 dark:text-red-300">
+                                <td>{{ err.line_no }}</td>
+                                <td>{{ err.raw.Employee_ID|default:"—" }}</td>
+                                <td>{{ err.raw.SLA_month|default:"—" }}</td>
+                                <td>{{ err.message }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endif %}
+
+        {% if report.skipped_scope %}
+            <h3 class="text-xs font-semibold uppercase tracking-wide text-amber-700 dark:text-amber-300 mt-4 mb-2">
+                Outside your scope ({{ report.skipped_scope|length }})
+            </h3>
+            <div class="overflow-x-auto">
+                <table class="table-simple text-sm">
+                    <thead>
+                        <tr><th class="w-12">Row</th><th>Employee ID</th><th>SLA month</th><th>Reason</th></tr>
+                    </thead>
+                    <tbody>
+                        {% for err in report.skipped_scope %}
+                            <tr class="text-amber-700 dark:text-amber-300">
+                                <td>{{ err.line_no }}</td>
+                                <td>{{ err.raw.Employee_ID|default:"—" }}</td>
+                                <td>{{ err.raw.SLA_month|default:"—" }}</td>
+                                <td>{{ err.message }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endif %}
+
+        {% if report.skipped_no_rate %}
+            <h3 class="text-xs font-semibold uppercase tracking-wide text-amber-700 dark:text-amber-300 mt-4 mb-2">
+                No SLA rate configured ({{ report.skipped_no_rate|length }})
+            </h3>
+            <p class="text-xs text-text-mute mb-2">
+                Nothing was written for these — a zero-value row would look identical to a paid one on the
+                register. Ask Finance to add an SLA incentive rate for the department, then re-upload.
+            </p>
+            <div class="overflow-x-auto">
+                <table class="table-simple text-sm">
+                    <thead>
+                        <tr><th class="w-12">Row</th><th>Employee ID</th><th>SLA month</th><th>Reason</th></tr>
+                    </thead>
+                    <tbody>
+                        {% for err in report.skipped_no_rate %}
+                            <tr class="text-amber-700 dark:text-amber-300">
+                                <td>{{ err.line_no }}</td>
+                                <td>{{ err.raw.Employee_ID|default:"—" }}</td>
+                                <td>{{ err.raw.SLA_month|default:"—" }}</td>
+                                <td>{{ err.message }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endif %}
+
+        {% if report.skipped_decided %}
+            <h3 class="text-xs font-semibold uppercase tracking-wide text-amber-700 dark:text-amber-300 mt-4 mb-2">
+                Already approved or rejected ({{ report.skipped_decided|length }})
+            </h3>
+            <p class="text-xs text-text-mute mb-2">
+                A re-upload never reopens a decision. Ask the department head to change these.
+            </p>
+            <div class="overflow-x-auto">
+                <table class="table-simple text-sm">
+                    <thead>
+                        <tr><th class="w-12">Row</th><th>Employee ID</th><th>SLA month</th><th>Reason</th></tr>
+                    </thead>
+                    <tbody>
+                        {% for err in report.skipped_decided %}
+                            <tr class="text-amber-700 dark:text-amber-300">
+                                <td>{{ err.line_no }}</td>
+                                <td>{{ err.raw.Employee_ID|default:"—" }}</td>
+                                <td>{{ err.raw.SLA_month|default:"—" }}</td>
+                                <td>{{ err.message }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endif %}
+
+        {% if preview and parsed_preview %}
+            <details class="mt-4" open>
+                <summary class="cursor-pointer text-xs font-semibold uppercase tracking-wide text-text-soft dark:text-white/70">
+                    Rows that would be applied ({{ parsed_preview|length }})
+                </summary>
+                <div class="overflow-x-auto mt-2">
+                    <table class="table-simple text-sm">
+                        <thead>
+                            <tr><th class="w-12">Row</th><th>Employee ID</th><th>SLA month</th></tr>
+                        </thead>
+                        <tbody>
+                            {% for row in parsed_preview %}
+                                <tr>
+                                    <td>{{ row.line_no }}</td>
+                                    <td>{{ row.employee_id }}</td>
+                                    <td>{{ row.sla_month_label }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </details>
+        {% endif %}
+
+        {% if not preview and not aborted %}
+            {% if report.created or report.updated %}
+                <details class="mt-4" open>
+                    <summary class="cursor-pointer text-xs font-semibold uppercase tracking-wide text-emerald-700 dark:text-emerald-300">
+                        Applied rows ({{ report.total_writes }})
+                    </summary>
+                    <div class="overflow-x-auto mt-2">
+                        <table class="table-simple text-sm">
+                            <thead>
+                                <tr><th class="w-12">Row</th><th>Status</th><th>Employee ID</th><th>SLA month</th><th class="text-right">Amount</th></tr>
+                            </thead>
+                            <tbody>
+                                {% for row in report.created %}
+                                    <tr class="text-emerald-700 dark:text-emerald-300">
+                                        <td>{{ row.line_no }}</td>
+                                        <td><span class="badge badge-success">Created</span></td>
+                                        <td>{{ row.employee_id }}</td>
+                                        <td>{{ row.sla_month_label }}</td>
+                                        <td class="text-right">{{ row.amount|taka  }}</td>
+                                    </tr>
+                                {% endfor %}
+                                {% for row in report.updated %}
+                                    <tr>
+                                        <td>{{ row.line_no }}</td>
+                                        <td><span class="badge badge-info">Updated</span></td>
+                                        <td>{{ row.employee_id }}</td>
+                                        <td>{{ row.sla_month_label }}</td>
+                                        <td class="text-right">{{ row.amount|taka  }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </details>
+            {% endif %}
+        {% endif %}
+    {% endif %}
+</div>

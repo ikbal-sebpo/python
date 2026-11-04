@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}Project Credits · Orbis{% endblock %}
+
+{% block content %}
+<div class="space-y-6 pt-2">
+    <div>
+        <p class="mt-1 text-sm text-text-soft dark:text-white/60">
+            This page highlights who contributed to each important area of the Orbis project:
+            ownership, project management, architecture, database design, UI/UX design,
+            templating, development, QA, documentation and deployment.
+        </p>
+    </div>
+
+    <div class="flex flex-wrap items-center justify-between gap-3">
+        <h2 class="text-lg font-semibold text-text-main dark:text-white">Contribution Areas</h2>
+        <span class="badge badge-success font-medium">Built by SEBPO Software Development Department</span>
+    </div>
+
+    <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3 items-start">
+        {% for area in areas %}
+            <section class="card">
+                <div class="flex items-center gap-3">
+                    <span class="w-9 h-9 shrink-0 rounded-lg flex items-center justify-center
+                                 bg-brand-accent/15 text-brand-accent">
+                        <i data-lucide="{{ area.icon }}" class="w-4 h-4"></i>
+                    </span>
+                    <h3 class="font-semibold text-text-main dark:text-white">{{ area.title }}</h3>
+                </div>
+                <p class="mt-3 text-sm text-text-soft dark:text-white/60">{{ area.description }}</p>
+                <ul class="mt-4 space-y-2">
+                    {% for person in area.people %}
+                        <li class="rounded-lg px-4 py-3 bg-bg-main dark:bg-white/5">
+                            <div class="flex flex-wrap items-center gap-2">
+                                <span class="font-medium text-text-main dark:text-white">{{ person.name }}</span>
+                                {% if person.former %}<span class="badge badge-muted">Former employee</span>{% endif %}
+                            </div>
+                            <div class="text-xs text-text-mute dark:text-white/50">{{ person.role }}</div>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </section>
+        {% endfor %}
+    </div>
+
+    <section class="card text-center">
+        <h2 class="text-lg font-semibold text-brand-accent flex items-center justify-center gap-2">
+            <i data-lucide="heart" class="w-4 h-4"></i>
+            Special Thanks
+        </h2>
+        <p class="mt-2 text-sm text-text-soft dark:text-white/60">{{ special_thanks }}</p>
+    </section>
+</div>
+{% endblock %}

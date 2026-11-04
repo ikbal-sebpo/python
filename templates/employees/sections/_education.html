@@ -1,0 +1,16 @@
+{% if rows %}
+    <ul class="space-y-3 text-sm">
+        {% for row in rows %}
+            <li class="flex items-start justify-between gap-3">
+                <div class="min-w-0">
+                    <div class="font-medium">{{ row.get_degree_level_display }}{% if row.degree_name %} — {{ row.degree_name }}{% endif %}</div>
+                    {% if row.academic_institution or row.passing_year or row.result_details %}<div class="text-text-soft dark:text-white/60 text-xs">{{ row.academic_institution|default:"—" }} · {{ row.passing_year|default:"—" }} · {{ row.result_details|default:"—" }}</div>{% else %}<div class="text-text-mute text-xs italic">Institution, year and result not yet on file</div>{% endif %}
+                    {% if row.major %}<div class="text-text-mute text-xs">Major: {{ row.major }}</div>{% endif %}
+                </div>
+                {% include "employees/sections/_row_actions.html" %}
+            </li>
+        {% endfor %}
+    </ul>
+{% else %}
+    {% include "employees/sections/_empty.html" %}
+{% endif %}

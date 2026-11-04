@@ -1,0 +1,96 @@
+{# Results fragment for PayrollReportView's htmx request: rows for the #}
+{# current page only, plus the full-set count and pager. The meals     #}
+{# warning lives here because the meals API is called by this request. #}
+{% if meal_counts_unavailable %}
+    <div class="shrink-0 px-3 py-2 rounded border border-amber-300 bg-amber-50 text-amber-800 dark:border-amber-700/50 dark:bg-amber-900/20 dark:text-amber-200 text-sm">
+        The meals system couldn't be reached — the Meal column below is showing 0 for everyone, not actual counts. Re-run the report once meals.sebpo.net is back up.
+    </div>
+{% endif %}
+
+{% include "partials/_result_count.html" with count_noun="employees" %}
+
+<div class="card p-0 table-scroll">
+    <table class="table-sticky min-w-full text-sm">
+        <thead>
+            <tr class="text-text-mute text-xs uppercase tracking-wider border-b border-bg-soft dark:border-white/10">
+                <th class="px-2 py-2 text-left">Emp ID</th>
+                <th class="px-2 py-2 text-left">Name</th>
+                <th class="px-2 py-2 text-left">Designation</th>
+                <th class="px-2 py-2 text-left">Department</th>
+                <th class="px-2 py-2 text-left">Team</th>
+                <th class="px-2 py-2 text-left">Resource Status</th>
+                <th class="px-2 py-2 text-left">Billing Status</th>
+                <th class="px-2 py-2 text-left">Joining Date</th>
+                <th class="px-2 py-2 text-left">Job Location</th>
+                <th class="px-2 py-2 text-left">Work Location</th>
+                {# Column-group tints live on the body <td> cells; the sticky #}
+                {# header stays a solid bar (opaque via .table-sticky) so rows #}
+                {# don't bleed through when it's pinned. #}
+                <th class="px-2 py-2 text-right">AL</th>
+                <th class="px-2 py-2 text-right">CL</th>
+                <th class="px-2 py-2 text-right">SL</th>
+                <th class="px-2 py-2 text-right">MTL</th>
+                <th class="px-2 py-2 text-right">GH</th>
+                <th class="px-2 py-2 text-right">CPL</th>
+                <th class="px-2 py-2 text-right">HDL</th>
+                <th class="px-2 py-2 text-right">LWP</th>
+                <th class="px-2 py-2 text-right" title="Ordinary night-crossing shift, no active Dedicated assignment">Night Reg.</th>
+                <th class="px-2 py-2 text-right" title="CUST shift, not covered by an active Dedicated assignment">Night Custom</th>
+                <th class="px-2 py-2 text-right" title="Approved Dedicated Night Shift assignment active on the shift date">Night Ded.</th>
+                <th class="px-2 py-2 text-right text-text-mute" title="Night shifts worked before the employee's confirmation date — no night allowance until confirmed, so these are not paid">Trainee nights (unpaid)</th>
+                <th class="px-2 py-2 text-right" title="CUST shift-days worked from office (not WFH)">Transport</th>
+                {# One column per overtime type actually present in this #}
+                {# scope/window, not a fixed catalog list — different OT #}
+                {# types carry different pay rates. #}
+                {% for ot_type in ot_types %}
+                    <th class="px-2 py-2 text-right" title="Approved {{ ot_type.name }} hours in the window">{{ ot_type.name }} (hrs)</th>
+                {% endfor %}
+                <th class="px-2 py-2 text-right" title="Total meals from the meals system in the window">Meal</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in rows %}
+                <tr class="border-b border-bg-soft/50 dark:border-white/5 hover:bg-bg-soft/40 dark:hover:bg-white/5">
+                    <td class="px-2 py-1.5 tabular-nums">{{ row.employee_id|default:"—" }}</td>
+                    <td class="px-2 py-1.5 font-medium whitespace-nowrap">{{ row.name }}</td>
+                    <td class="px-2 py-1.5 text-text-mute whitespace-nowrap">{{ row.designation|default:"—" }}</td>
+                    <td class="px-2 py-1.5 text-text-mute whitespace-nowrap">{{ row.department|default:"—" }}</td>
+                    <td class="px-2 py-1.5 text-text-mute whitespace-nowrap">{{ row.team|default:"—" }}</td>
+                    <td class="px-2 py-1.5 text-text-mute whitespace-nowrap">{{ row.resource_status|default:"—" }}</td>
+                    <td class="px-2 py-1.5 text-text-mute whitespace-nowrap">{{ row.billing_status|default:"—" }}</td>
+                    <td class="px-2 py-1.5 text-text-mute whitespace-nowrap">{{ row.joining_date|date:"Y-m-d"|default:"—" }}</td>
+                    <td class="px-2 py-1.5 text-text-mute whitespace-nowrap">{{ row.job_location|default:"—" }}</td>
+                    <td class="px-2 py-1.5 text-text-mute whitespace-nowrap">{{ row.work_location|default:"—" }}</td>
+                    <td class="px-2 py-1.5 text-right tabular-nums bg-bg-soft/30 dark:bg-white/5">{{ row.counts.AL }}</td>
+                    <td class="px-2 py-1.5 text-right tabular-nums bg-bg-soft/30 dark:bg-white/5">{{ row.counts.CL }}</td>
+                    <td class="px-2 py-1.5 text-right tabular-nums bg-bg-soft/30 dark:bg-white/5">{{ row.counts.SL }}</td>
+                    <td class="px-2 py-1.5 text-right tabular-nums bg-bg-soft/30 dark:bg-white/5">{{ row.counts.MTL }}</td>
+                    <td class="px-2 py-1.5 text-right tabular-nums bg-bg-soft/30 dark:bg-white/5">{{ row.counts.FL }}</td>
+                    <td class="px-2 py-1.5 text-right tabular-nums bg-bg-soft/30 dark:bg-white/5">{{ row.counts.CPL }}</td>
+                    <td class="px-2 py-1.5 text-right tabular-nums bg-bg-soft/30 dark:bg-white/5">{{ row.counts.HDL }}</td>
+                    <td class="px-2 py-1.5 text-right tabular-nums bg-bg-soft/30 dark:bg-white/5">{{ row.counts.LWP }}</td>
+                    <td class="px-2 py-1.5 text-right tabular-nums bg-brand-gold/10 font-semibold">{{ row.counts.NIGHT_REGULAR }}</td>
+                    <td class="px-2 py-1.5 text-right tabular-nums bg-brand-gold/10 font-semibold">{{ row.counts.NIGHT_CUSTOM }}</td>
+                    <td class="px-2 py-1.5 text-right tabular-nums bg-brand-gold/10 font-semibold">{{ row.counts.NIGHT_DEDICATED }}</td>
+                    <td class="px-2 py-1.5 text-right tabular-nums text-text-mute">{{ row.counts.NIGHT_UNPAID|default:"" }}</td>
+                    <td class="px-2 py-1.5 text-right tabular-nums bg-brand-gold/10 font-semibold">{{ row.counts.TRANSPORT }}</td>
+                    {% for ot_hours in row.ot_by_type %}
+                        <td class="px-2 py-1.5 text-right tabular-nums bg-brand-gold/10 font-semibold">{{ ot_hours }}</td>
+                    {% endfor %}
+                    <td class="px-2 py-1.5 text-right tabular-nums bg-bg-soft/30 dark:bg-white/5">{{ row.meal_count }}</td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="{{ ot_types|length|add:24 }}" class="px-3 py-4 text-text-mute italic text-center">
+                        {% if errors %}Fix the filters to run the summary.{% else %}No active employees found.{% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{# Boost only the pager. #}
+<div hx-boost="true" class="shrink-0">
+    {% include "partials/_pagination.html" %}
+</div>

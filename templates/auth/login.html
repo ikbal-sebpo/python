@@ -1,0 +1,95 @@
+{% load static tailwind_tags %}<!DOCTYPE html>
+<html lang="en-CA" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="dark light">
+    <title>Sign in · Orbis</title>
+    <script>
+        (function () {
+            try {
+                var storedTheme = localStorage.getItem('orbis-theme');
+                if (storedTheme !== 'light') document.documentElement.classList.add('dark');
+            } catch (e) {}
+        })();
+    </script>
+    {% include "partials/_favicon.html" %}
+    <link rel="preconnect" href="https://fonts.bunny.net" crossorigin>
+    <link rel="stylesheet" href="https://fonts.bunny.net/css?family=figtree:400,500,600|roboto:400,500&display=swap">
+    {% tailwind_css %}
+</head>
+<body class="min-h-screen flex items-center justify-center p-6">
+
+<div class="w-full max-w-md">
+    {% comment %} SEBPO | Orbis lockup. The wordmark swaps on the <html> .dark class
+       (set before paint, flipped by the theme toggle) — static/brand/ files are
+       named for the background they sit on. {% endcomment %}
+    <div class="flex items-center justify-center gap-4 mb-6">
+        <!-- <div class="px-4 py-2 rounded bg-brand flex items-center justify-center">
+            <img src="{% static 'sebpo_logo_white.png' %}" alt="SEBPO" class="h-10 w-auto">
+        </div> -->
+        <!-- <span class="h-10 w-px bg-bg-soft dark:bg-white/20" aria-hidden="true"></span> -->
+        <img src="{% static 'brand/orbis-wordmark-on-light.svg' %}" alt="Orbis" class="h-10 w-auto dark:hidden">
+        <img src="{% static 'brand/orbis-wordmark-on-dark.svg' %}" alt="Orbis" class="h-10 w-auto hidden dark:block">
+    </div>
+
+    <div class="card">
+        <h1 class="text-xl font-semibold text-text-main dark:text-white mb-1">Sign in</h1>
+        <p class="text-sm text-text-soft dark:text-white/60 mb-6">
+            {% if sso_enabled %}Use your SEBPO Microsoft account.{% else %}Use your SEBPO email address.{% endif %}
+        </p>
+
+        {% if sso_bounce %}
+            <div class="mb-4 rounded border border-amber-200 bg-amber-50 text-amber-800 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-300 px-3 py-2 text-sm">
+                <div class="font-semibold mb-1">Account not yet provisioned</div>
+                You authenticated successfully with your SEBPO account, but you don't
+                have an Orbis profile yet. Please contact HR to be added — they'll
+                let you know when you can sign in.
+            </div>
+        {% endif %}
+
+        {% if sso_enabled %}
+            {% comment %} SSO-only: OrbisLoginView refuses a password POST when SSO is
+               configured; superusers' break-glass is /admin/login/. {% endcomment %}
+            <a href="{% url 'oidc_authentication_init' %}" class="btn-primary w-full">
+                <i data-lucide="shield-check" class="w-4 h-4"></i>
+                <span>Sign in with Company SSO</span>
+            </a>
+        {% else %}
+            {% if form.non_field_errors %}
+                <div class="mb-4 rounded border border-red-200 bg-red-50 text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-300 px-3 py-2 text-sm">
+                    {{ form.non_field_errors|striptags }}
+                </div>
+            {% endif %}
+
+            <form method="post" class="space-y-4">
+                {% csrf_token %}
+                <div>
+                    <label for="{{ form.username.id_for_label }}" class="form-label">{{ form.username.label }}</label>
+                    {{ form.username }}
+                    {% if form.username.errors %}<p class="mt-1 text-xs text-red-600 dark:text-red-400">{{ form.username.errors|striptags }}</p>{% endif %}
+                </div>
+                <div>
+                    <label for="{{ form.password.id_for_label }}" class="form-label">{{ form.password.label }}</label>
+                    {{ form.password }}
+                    {% if form.password.errors %}<p class="mt-1 text-xs text-red-600 dark:text-red-400">{{ form.password.errors|striptags }}</p>{% endif %}
+                </div>
+
+                <button type="submit" class="btn-primary w-full">
+                    <i data-lucide="log-in" class="w-4 h-4"></i>
+                    <span>Sign in</span>
+                </button>
+            </form>
+        {% endif %}
+    </div>
+
+    <p class="text-center text-xs leading-relaxed text-text-mute dark:text-white/40 mt-6">
+        &copy; {% now "Y" %} SEBPO BD. All Rights Reserved.<br>
+        Designed and Developed by Software Development Department.
+    </p>
+</div>
+
+<script src="{% static 'vendor/lucide-0.544.0.min.js' %}"></script>
+<script>document.addEventListener('DOMContentLoaded', function () { if (window.lucide) window.lucide.createIcons(); });</script>
+</body>
+</html>

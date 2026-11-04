@@ -1,0 +1,41 @@
+{% comment %}
+    Drawer body — returned by htmx on GET, and on POST with validation errors.
+    Fires `orbis:drawer-title` so Alpine's outer `drawerTitle` updates.
+
+    The form targets the drawer body itself, so a validation-error re-render
+    lands back in the drawer. On success SectionEditView answers with the
+    refreshed section card plus `HX-Retarget: #section-card-<slug>` /
+    `HX-Reswap: outerHTML`, which redirects that one swap to the card on the
+    page. (Targeting the card from here, as this used to, put error
+    re-renders into the card — noticed 2026-10-07 on the tax declaration.)
+{% endcomment %}
+<form method="post" action="{{ action_url }}"
+      hx-post="{{ action_url }}"
+      hx-target="#drawer-body"
+      hx-swap="innerHTML"
+      enctype="multipart/form-data"
+      data-section="{{ spec.slug }}"
+      class="flex flex-col flex-1 min-h-0">
+    {% csrf_token %}
+
+    <div class="drawer-body space-y-4">
+        {% if form.non_field_errors %}
+            <div class="rounded border border-red-200 bg-red-50 text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-300 px-3 py-2 text-sm">
+                {{ form.non_field_errors|striptags }}
+            </div>
+        {% endif %}
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {% for field in form %}
+                {% include "accounts/_field.html" with field=field %}
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="drawer-footer justify-end">
+        <button type="button" class="btn-secondary" @click="close()">Cancel</button>
+        <button type="submit" class="btn-primary">
+            <i data-lucide="save" class="w-4 h-4"></i><span>Save</span>
+        </button>
+    </div>
+</form>

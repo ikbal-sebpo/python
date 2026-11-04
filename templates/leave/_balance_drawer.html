@@ -1,0 +1,122 @@
+{% comment %}
+Balance drawer body — LeaveBalanceView's htmx response, opened from the
+employee column of the leave list. Same view, same numbers as the full
+balance page; `?application=<pk>` adds the decision arithmetic on top.
+{% endcomment %}
+<div class="drawer-body space-y-4">
+
+    <div class="text-sm">
+        <div class="font-medium text-text-main dark:text-white">{{ target.display_name }}</div>
+        <div class="text-xs text-text-mute">{{ target.email }}</div>
+    </div>
+
+    {% if application %}
+        <div class="rounded-lg border border-bg-soft p-3 dark:border-white/10">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+                <div class="text-sm font-medium text-text-main dark:text-white">
+                    {{ application.leave_type.name }} ·
+                    {{ application.start_date|date:"Y-m-d" }} → {{ application.end_date|date:"Y-m-d" }}
+                </div>
+                <a href="{% url 'leave_detail' application.pk %}"
+                   class="text-xs text-brand hover:underline dark:text-brand-accent">Open application</a>
+            </div>
+
+            {% if impact.bypass == 'unpaid' %}
+                <p class="mt-2 text-xs text-text-mute">
+                    {{ impact.leave_type_name }} is unpaid — it's a salary deduction, not a
+                    balance deduction, so there's no balance to check against.
+                </p>
+            {% elif impact.bypass == 'no_billable_days' %}
+                <p class="mt-2 text-xs text-text-mute">
+                    No billable days — every day requested falls on a non-working day or
+                    holiday, so nothing would be deducted.
+                </p>
+            {% elif impact.bypass == 'unseeded' %}
+                <p class="mt-2 text-xs text-text-mute">
+                    No {{ impact.leave_type_name }} entitlement is configured for this employee yet,
+                    so approval won't be balance-checked. Requesting
+                    <strong>{{ impact.requested }}</strong> day(s).
+                </p>
+            {% else %}
+                <div class="mt-3 grid grid-cols-3 gap-2 text-center">
+                    <div class="rounded-md bg-bg-soft/60 px-2 py-2 dark:bg-white/5">
+                        <div class="text-[11px] uppercase tracking-wider text-text-mute">Available</div>
+                        <div class="text-base font-semibold tabular-nums">{{ impact.available_before|floatformat:2 }}</div>
+                        <div class="text-[11px] text-text-mute">on {{ impact.as_of|date:"M j" }}</div>
+                    </div>
+                    <div class="rounded-md bg-bg-soft/60 px-2 py-2 dark:bg-white/5">
+                        <div class="text-[11px] uppercase tracking-wider text-text-mute">Requesting</div>
+                        <div class="text-base font-semibold tabular-nums">{{ impact.requested|floatformat:2 }}</div>
+                        {% if impact.sandwich %}
+                            <div class="text-[11px] text-text-mute">
+                                {{ impact.working|floatformat:2 }} + {{ impact.sandwich|floatformat:2 }} sandwich
+                            </div>
+                        {% endif %}
+                    </div>
+                    {% if application.is_pending %}
+                        <div class="rounded-md px-2 py-2 {% if not impact.sufficient %}bg-red-50 dark:bg-red-500/10{% elif impact.is_advance %}bg-amber-50 dark:bg-amber-500/10{% else %}bg-emerald-50 dark:bg-emerald-500/10{% endif %}">
+                            <div class="text-[11px] uppercase tracking-wider text-text-mute">If approved</div>
+                            <div class="text-base font-semibold tabular-nums {% if not impact.sufficient %}text-red-600 dark:text-red-400{% elif impact.is_advance %}text-amber-700 dark:text-amber-300{% else %}text-emerald-700 dark:text-emerald-300{% endif %}">
+                                {{ impact.available_after|floatformat:2 }}
+                            </div>
+                        </div>
+                    {% else %}
+                        {% comment %} Already decided — the debit (if any) is already inside
+                           "Available", so an if-approved figure would double-count. {% endcomment %}
+                        <div class="rounded-md bg-bg-soft/60 px-2 py-2 dark:bg-white/5">
+                            <div class="text-[11px] uppercase tracking-wider text-text-mute">Status</div>
+                            <div class="text-base font-semibold">{{ application.get_status_display }}</div>
+                        </div>
+                    {% endif %}
+                </div>
+
+                {% if impact.as_of != today %}
+                    {% comment %} Approve checks availability as of the leave's start date, so
+                       for a future-dated leave these figures outrun the table below
+                       (which is as of today) by whatever accrues in between. Say so
+                       rather than leave two different "available" numbers on screen. {% endcomment %}
+                    <p class="mt-2 text-[11px] text-text-mute">
+                        Figures are as of {{ impact.as_of|date:"Y-m-d" }}, the leave's start date —
+                        which is what Approve checks against. The table below is as of today.
+                    </p>
+                {% endif %}
+
+                {% if application.is_pending %}
+                    {% if impact.is_advance %}
+                        <p class="mt-2 rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-800 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-200">
+                            <strong>Advance request.</strong> {{ impact.message }}
+                            Your call — approve if you're confident they'll cover it, or decline.
+                        </p>
+                    {% elif impact.sufficient %}
+                        <p class="mt-2 text-xs text-text-mute">
+                            Balance covers this application.
+                            {% if impact.expiry_window_days %}
+                                Un-expired grants only — {{ impact.leave_type_name }} must be used within
+                                {{ impact.expiry_window_days }} working days of being earned.
+                            {% endif %}
+                        </p>
+                    {% else %}
+                        <p class="mt-2 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-200">
+                            <strong>Approve will be rejected.</strong> {{ impact.message }}
+                        </p>
+                    {% endif %}
+                {% else %}
+                    <p class="mt-2 text-xs text-text-mute">
+                        Already {{ application.get_status_display|lower }} — the balance above
+                        already reflects it.
+                    </p>
+                {% endif %}
+            {% endif %}
+        </div>
+    {% endif %}
+
+    {% include "leave/_balance_table.html" with wrapper_class="card p-0" %}
+</div>
+
+<div class="drawer-footer justify-between">
+    <a href="{% url 'leave_balance' %}?for={{ target.pk }}"
+       class="text-xs text-brand hover:underline dark:text-brand-accent">
+        Open full balance page
+    </a>
+    <button type="button" class="btn-secondary" @click="close()">Close</button>
+</div>

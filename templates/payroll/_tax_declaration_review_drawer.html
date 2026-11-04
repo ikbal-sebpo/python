@@ -1,0 +1,18 @@
+{% comment %}
+    Drawer body for the employee's once-a-year tax declaration confirmation
+    (or Payroll-HR's on their behalf). GET loads this into #drawer-body on
+    the profile page; an invalid POST re-renders it (status 400); a valid
+    one answers 204 + HX-Redirect back to the profile, where the section
+    shows the row locked. The body is shared with the full-page fallback
+    (tax_declaration_review.html) via _tax_declaration_review_body.html.
+{% endcomment %}
+<div class="drawer-body space-y-4">
+    {% include "payroll/_tax_declaration_review_body.html" with form_id="tax-declaration-review-form" %}
+</div>
+
+<div class="drawer-footer justify-end">
+    <button type="button" class="btn-secondary" @click="close()">Cancel</button>
+    <button type="submit" form="tax-declaration-review-form" class="btn-primary">
+        <i data-lucide="lock" class="w-4 h-4"></i><span>Confirm &amp; lock</span>
+    </button>
+</div>

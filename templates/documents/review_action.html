@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}Review · Orbis{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl space-y-6">
+  <div>
+    <a href="{% url 'documents:request_detail' doc_request.id %}" class="text-sm text-text-soft hover:underline">← Back to request</a>
+    <h1 class="text-2xl font-semibold text-text-main dark:text-white mt-2">Review document request</h1>
+    <p class="text-sm text-text-soft mt-1">
+      {{ doc_request.employee.display_name }} · {{ doc_request.document_type.display_name }}
+    </p>
+  </div>
+
+  <form method="post" action="{{ action_url }}"
+        {% if form.has_salary_month_wizard %}x-data="{ step: 0, last: 4 }"{% endif %}
+        class="card space-y-4">
+    {% csrf_token %}
+    {% include "documents/_step_action_fields.html" %}
+    <div class="flex justify-end gap-2">
+      <a href="{% url 'documents:request_detail' doc_request.id %}" class="btn-secondary">Cancel</a>
+      {% if form.has_salary_month_wizard %}
+        <button type="button" class="btn-secondary" x-show="step > 0" @click="step--">
+          <i data-lucide="arrow-left" class="w-4 h-4"></i><span>Previous</span>
+        </button>
+        <button type="button" class="btn-primary" x-show="step < last" @click="step++">
+          <span>Next</span><i data-lucide="arrow-right" class="w-4 h-4"></i>
+        </button>
+      {% endif %}
+      <button type="submit" class="btn-primary" {% if form.has_salary_month_wizard %}x-show="step === last"{% endif %}>
+        <i data-lucide="check" class="w-4 h-4"></i><span>Submit</span>
+      </button>
+    </div>
+  </form>
+</div>
+{% endblock %}

@@ -1,0 +1,50 @@
+{# Shared per-row cells for both modes of /attendance/ — team mode (one row #}
+{# per employee for one date) and single-employee range mode (one row per #}
+{# date). Everything from Shift rightwards is identical; only the leading #}
+{# identity/date cells differ, so those stay in list.html. #}
+{# Needs: r (the annotated row — shift_label / punch / is_unaccounted / #}
+{# pending_correction / is_corrected / correction / can_request_correction), #}
+{# d (the working date), target_pk + target_name (whose correction it is). #}
+<td class="whitespace-nowrap">{{ r.shift_label|default:"—" }}</td>
+<td class="whitespace-nowrap">{{ r.punch.office_bucket|default:"—" }}</td>
+<td class="tabular-nums whitespace-nowrap">{{ r.punch.check_in|time:"H:i"|default:"—" }}</td>
+<td class="tabular-nums whitespace-nowrap">{{ r.punch.check_out|time:"H:i"|default:"—" }}</td>
+<td class="tabular-nums whitespace-nowrap">
+    {{ r.punch.time_in_office|default:"—" }}
+    {% if r.is_corrected %}
+        <span class="inline-block align-text-top"
+              title="Manually corrected{% if r.correction %} — requested by {{ r.correction.requested_by.display_name }}, approved by {{ r.correction.processed_by.display_name }} on {{ r.correction.processed_at|date:'Y-m-d' }}{% if r.correction.reason %}. Reason: {{ r.correction.reason }}{% endif %}{% endif %}">
+            <i data-lucide="pencil-line" class="w-3 h-3 inline-block text-brand-accent"></i>
+        </span>
+    {% endif %}
+</td>
+<td class="whitespace-nowrap">
+    {% if r.is_unaccounted %}
+        <span class="badge badge-warning">⚠ Unaccounted</span>
+    {% endif %}
+</td>
+<td class="text-right whitespace-nowrap">
+    {% if r.has_pending_correction %}
+        <span class="badge badge-info">Correction pending</span>
+        {% if r.can_request_correction %}
+            <button type="button"
+                    class="p-1 rounded text-text-mute hover:bg-bg-soft hover:text-brand dark:hover:bg-white/5 dark:hover:text-brand-accent align-middle"
+                    title="Edit request"
+                    hx-get="{% url 'attendance_correction_edit' r.pending_correction.pk %}"
+                    hx-target="#drawer-body"
+                    hx-swap="innerHTML"
+                    @click="open('Edit correction request — {{ target_name|escapejs }}')">
+                <i data-lucide="pencil" class="w-3.5 h-3.5"></i>
+            </button>
+        {% endif %}
+    {% elif r.can_request_correction %}
+        <button type="button"
+                class="text-xs text-brand hover:underline dark:text-brand-accent"
+                hx-get="{% url 'attendance_correction_request' %}?for={{ target_pk }}&date={{ d|date:'Y-m-d' }}"
+                hx-target="#drawer-body"
+                hx-swap="innerHTML"
+                @click="open('{% if r.punch %}Request correction{% else %}Add timesheet{% endif %} — {{ target_name|escapejs }}')">
+            {% if r.punch %}Request correction{% else %}Add timesheet{% endif %}
+        </button>
+    {% endif %}
+</td>

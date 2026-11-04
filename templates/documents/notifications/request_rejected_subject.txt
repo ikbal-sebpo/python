@@ -1,0 +1,1 @@
+[Orbis] Your document request was rejected: {{ request_obj.document_type.display_name }}

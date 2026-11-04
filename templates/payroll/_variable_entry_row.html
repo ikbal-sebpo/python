@@ -1,0 +1,25 @@
+{% comment %}
+    One VariablePayEntry, view mode. Needs entry / run / employee in context.
+{% endcomment %}
+<li id="variable-entry-{{ entry.pk }}"
+    class="flex items-center justify-between gap-3 rounded border border-bg-soft dark:border-white/10 px-3 py-2 text-sm">
+    <div class="min-w-0">
+        <span class="font-medium">{{ entry.component.name }}</span>
+        <span class="tabular-nums">{{ entry.amount|taka }}</span>
+        {% if entry.reason %}<div class="text-xs text-text-mute truncate">{{ entry.reason }}</div>{% endif %}
+    </div>
+    <div class="flex items-center gap-3 shrink-0">
+        <button type="button" class="text-xs text-brand hover:underline dark:text-brand-accent"
+                hx-get="{% url 'payroll_run_variable_edit' run.pk employee.pk entry.pk %}"
+                hx-target="#variable-entry-{{ entry.pk }}" hx-swap="outerHTML">
+            Edit
+        </button>
+        <form method="post"
+              action="{% url 'payroll_run_variable_delete' run.pk employee.pk entry.pk %}"
+              hx-post="{% url 'payroll_run_variable_delete' run.pk employee.pk entry.pk %}"
+              hx-target="#drawer-body" hx-swap="innerHTML">
+            {% csrf_token %}
+            <button type="submit" class="text-xs text-red-600 dark:text-red-400 hover:underline">Remove</button>
+        </form>
+    </div>
+</li>

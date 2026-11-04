@@ -1,0 +1,77 @@
+code,name,kind,district_code,district,division_code,division
+100400,Barguna N/A,district_na,1004,Barguna,10,Barishal
+100600,Barishal N/A,district_na,1006,Barishal,10,Barishal
+100650,Barishal City Corporation,city_corporation,1006,Barishal,10,Barishal
+100900,Bhola N/A,district_na,1009,Bhola,10,Barishal
+104200,Jhalokati N/A,district_na,1042,Jhalokathi,10,Barishal
+107800,Patuakhali N/A,district_na,1078,Patuakhali,10,Barishal
+107900,Pirojpur N/A,district_na,1079,Pirojpur,10,Barishal
+200300,Bandarban N/A,district_na,2003,Bandarban,20,Chattogram
+201200,Brahmanbaria N/A,district_na,2012,Brahmanbaria,20,Chattogram
+201300,Chandpur N/A,district_na,2013,Chandpur,20,Chattogram
+201500,Chattogram N/A,district_na,2015,Chattogram,20,Chattogram
+201516,Chattogram City Corporation,city_corporation,2015,Chattogram,20,Chattogram
+201900,Cumilla N/A,district_na,2019,Cumilla,20,Chattogram
+201950,Cumilla City Corporation,city_corporation,2019,Cumilla,20,Chattogram
+202200,Cox's Bazar N/A,district_na,2022,Cox's Bazar,20,Chattogram
+203000,Feni N/A,district_na,2030,Feni,20,Chattogram
+204600,Khagrachhari N/A,district_na,2046,Khagrachari,20,Chattogram
+205100,Lakshmipur N/A,district_na,2051,Lakshmipur,20,Chattogram
+207500,Noakhali N/A,district_na,2075,Noakhali,20,Chattogram
+208400,Rangamati N/A,district_na,2084,Rangamati,20,Chattogram
+302600,Dhaka N/A,district_na,3026,Dhaka,30,Dhaka
+302620,Dhaka South City Corporation,city_corporation,3026,Dhaka,30,Dhaka
+302625,Dhaka North City Corperation,city_corporation,3026,Dhaka,30,Dhaka
+302900,Faridpur N/A,district_na,3029,Faridpur,30,Dhaka
+303300,Gazipur N/A,district_na,3033,Gazipur,30,Dhaka
+303333,Gazipur City Corporation,city_corporation,3033,Gazipur,30,Dhaka
+303500,Gopalganj N/A,district_na,3035,Gopalganj,30,Dhaka
+304800,Kishoreganj N/A,district_na,3048,Kishoreganj,30,Dhaka
+305400,Madaripur N/A,district_na,3054,Madaripur,30,Dhaka
+305600,Manikganj N/A,district_na,3056,Manikganj,30,Dhaka
+305900,Munshiganj N/A,district_na,3059,Munshiganj,30,Dhaka
+306700,Narayanganj N/A,district_na,3067,Narayanganj,30,Dhaka
+306744,Narayanganj City Corporation,city_corporation,3067,Narayanganj,30,Dhaka
+306800,Narsingdi N/A,district_na,3068,Narsingdi,30,Dhaka
+308200,Rajbari N/A,district_na,3082,Rajbari,30,Dhaka
+308600,Shariatpur N/A,district_na,3086,Shariatpur,30,Dhaka
+309300,Tangail N/A,district_na,3093,Tangail,30,Dhaka
+400100,Bagerhat N/A,district_na,4001,Bagerhat,40,Khulna
+401800,Chuadanga N/A,district_na,4018,Chuadanga,40,Khulna
+404100,Jashore N/A,district_na,4041,Jashore,40,Khulna
+404400,Jhenaidah N/A,district_na,4044,Jhenaidah,40,Khulna
+404700,Khulna N/A,district_na,4047,Khulna,40,Khulna
+404733,Khulna City Corporation,city_corporation,4047,Khulna,40,Khulna
+405000,Kushtia N/A,district_na,4050,Kushtia,40,Khulna
+405500,Magura N/A,district_na,4055,Magura,40,Khulna
+405700,Meherpur N/A,district_na,4057,Meherpur,40,Khulna
+406500,Narail N/A,district_na,4065,Narail,40,Khulna
+408700,Satkhira N/A,district_na,4087,Satkhira,40,Khulna
+453900,Jamalpur N/A,district_na,4539,Jamalpur,45,Mymensingh
+456100,Mymensingh N/A,district_na,4561,Mymensingh,45,Mymensingh
+456140,Mymensingh City Corporation,city_corporation,4561,Mymensingh,45,Mymensingh
+457200,Netrakona N/A,district_na,4572,Netrakona,45,Mymensingh
+458900,Sherpur N/A,district_na,4589,Sherpur,45,Mymensingh
+501000,Bogura N/A,district_na,5010,Bogura,50,Rajshahi
+503800,Joypurhat N/A,district_na,5038,Joypurhat,50,Rajshahi
+506400,Naogaon N/A,district_na,5064,Naogaon,50,Rajshahi
+506900,Natore N/A,district_na,5069,Natore,50,Rajshahi
+507000,Chapainawabganj N/A,district_na,5070,Chapainawabganj,50,Rajshahi
+507600,Pabna N/A,district_na,5076,Pabna,50,Rajshahi
+508100,Rajshahi N/A,district_na,5081,Rajshahi,50,Rajshahi
+508166,Rajshahi City Corporation,city_corporation,5081,Rajshahi,50,Rajshahi
+508800,Sirajganj N/A,district_na,5088,Sirajganj,50,Rajshahi
+552700,Dinajpur N/A,district_na,5527,Dinajpur,55,Rangpur
+553200,Gaibandha N/A,district_na,5532,Gaibandha,55,Rangpur
+554900,Kurigram N/A,district_na,5549,Kurigram,55,Rangpur
+555200,Lalmonirhat N/A,district_na,5552,Lalmonirhat,55,Rangpur
+557300,Nilphamari N/A,district_na,5573,Nilphamari,55,Rangpur
+557700,Panchagarh N/A,district_na,5577,Panchagarh,55,Rangpur
+558500,Rangpur N/A,district_na,5585,Rangpur,55,Rangpur
+558575,Rangpur City Corporation,city_corporation,5585,Rangpur,55,Rangpur
+559400,Thakurgaon N/A,district_na,5594,Thakurgaon,55,Rangpur
+603600,Habiganj N/A,district_na,6036,Habiganj,60,Sylhet
+605800,Moulvibazar N/A,district_na,6058,Maulvibazar,60,Sylhet
+609000,Sunamganj N/A,district_na,6090,Sunamganj,60,Sylhet
+609100,Sylhet N/A,district_na,6091,Sylhet,60,Sylhet
+609150,Sylhet City Corporation,city_corporation,6091,Sylhet,60,Sylhet

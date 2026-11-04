@@ -1,0 +1,596 @@
+parent_kind,parent_code,parent_name,division_code,division,district_code,district,thana_code,thana_name,union_count
+district,1004,Barguna,10,Barishal,1004,Barguna,10040009,Amtali,15
+district,1004,Barguna,10,Barishal,1004,Barguna,10040019,Bamna,4
+district,1004,Barguna,10,Barishal,1004,Barguna,10040028,Barguna Sadar,11
+district,1004,Barguna,10,Barishal,1004,Barguna,10040047,Betagi,8
+district,1004,Barguna,10,Barishal,1004,Barguna,10040085,Patharghata,8
+district,1004,Barguna,10,Barishal,1004,Barguna,10040090,Taltali,0
+city_corporation,100650,Barishal City Corporation,10,Barishal,1006,Barishal,10065051,Barishal Sadar,0
+district,1006,Barishal,10,Barishal,1006,Barishal,10060002,Agailjhara,5
+district,1006,Barishal,10,Barishal,1006,Barishal,10060003,Babuganj,6
+district,1006,Barishal,10,Barishal,1006,Barishal,10060007,Bakerganj,15
+district,1006,Barishal,10,Barishal,1006,Barishal,10060010,Banaripara,9
+district,1006,Barishal,10,Barishal,1006,Barishal,10060032,Gaurnadi,8
+district,1006,Barishal,10,Barishal,1006,Barishal,10060036,Hizla,6
+district,1006,Barishal,10,Barishal,1006,Barishal,10060062,Mehendiganj,14
+district,1006,Barishal,10,Barishal,1006,Barishal,10060069,Muladi,8
+district,1006,Barishal,10,Barishal,1006,Barishal,10060094,Wazirpur,9
+district,1009,Bhola,10,Barishal,1009,Bhola,10090018,Bhola Sadar,14
+district,1009,Bhola,10,Barishal,1009,Bhola,10090021,Borhanuddin,10
+district,1009,Bhola,10,Barishal,1009,Bhola,10090025,Charfession,20
+district,1009,Bhola,10,Barishal,1009,Bhola,10090029,Daulatkhan,10
+district,1009,Bhola,10,Barishal,1009,Bhola,10090054,Lalmohan,10
+district,1009,Bhola,10,Barishal,1009,Bhola,10090065,Manpura,4
+district,1009,Bhola,10,Barishal,1009,Bhola,10090091,Tazumuddin,5
+district,1042,Jhalokathi,10,Barishal,1042,Jhalokathi,10420040,Jhalokathi Sadar,11
+district,1042,Jhalokathi,10,Barishal,1042,Jhalokathi,10420043,Kanthalia,6
+district,1042,Jhalokathi,10,Barishal,1042,Jhalokathi,10420073,Nalchity,11
+district,1042,Jhalokathi,10,Barishal,1042,Jhalokathi,10420084,Rajapur,6
+district,1078,Patuakhali,10,Barishal,1078,Patuakhali,10780038,Bauphal,15
+district,1078,Patuakhali,10,Barishal,1078,Patuakhali,10780052,Dashmina,6
+district,1078,Patuakhali,10,Barishal,1078,Patuakhali,10780055,Dumki,4
+district,1078,Patuakhali,10,Barishal,1078,Patuakhali,10780057,Galachipa,18
+district,1078,Patuakhali,10,Barishal,1078,Patuakhali,10780066,Kalapara,12
+district,1078,Patuakhali,10,Barishal,1078,Patuakhali,10780076,Mirzaganj,6
+district,1078,Patuakhali,10,Barishal,1078,Patuakhali,10780095,Patuakhali Sadar,13
+district,1078,Patuakhali,10,Barishal,1078,Patuakhali,10780097,Rangabali,0
+district,1079,Pirojpur,10,Barishal,1079,Pirojpur,10790014,Bhandaria,7
+district,1079,Pirojpur,10,Barishal,1079,Pirojpur,10790090,Indurkani,3
+district,1079,Pirojpur,10,Barishal,1079,Pirojpur,10790047,Kawkhali,5
+district,1079,Pirojpur,10,Barishal,1079,Pirojpur,10790058,Mathbaria,12
+district,1079,Pirojpur,10,Barishal,1079,Pirojpur,10790076,Nazirpur,8
+district,1079,Pirojpur,10,Barishal,1079,Pirojpur,10790087,Nesarabad,11
+district,1079,Pirojpur,10,Barishal,1079,Pirojpur,10790080,Pirojpur Sadar,8
+district,2003,Bandarban,20,Chattogram,2003,Bandarban,20030004,Alikadam,2
+district,2003,Bandarban,20,Chattogram,2003,Bandarban,20030014,Bandarban Sadar,6
+district,2003,Bandarban,20,Chattogram,2003,Bandarban,20030051,Lama,8
+district,2003,Bandarban,20,Chattogram,2003,Bandarban,20030073,Naikhongchari,4
+district,2003,Bandarban,20,Chattogram,2003,Bandarban,20030089,Rowangchari,4
+district,2003,Bandarban,20,Chattogram,2003,Bandarban,20030091,Ruma,4
+district,2003,Bandarban,20,Chattogram,2003,Bandarban,20030095,Thanchi,4
+district,2012,Brahmanbaria,20,Chattogram,2012,Brahmanbaria,20120002,Akhaura,6
+district,2012,Brahmanbaria,20,Chattogram,2012,Brahmanbaria,20120033,Ashuganj,8
+district,2012,Brahmanbaria,20,Chattogram,2012,Brahmanbaria,20120004,Banchharampur,13
+district,2012,Brahmanbaria,20,Chattogram,2012,Brahmanbaria,20120007,Bijoynagar,10
+district,2012,Brahmanbaria,20,Chattogram,2012,Brahmanbaria,20120013,Brahmanbaria Sadar,12
+district,2012,Brahmanbaria,20,Chattogram,2012,Brahmanbaria,20120063,Kasba,11
+district,2012,Brahmanbaria,20,Chattogram,2012,Brahmanbaria,20120085,Nabinagar,22
+district,2012,Brahmanbaria,20,Chattogram,2012,Brahmanbaria,20120090,Nasirnagar,13
+district,2012,Brahmanbaria,20,Chattogram,2012,Brahmanbaria,20120094,Sarail,9
+district,2013,Chandpur,20,Chattogram,2013,Chandpur,20130022,Chandpur Sadar,15
+district,2013,Chandpur,20,Chattogram,2013,Chandpur,20130045,Faridganj,16
+district,2013,Chandpur,20,Chattogram,2013,Chandpur,20130047,Haimchar,6
+district,2013,Chandpur,20,Chattogram,2013,Chandpur,20130049,Hajiganj,12
+district,2013,Chandpur,20,Chattogram,2013,Chandpur,20130058,Kachua,13
+district,2013,Chandpur,20,Chattogram,2013,Chandpur,20130076,Matlab Dakshin,7
+district,2013,Chandpur,20,Chattogram,2013,Chandpur,20130079,Matlab Uttar,15
+district,2013,Chandpur,20,Chattogram,2013,Chandpur,20130095,Shahrasti,11
+city_corporation,201516,Chattogram City Corporation,20,Chattogram,2015,Chattogram,20151602,Akbarshah,0
+city_corporation,201516,Chattogram City Corporation,20,Chattogram,2015,Chattogram,20151610,Bakalia,0
+city_corporation,201516,Chattogram City Corporation,20,Chattogram,2015,Chattogram,20151606,Bayejid Bostami,0
+city_corporation,201516,Chattogram City Corporation,20,Chattogram,2015,Chattogram,20151616,Chalk Bazar,0
+city_corporation,201516,Chattogram City Corporation,20,Chattogram,2015,Chattogram,20151619,Chandgaon,0
+city_corporation,201516,Chattogram City Corporation,20,Chattogram,2015,Chattogram,20151620,Chittogram Port,0
+city_corporation,201516,Chattogram City Corporation,20,Chattogram,2015,Chattogram,20151628,Double Mooring,0
+city_corporation,201516,Chattogram City Corporation,20,Chattogram,2015,Chattogram,20151631,EPZ,0
+city_corporation,201516,Chattogram City Corporation,20,Chattogram,2015,Chattogram,20151635,Halishahar,0
+city_corporation,201516,Chattogram City Corporation,20,Chattogram,2015,Chattogram,20151643,Khulshi,0
+city_corporation,201516,Chattogram City Corporation,20,Chattogram,2015,Chattogram,20151641,Kotwali,0
+city_corporation,201516,Chattogram City Corporation,20,Chattogram,2015,Chattogram,20151655,Pahartali,0
+city_corporation,201516,Chattogram City Corporation,20,Chattogram,2015,Chattogram,20151657,Panchlaish,0
+city_corporation,201516,Chattogram City Corporation,20,Chattogram,2015,Chattogram,20151665,Patenga,0
+city_corporation,201516,Chattogram City Corporation,20,Chattogram,2015,Chattogram,20151677,Sadarghat,0
+district,2015,Chattogram,20,Chattogram,2015,Chattogram,20150004,Anowara,11
+district,2015,Chattogram,20,Chattogram,2015,Chattogram,20150008,Banshkhali,15
+district,2015,Chattogram,20,Chattogram,2015,Chattogram,20150012,Boalkhali,10
+district,2015,Chattogram,20,Chattogram,2015,Chattogram,20150018,Chandanaish,10
+district,2015,Chattogram,20,Chattogram,2015,Chattogram,20150033,Fatikchari,21
+district,2015,Chattogram,20,Chattogram,2015,Chattogram,20150037,Hathazari,15
+district,2015,Chattogram,20,Chattogram,2015,Chattogram,20150039,Karnaphuli,0
+district,2015,Chattogram,20,Chattogram,2015,Chattogram,20150047,Lohagara,9
+district,2015,Chattogram,20,Chattogram,2015,Chattogram,20150053,Mirsharai,18
+district,2015,Chattogram,20,Chattogram,2015,Chattogram,20150061,Patiya,23
+district,2015,Chattogram,20,Chattogram,2015,Chattogram,20150070,Rangunia,16
+district,2015,Chattogram,20,Chattogram,2015,Chattogram,20150074,Raozan,15
+district,2015,Chattogram,20,Chattogram,2015,Chattogram,20150078,Sandwip,16
+district,2015,Chattogram,20,Chattogram,2015,Chattogram,20150082,Satkania,18
+district,2015,Chattogram,20,Chattogram,2015,Chattogram,20150086,Sitakunda,10
+district,2022,Cox's Bazar,20,Chattogram,2022,Cox's Bazar,20220016,Chakaria,19
+district,2022,Cox's Bazar,20,Chattogram,2022,Cox's Bazar,20220024,Cox's Bazar Sadar,11
+district,2022,Cox's Bazar,20,Chattogram,2022,Cox's Bazar,20220032,Eidgaon,0
+district,2022,Cox's Bazar,20,Chattogram,2022,Cox's Bazar,20220075,Eidgaon,0
+district,2022,Cox's Bazar,20,Chattogram,2022,Cox's Bazar,20220045,Kutubdia,6
+district,2022,Cox's Bazar,20,Chattogram,2022,Cox's Bazar,20220049,Maheshkhali,9
+district,2022,Cox's Bazar,20,Chattogram,2022,Cox's Bazar,20220056,Pekua,7
+district,2022,Cox's Bazar,20,Chattogram,2022,Cox's Bazar,20220066,Ramu,11
+district,2022,Cox's Bazar,20,Chattogram,2022,Cox's Bazar,20220090,Teknaf,7
+district,2022,Cox's Bazar,20,Chattogram,2022,Cox's Bazar,20220094,Ukhia,5
+city_corporation,201950,Cumilla City Corporation,20,Chattogram,2019,Cumilla,20195067,Cumilla Adarsha Sadar,0
+city_corporation,201950,Cumilla City Corporation,20,Chattogram,2019,Cumilla,20195033,Cumilla Sadar Dakshin,0
+district,2019,Cumilla,20,Chattogram,2019,Cumilla,20190009,Barura,15
+district,2019,Cumilla,20,Chattogram,2019,Cumilla,20190015,Brahmanpara,8
+district,2019,Cumilla,20,Chattogram,2019,Cumilla,20190018,Burichang,8
+district,2019,Cumilla,20,Chattogram,2019,Cumilla,20190027,Chandina,14
+district,2019,Cumilla,20,Chattogram,2019,Cumilla,20190031,Chauddagram,15
+district,2019,Cumilla,20,Chattogram,2019,Cumilla,20190036,Daudkandi,16
+district,2019,Cumilla,20,Chattogram,2019,Cumilla,20190040,Debidwar,17
+district,2019,Cumilla,20,Chattogram,2019,Cumilla,20190054,Homna,11
+district,2019,Cumilla,20,Chattogram,2019,Cumilla,20190072,Laksam,8
+district,2019,Cumilla,20,Chattogram,2019,Cumilla,20190073,Lalmi,0
+district,2019,Cumilla,20,Chattogram,2019,Cumilla,20190075,Meghna,7
+district,2019,Cumilla,20,Chattogram,2019,Cumilla,20190074,Monoharganj,11
+district,2019,Cumilla,20,Chattogram,2019,Cumilla,20190081,Muradnagar,22
+district,2019,Cumilla,20,Chattogram,2019,Cumilla,20190087,Nangalkot,14
+district,2019,Cumilla,20,Chattogram,2019,Cumilla,20190094,Titas,9
+district,2030,Feni,20,Chattogram,2030,Feni,20300014,Chhagalnaiya,6
+district,2030,Feni,20,Chattogram,2030,Feni,20300025,Daganbhuiyan,9
+district,2030,Feni,20,Chattogram,2030,Feni,20300029,Feni Sadar,13
+district,2030,Feni,20,Chattogram,2030,Feni,20300041,Fulgazi,6
+district,2030,Feni,20,Chattogram,2030,Feni,20300051,Parshuram,4
+district,2030,Feni,20,Chattogram,2030,Feni,20300094,Sonagazi,10
+district,2046,Khagrachari,20,Chattogram,2046,Khagrachari,20460043,Dighinala,5
+district,2046,Khagrachari,20,Chattogram,2046,Khagrachari,20460047,Guimara,0
+district,2046,Khagrachari,20,Chattogram,2046,Khagrachari,20460049,Khagrachari Sadar,6
+district,2046,Khagrachari,20,Chattogram,2046,Khagrachari,20460061,Lakshmichari,3
+district,2046,Khagrachari,20,Chattogram,2046,Khagrachari,20460065,Mahalchari,5
+district,2046,Khagrachari,20,Chattogram,2046,Khagrachari,20460067,Manikchari,4
+district,2046,Khagrachari,20,Chattogram,2046,Khagrachari,20460070,Matiranga,9
+district,2046,Khagrachari,20,Chattogram,2046,Khagrachari,20460077,Panchhari,5
+district,2046,Khagrachari,20,Chattogram,2046,Khagrachari,20460080,Ramgarh,4
+district,2051,Lakshmipur,20,Chattogram,2051,Lakshmipur,20510033,Kamalnagar,9
+district,2051,Lakshmipur,20,Chattogram,2051,Lakshmipur,20510043,Lakshmipur Sadar,22
+district,2051,Lakshmipur,20,Chattogram,2051,Lakshmipur,20510058,Raipur,11
+district,2051,Lakshmipur,20,Chattogram,2051,Lakshmipur,20510065,Ramganj,11
+district,2051,Lakshmipur,20,Chattogram,2051,Lakshmipur,20510073,Ramgati,9
+district,2075,Noakhali,20,Chattogram,2075,Noakhali,20750007,Begumganj,17
+district,2075,Noakhali,20,Chattogram,2075,Noakhali,20750010,Chatkhil,10
+district,2075,Noakhali,20,Chattogram,2075,Noakhali,20750021,Companiganj,9
+district,2075,Noakhali,20,Chattogram,2075,Noakhali,20750036,Hatiya,12
+district,2075,Noakhali,20,Chattogram,2075,Noakhali,20750047,Kabirhat,8
+district,2075,Noakhali,20,Chattogram,2075,Noakhali,20750087,Noakhali Sadar,14
+district,2075,Noakhali,20,Chattogram,2075,Noakhali,20750080,Senbagh,10
+district,2075,Noakhali,20,Chattogram,2075,Noakhali,20750083,Sonaimuri,11
+district,2075,Noakhali,20,Chattogram,2075,Noakhali,20750085,Subarnachar,8
+district,2084,Rangamati,20,Chattogram,2084,Rangamati,20840007,Baghaichari,9
+district,2084,Rangamati,20,Chattogram,2084,Rangamati,20840021,Barkal,5
+district,2084,Rangamati,20,Chattogram,2084,Rangamati,20840029,Belaichari,3
+district,2084,Rangamati,20,Chattogram,2084,Rangamati,20840047,Juraichari,4
+district,2084,Rangamati,20,Chattogram,2084,Rangamati,20840036,Kaptai,5
+district,2084,Rangamati,20,Chattogram,2084,Rangamati,20840025,Kowkhali,4
+district,2084,Rangamati,20,Chattogram,2084,Rangamati,20840058,Langadu,7
+district,2084,Rangamati,20,Chattogram,2084,Rangamati,20840075,Naniarchar,4
+district,2084,Rangamati,20,Chattogram,2084,Rangamati,20840078,Rajasthali,3
+district,2084,Rangamati,20,Chattogram,2084,Rangamati,20840087,Rangamati Sadar,7
+city_corporation,302625,Dhaka North City Corperation,30,Dhaka,3026,Dhaka,30262502,Adabor,2
+city_corporation,302625,Dhaka North City Corperation,30,Dhaka,3026,Dhaka,30262504,Badda,5
+city_corporation,302625,Dhaka North City Corperation,30,Dhaka,3026,Dhaka,30262507,Banani,0
+city_corporation,302625,Dhaka North City Corperation,30,Dhaka,3026,Dhaka,30262521,Bhasan Tek,0
+city_corporation,302625,Dhaka North City Corperation,30,Dhaka,3026,Dhaka,30262522,Bhatara,0
+city_corporation,302625,Dhaka North City Corperation,30,Dhaka,3026,Dhaka,30262506,Biman Bandar,3
+city_corporation,302625,Dhaka North City Corperation,30,Dhaka,3026,Dhaka,30262508,Cantonment,2
+city_corporation,302625,Dhaka North City Corperation,30,Dhaka,3026,Dhaka,30262510,Dakshinkhan,1
+city_corporation,302625,Dhaka North City Corperation,30,Dhaka,3026,Dhaka,30262511,Darus Salam,2
+city_corporation,302625,Dhaka North City Corperation,30,Dhaka,3026,Dhaka,30262526,Gulshan,3
+city_corporation,302625,Dhaka North City Corperation,30,Dhaka,3026,Dhaka,30262527,Hatirjheel,0
+city_corporation,302625,Dhaka North City Corperation,30,Dhaka,3026,Dhaka,30262530,Kafrul,4
+city_corporation,302625,Dhaka North City Corperation,30,Dhaka,3026,Dhaka,30262537,Khilkhet,3
+city_corporation,302625,Dhaka North City Corperation,30,Dhaka,3026,Dhaka,30262548,Mirpur,5
+city_corporation,302625,Dhaka North City Corperation,30,Dhaka,3026,Dhaka,30262550,Mohammadpur,6
+city_corporation,302625,Dhaka North City Corperation,30,Dhaka,3026,Dhaka,30262564,Pallabi,5
+city_corporation,302625,Dhaka North City Corperation,30,Dhaka,3026,Dhaka,30262567,Rampura,2
+city_corporation,302625,Dhaka North City Corperation,30,Dhaka,3026,Dhaka,30262570,Rupnagar,0
+city_corporation,302625,Dhaka North City Corperation,30,Dhaka,3026,Dhaka,30262574,Shah Ali,1
+city_corporation,302625,Dhaka North City Corperation,30,Dhaka,3026,Dhaka,30262580,Sher-e-bangla Nagar,2
+city_corporation,302625,Dhaka North City Corperation,30,Dhaka,3026,Dhaka,30262590,Tejgaon,3
+city_corporation,302625,Dhaka North City Corperation,30,Dhaka,3026,Dhaka,30262592,Tejgaon Ind. Area,3
+city_corporation,302625,Dhaka North City Corperation,30,Dhaka,3026,Dhaka,30262593,Turag,1
+city_corporation,302625,Dhaka North City Corperation,30,Dhaka,3026,Dhaka,30262596,Uttar Khan,1
+city_corporation,302625,Dhaka North City Corperation,30,Dhaka,3026,Dhaka,30262594,Uttara Paschim,0
+city_corporation,302625,Dhaka North City Corperation,30,Dhaka,3026,Dhaka,30262595,Uttara Purba,0
+city_corporation,302620,Dhaka South City Corporation,30,Dhaka,3026,Dhaka,30262005,Bangshal,7
+city_corporation,302620,Dhaka South City Corporation,30,Dhaka,3026,Dhaka,30262009,Chak Bazar,5
+city_corporation,302620,Dhaka South City Corporation,30,Dhaka,3026,Dhaka,30262012,Demra,3
+city_corporation,302620,Dhaka South City Corporation,30,Dhaka,3026,Dhaka,30262097,Dhanmondi,3
+city_corporation,302620,Dhaka South City Corporation,30,Dhaka,3026,Dhaka,30262024,Gendaria,4
+city_corporation,302620,Dhaka South City Corporation,30,Dhaka,3026,Dhaka,30262028,Hazaribag,0
+city_corporation,302620,Dhaka South City Corporation,30,Dhaka,3026,Dhaka,30262029,Jatrabari,6
+city_corporation,302620,Dhaka South City Corporation,30,Dhaka,3026,Dhaka,30262032,Kadamtali,5
+city_corporation,302620,Dhaka South City Corporation,30,Dhaka,3026,Dhaka,30262033,Kalabagan,2
+city_corporation,302620,Dhaka South City Corporation,30,Dhaka,3026,Dhaka,30262034,Kamrangir Char,1
+city_corporation,302620,Dhaka South City Corporation,30,Dhaka,3026,Dhaka,30262036,Khilgaon,5
+city_corporation,302620,Dhaka South City Corporation,30,Dhaka,3026,Dhaka,30262040,Kotwali,4
+city_corporation,302620,Dhaka South City Corporation,30,Dhaka,3026,Dhaka,30262042,Lalbag,0
+city_corporation,302620,Dhaka South City Corporation,30,Dhaka,3026,Dhaka,30262054,Motijheel,5
+city_corporation,302620,Dhaka South City Corporation,30,Dhaka,3026,Dhaka,30262057,Mugda Para,0
+city_corporation,302620,Dhaka South City Corporation,30,Dhaka,3026,Dhaka,30262063,New Market,1
+city_corporation,302620,Dhaka South City Corporation,30,Dhaka,3026,Dhaka,30262065,Paltan,1
+city_corporation,302620,Dhaka South City Corporation,30,Dhaka,3026,Dhaka,30262066,Ramna,3
+city_corporation,302620,Dhaka South City Corporation,30,Dhaka,3026,Dhaka,30262068,Sabujbag,0
+city_corporation,302620,Dhaka South City Corporation,30,Dhaka,3026,Dhaka,30262075,Shahbag,0
+city_corporation,302620,Dhaka South City Corporation,30,Dhaka,3026,Dhaka,30262073,Shahjahanpur,0
+city_corporation,302620,Dhaka South City Corporation,30,Dhaka,3026,Dhaka,30262076,Shyampur,3
+city_corporation,302620,Dhaka South City Corporation,30,Dhaka,3026,Dhaka,30262088,Sutrapur,6
+city_corporation,302620,Dhaka South City Corporation,30,Dhaka,3026,Dhaka,30262098,Wari,0
+district,3026,Dhaka,30,Dhaka,3026,Dhaka,30260014,Dhamrai,17
+district,3026,Dhaka,30,Dhaka,3026,Dhaka,30260018,Dohar,9
+district,3026,Dhaka,30,Dhaka,3026,Dhaka,30260022,Gaffargaon,0
+district,3026,Dhaka,30,Dhaka,3026,Dhaka,30260023,Gauripur,0
+district,3026,Dhaka,30,Dhaka,3026,Dhaka,30260038,Keraniganj,12
+district,3026,Dhaka,30,Dhaka,3026,Dhaka,30260062,Nawabganj,14
+district,3026,Dhaka,30,Dhaka,3026,Dhaka,30260072,Savar,13
+district,3026,Dhaka,30,Dhaka,3026,Dhaka,30260090,Sreebardi,3
+district,3029,Faridpur,30,Dhaka,3029,Faridpur,30290003,Alfadanga,6
+district,3029,Faridpur,30,Dhaka,3029,Faridpur,30290010,Bhanga,13
+district,3029,Faridpur,30,Dhaka,3029,Faridpur,30290018,Boalmari,12
+district,3029,Faridpur,30,Dhaka,3029,Faridpur,30290021,Char Bhadrasan,4
+district,3029,Faridpur,30,Dhaka,3029,Faridpur,30290047,Faridpur Sadar,12
+district,3029,Faridpur,30,Dhaka,3029,Faridpur,30290056,Madhukhali,9
+district,3029,Faridpur,30,Dhaka,3029,Faridpur,30290062,Nagarkanda,10
+district,3029,Faridpur,30,Dhaka,3029,Faridpur,30290084,Sadarpur,9
+district,3029,Faridpur,30,Dhaka,3029,Faridpur,30290090,Saltha,8
+city_corporation,303333,Gazipur City Corporation,30,Dhaka,3033,Gazipur,30333315,Basan,0
+city_corporation,303333,Gazipur City Corporation,30,Dhaka,3033,Gazipur,30333318,Gachha,0
+city_corporation,303333,Gazipur City Corporation,30,Dhaka,3033,Gazipur,30333330,Gazipur Sadar,10
+city_corporation,303333,Gazipur City Corporation,30,Dhaka,3033,Gazipur,30333399,Joydebpur,0
+city_corporation,303333,Gazipur City Corporation,30,Dhaka,3033,Gazipur,30333340,Kashimpur,0
+city_corporation,303333,Gazipur City Corporation,30,Dhaka,3033,Gazipur,30333345,Konabari,0
+city_corporation,303333,Gazipur City Corporation,30,Dhaka,3033,Gazipur,30333350,Pubail,0
+city_corporation,303333,Gazipur City Corporation,30,Dhaka,3033,Gazipur,30333390,Tongi Pashchim,0
+city_corporation,303333,Gazipur City Corporation,30,Dhaka,3033,Gazipur,30333393,Tongi Purba,0
+district,3033,Gazipur,30,Dhaka,3033,Gazipur,30330032,Kaliakair,10
+district,3033,Gazipur,30,Dhaka,3033,Gazipur,30330034,Kaliganj,8
+district,3033,Gazipur,30,Dhaka,3033,Gazipur,30330036,Kapasia,11
+district,3033,Gazipur,30,Dhaka,3033,Gazipur,30330086,Sreepur,9
+district,3035,Gopalganj,30,Dhaka,3035,Gopalganj,30350032,Gopalganj Sadar,22
+district,3035,Gopalganj,30,Dhaka,3035,Gopalganj,30350043,Kashiani,14
+district,3035,Gopalganj,30,Dhaka,3035,Gopalganj,30350051,Kotalipara,13
+district,3035,Gopalganj,30,Dhaka,3035,Gopalganj,30350058,Muksudpur,17
+district,3035,Gopalganj,30,Dhaka,3035,Gopalganj,30350091,Tungipara,6
+district,3048,Kishoreganj,30,Dhaka,3048,Kishoreganj,30480002,Austagram,8
+district,3048,Kishoreganj,30,Dhaka,3048,Kishoreganj,30480006,Bajitpur,12
+district,3048,Kishoreganj,30,Dhaka,3048,Kishoreganj,30480011,Bhairab,8
+district,3048,Kishoreganj,30,Dhaka,3048,Kishoreganj,30480027,Hossainpur,7
+district,3048,Kishoreganj,30,Dhaka,3048,Kishoreganj,30480033,Itna,9
+district,3048,Kishoreganj,30,Dhaka,3048,Kishoreganj,30480042,Karimganj,12
+district,3048,Kishoreganj,30,Dhaka,3048,Kishoreganj,30480045,Katiadi,11
+district,3048,Kishoreganj,30,Dhaka,3048,Kishoreganj,30480049,Kishoreganj Sadar,12
+district,3048,Kishoreganj,30,Dhaka,3048,Kishoreganj,30480054,Kuliarchar,7
+district,3048,Kishoreganj,30,Dhaka,3048,Kishoreganj,30480059,Mithamain,7
+district,3048,Kishoreganj,30,Dhaka,3048,Kishoreganj,30480076,Nikli,7
+district,3048,Kishoreganj,30,Dhaka,3048,Kishoreganj,30480079,Pakundia,11
+district,3048,Kishoreganj,30,Dhaka,3048,Kishoreganj,30480092,Tarail,7
+district,3054,Madaripur,30,Dhaka,3054,Madaripur,30540018,Dasar,0
+district,3054,Madaripur,30,Dhaka,3054,Madaripur,30540040,Kalkini,15
+district,3054,Madaripur,30,Dhaka,3054,Madaripur,30540054,Madaripur Sadar,16
+district,3054,Madaripur,30,Dhaka,3054,Madaripur,30540080,Rajoir,11
+district,3054,Madaripur,30,Dhaka,3054,Madaripur,30540087,Shibchar,20
+district,3056,Manikganj,30,Dhaka,3056,Manikganj,30560010,Daulatpur,8
+district,3056,Manikganj,30,Dhaka,3056,Manikganj,30560022,Ghior,7
+district,3056,Manikganj,30,Dhaka,3056,Manikganj,30560028,Harirampur,13
+district,3056,Manikganj,30,Dhaka,3056,Manikganj,30560046,Manikganj Sadar,11
+district,3056,Manikganj,30,Dhaka,3056,Manikganj,30560070,Saturia,9
+district,3056,Manikganj,30,Dhaka,3056,Manikganj,30560078,Shibalaya,7
+district,3056,Manikganj,30,Dhaka,3056,Manikganj,30560082,Singair,12
+district,3059,Munshiganj,30,Dhaka,3059,Munshiganj,30590024,Gazaria,8
+district,3059,Munshiganj,30,Dhaka,3059,Munshiganj,30590044,Lohajang,10
+district,3059,Munshiganj,30,Dhaka,3059,Munshiganj,30590056,Munshiganj Sadar,11
+district,3059,Munshiganj,30,Dhaka,3059,Munshiganj,30590074,Serajdikhan,14
+district,3059,Munshiganj,30,Dhaka,3059,Munshiganj,30590084,Sreenagar,14
+district,3059,Munshiganj,30,Dhaka,3059,Munshiganj,30590094,Tongibari,12
+city_corporation,306744,Narayanganj City Corporation,30,Dhaka,3067,Narayanganj,30674406,Bandar,6
+city_corporation,306744,Narayanganj City Corporation,30,Dhaka,3067,Narayanganj,30674458,Narayanganj Sadar,9
+district,3067,Narayanganj,30,Dhaka,3067,Narayanganj,30670002,Araihazar,12
+district,3067,Narayanganj,30,Dhaka,3067,Narayanganj,30670068,Rupganj,9
+district,3067,Narayanganj,30,Dhaka,3067,Narayanganj,30670004,Sonargaon,11
+district,3068,Narsingdi,30,Dhaka,3068,Narsingdi,30680007,Belabo,8
+district,3068,Narsingdi,30,Dhaka,3068,Narsingdi,30680052,Manohardi,12
+district,3068,Narsingdi,30,Dhaka,3068,Narsingdi,30680060,Narsingdi Sadar,16
+district,3068,Narsingdi,30,Dhaka,3068,Narsingdi,30680063,Palash,5
+district,3068,Narsingdi,30,Dhaka,3068,Narsingdi,30680064,Roypura,25
+district,3068,Narsingdi,30,Dhaka,3068,Narsingdi,30680076,Shibpur,10
+district,3082,Rajbari,30,Dhaka,3082,Rajbari,30820007,Baliakandi,7
+district,3082,Rajbari,30,Dhaka,3082,Rajbari,30820029,Goalanda,5
+district,3082,Rajbari,30,Dhaka,3082,Rajbari,30820047,Kalukhali,7
+district,3082,Rajbari,30,Dhaka,3082,Rajbari,30820073,Pangsha,11
+district,3082,Rajbari,30,Dhaka,3082,Rajbari,30820076,Rajbari Sadar,15
+district,3086,Shariatpur,30,Dhaka,3086,Shariatpur,30860014,Bhedarganj,14
+district,3086,Shariatpur,30,Dhaka,3086,Shariatpur,30860025,Damudya,8
+district,3086,Shariatpur,30,Dhaka,3086,Shariatpur,30860036,Gosairhat,8
+district,3086,Shariatpur,30,Dhaka,3086,Shariatpur,30860065,Naria,15
+district,3086,Shariatpur,30,Dhaka,3086,Shariatpur,30860069,Shariatpur Sadar,12
+district,3086,Shariatpur,30,Dhaka,3086,Shariatpur,30860094,Zanjira,13
+district,3093,Tangail,30,Dhaka,3093,Tangail,30930009,Basail,6
+district,3093,Tangail,30,Dhaka,3093,Tangail,30930019,Bhuapur,7
+district,3093,Tangail,30,Dhaka,3093,Tangail,30930023,Delduar,8
+district,3093,Tangail,30,Dhaka,3093,Tangail,30930025,Dhanbari,8
+district,3093,Tangail,30,Dhaka,3093,Tangail,30930028,Ghatail,12
+district,3093,Tangail,30,Dhaka,3093,Tangail,30930038,Gopalpur,8
+district,3093,Tangail,30,Dhaka,3093,Tangail,30930047,Kalihati,15
+district,3093,Tangail,30,Dhaka,3093,Tangail,30930057,Madhupur,7
+district,3093,Tangail,30,Dhaka,3093,Tangail,30930066,Mirzapur,15
+district,3093,Tangail,30,Dhaka,3093,Tangail,30930076,Nagarpur,12
+district,3093,Tangail,30,Dhaka,3093,Tangail,30930085,Sakhipur,7
+district,3093,Tangail,30,Dhaka,3093,Tangail,30930095,Tangail Sadar,13
+district,4001,Bagerhat,40,Khulna,4001,Bagerhat,40010008,Bagerhat Sadar,11
+district,4001,Bagerhat,40,Khulna,4001,Bagerhat,40010014,Chitalmari,7
+district,4001,Bagerhat,40,Khulna,4001,Bagerhat,40010034,Fakirhat,8
+district,4001,Bagerhat,40,Khulna,4001,Bagerhat,40010038,Kachua,7
+district,4001,Bagerhat,40,Khulna,4001,Bagerhat,40010056,Mollahat,7
+district,4001,Bagerhat,40,Khulna,4001,Bagerhat,40010058,Mongla,8
+district,4001,Bagerhat,40,Khulna,4001,Bagerhat,40010060,Morrelganj,17
+district,4001,Bagerhat,40,Khulna,4001,Bagerhat,40010073,Rampal,10
+district,4001,Bagerhat,40,Khulna,4001,Bagerhat,40010077,Sarankhola,5
+district,4018,Chuadanga,40,Khulna,4018,Chuadanga,40180007,Alamdanga,15
+district,4018,Chuadanga,40,Khulna,4018,Chuadanga,40180023,Chuadanga Sadar,8
+district,4018,Chuadanga,40,Khulna,4018,Chuadanga,40180031,Damurhuda,8
+district,4018,Chuadanga,40,Khulna,4018,Chuadanga,40180055,Jibannagar,5
+district,4041,Jashore,40,Khulna,4041,Jashore,40410004,Abhaynagar,9
+district,4041,Jashore,40,Khulna,4041,Jashore,40410009,Bagherpara,10
+district,4041,Jashore,40,Khulna,4041,Jashore,40410011,Chaugacha,12
+district,4041,Jashore,40,Khulna,4041,Jashore,40410047,Jashore Sadar,16
+district,4041,Jashore,40,Khulna,4041,Jashore,40410023,Jhikargacha,12
+district,4041,Jashore,40,Khulna,4041,Jashore,40410038,Keshabpur,10
+district,4041,Jashore,40,Khulna,4041,Jashore,40410061,Monirampur,18
+district,4041,Jashore,40,Khulna,4041,Jashore,40410090,Sharsha,12
+district,4044,Jhenaidah,40,Khulna,4044,Jhenaidah,40440014,Harinakunda,9
+district,4044,Jhenaidah,40,Khulna,4044,Jhenaidah,40440019,Jhenaidah Sadar,18
+district,4044,Jhenaidah,40,Khulna,4044,Jhenaidah,40440033,Kaliganj,12
+district,4044,Jhenaidah,40,Khulna,4044,Jhenaidah,40440042,Kotchandpur,6
+district,4044,Jhenaidah,40,Khulna,4044,Jhenaidah,40440071,Maheshpur,13
+district,4044,Jhenaidah,40,Khulna,4044,Jhenaidah,40440080,Shailkupa,15
+city_corporation,404733,Khulna City Corporation,40,Khulna,4047,Khulna,40473321,Daulatpur,7
+city_corporation,404733,Khulna City Corporation,40,Khulna,4047,Khulna,40473345,Khalishpur,9
+city_corporation,404733,Khulna City Corporation,40,Khulna,4047,Khulna,40473348,Khan Jahan Ali,3
+city_corporation,404733,Khulna City Corporation,40,Khulna,4047,Khulna,40473351,Khulna Sadar,9
+city_corporation,404733,Khulna City Corporation,40,Khulna,4047,Khulna,40473385,Sonadanga,7
+district,4047,Khulna,40,Khulna,4047,Khulna,40470012,Batiaghata,7
+district,4047,Khulna,40,Khulna,4047,Khulna,40470017,Dacope,11
+district,4047,Khulna,40,Khulna,4047,Khulna,40470040,Dighalia,4
+district,4047,Khulna,40,Khulna,4047,Khulna,40470030,Dumuria,14
+district,4047,Khulna,40,Khulna,4047,Khulna,40470053,Koyra,8
+district,4047,Khulna,40,Khulna,4047,Khulna,40470064,Paikgacha,11
+district,4047,Khulna,40,Khulna,4047,Khulna,40470069,Phultala,3
+district,4047,Khulna,40,Khulna,4047,Khulna,40470075,Rupsa,5
+district,4047,Khulna,40,Khulna,4047,Khulna,40470094,Terokhada,6
+district,4050,Kushtia,40,Khulna,4050,Kushtia,40500015,Bheramara,7
+district,4050,Kushtia,40,Khulna,4050,Kushtia,40500039,Daulatpur,14
+district,4050,Kushtia,40,Khulna,4050,Kushtia,40500063,Khoksa,10
+district,4050,Kushtia,40,Khulna,4050,Kushtia,40500071,Kumarkhali,12
+district,4050,Kushtia,40,Khulna,4050,Kushtia,40500079,Kushtia Sadar,15
+district,4050,Kushtia,40,Khulna,4050,Kushtia,40500094,Mirpur,13
+district,4055,Magura,40,Khulna,4055,Magura,40550057,Magura Sadar,14
+district,4055,Magura,40,Khulna,4055,Magura,40550066,Mohammadpur,8
+district,4055,Magura,40,Khulna,4055,Magura,40550085,Shalikha,7
+district,4055,Magura,40,Khulna,4055,Magura,40550095,Sreepur,8
+district,4057,Meherpur,40,Khulna,4057,Meherpur,40570047,Gangni,10
+district,4057,Meherpur,40,Khulna,4057,Meherpur,40570087,Meherpur Sadar,6
+district,4057,Meherpur,40,Khulna,4057,Meherpur,40570060,Mujibnagar,4
+district,4065,Narail,40,Khulna,4065,Narail,40650028,Kalia,14
+district,4065,Narail,40,Khulna,4065,Narail,40650052,Lohagara,13
+district,4065,Narail,40,Khulna,4065,Narail,40650076,Narail Sadar,14
+district,4087,Satkhira,40,Khulna,4087,Satkhira,40870004,Assasuni,11
+district,4087,Satkhira,40,Khulna,4087,Satkhira,40870025,Debhata,5
+district,4087,Satkhira,40,Khulna,4087,Satkhira,40870043,Kalaroa,13
+district,4087,Satkhira,40,Khulna,4087,Satkhira,40870047,Kaliganj,12
+district,4087,Satkhira,40,Khulna,4087,Satkhira,40870082,Satkhira Sadar,15
+district,4087,Satkhira,40,Khulna,4087,Satkhira,40870086,Shyamnagar,13
+district,4087,Satkhira,40,Khulna,4087,Satkhira,40870090,Tala,12
+district,4539,Jamalpur,45,Mymensingh,4539,Jamalpur,45390007,Bakshiganj,7
+district,4539,Jamalpur,45,Mymensingh,4539,Jamalpur,45390015,Dewanganj,9
+district,4539,Jamalpur,45,Mymensingh,4539,Jamalpur,45390029,Islampur,13
+district,4539,Jamalpur,45,Mymensingh,4539,Jamalpur,45390036,Jamalpur Sadar,16
+district,4539,Jamalpur,45,Mymensingh,4539,Jamalpur,45390058,Madarganj,8
+district,4539,Jamalpur,45,Mymensingh,4539,Jamalpur,45390061,Melandaha,12
+district,4539,Jamalpur,45,Mymensingh,4539,Jamalpur,45390085,Sarishabari,9
+city_corporation,456140,Mymensingh City Corporation,45,Mymensingh,4561,Mymensingh,45614052,Mymensingh Sadar,14
+district,4561,Mymensingh,45,Mymensingh,4561,Mymensingh,45610013,Bhaluka,12
+district,4561,Mymensingh,45,Mymensingh,4561,Mymensingh,45610016,Dhobaura,7
+district,4561,Mymensingh,45,Mymensingh,4561,Mymensingh,45610020,Fulbaria,14
+district,4561,Mymensingh,45,Mymensingh,4561,Mymensingh,45610022,Gafargaon,16
+district,4561,Mymensingh,45,Mymensingh,4561,Mymensingh,45610023,Gouripur,11
+district,4561,Mymensingh,45,Mymensingh,4561,Mymensingh,45610024,Haluaghat,12
+district,4561,Mymensingh,45,Mymensingh,4561,Mymensingh,45610031,Ishwarganj,12
+district,4561,Mymensingh,45,Mymensingh,4561,Mymensingh,45610065,Muktagacha,11
+district,4561,Mymensingh,45,Mymensingh,4561,Mymensingh,45610072,Nandail,13
+district,4561,Mymensingh,45,Mymensingh,4561,Mymensingh,45610081,Phulpur,21
+district,4561,Mymensingh,45,Mymensingh,4561,Mymensingh,45610088,Tarakanda,0
+district,4561,Mymensingh,45,Mymensingh,4561,Mymensingh,45610094,Trishal,13
+district,4572,Netrakona,45,Mymensingh,4572,Netrakona,45720004,Atpara,7
+district,4572,Netrakona,45,Mymensingh,4572,Netrakona,45720009,Barhatta,7
+district,4572,Netrakona,45,Mymensingh,4572,Netrakona,45720018,Durgapur,8
+district,4572,Netrakona,45,Mymensingh,4572,Netrakona,45720040,Kalmakanda,8
+district,4572,Netrakona,45,Mymensingh,4572,Netrakona,45720047,Kendua,14
+district,4572,Netrakona,45,Mymensingh,4572,Netrakona,45720038,Khaliajuri,6
+district,4572,Netrakona,45,Mymensingh,4572,Netrakona,45720056,Madan,9
+district,4572,Netrakona,45,Mymensingh,4572,Netrakona,45720063,Mohanganj,8
+district,4572,Netrakona,45,Mymensingh,4572,Netrakona,45720074,Netrokona Sadar,13
+district,4572,Netrakona,45,Mymensingh,4572,Netrakona,45720083,Purbadhala,12
+district,4589,Sherpur,45,Mymensingh,4589,Sherpur,45890037,Jhenaigati,7
+district,4589,Sherpur,45,Mymensingh,4589,Sherpur,45890067,Nakla,10
+district,4589,Sherpur,45,Mymensingh,4589,Sherpur,45890070,Nalitabari,13
+district,4589,Sherpur,45,Mymensingh,4589,Sherpur,45890088,Sherpur Sadar,15
+district,4589,Sherpur,45,Mymensingh,4589,Sherpur,45890090,Sreebardi,11
+district,5010,Bogura,50,Rajshahi,5010,Bogura,50100006,Adamdighi,7
+district,5010,Bogura,50,Rajshahi,5010,Bogura,50100020,Bogura Sadar,12
+district,5010,Bogura,50,Rajshahi,5010,Bogura,50100027,Dhunat,11
+district,5010,Bogura,50,Rajshahi,5010,Bogura,50100033,Dhupchanchia,7
+district,5010,Bogura,50,Rajshahi,5010,Bogura,50100040,Gabtali,12
+district,5010,Bogura,50,Rajshahi,5010,Bogura,50100054,Kahaloo,10
+district,5010,Bogura,50,Rajshahi,5010,Bogura,50100067,Nandigram,6
+district,5010,Bogura,50,Rajshahi,5010,Bogura,50100081,Sariakandi,13
+district,5010,Bogura,50,Rajshahi,5010,Bogura,50100085,Shajahanpur,11
+district,5010,Bogura,50,Rajshahi,5010,Bogura,50100088,Sherpur,11
+district,5010,Bogura,50,Rajshahi,5010,Bogura,50100094,Shibganj,13
+district,5010,Bogura,50,Rajshahi,5010,Bogura,50100095,Sonatola,8
+district,5070,Chapainawabganj,50,Rajshahi,5070,Chapainawabganj,50700018,Bholahat,4
+district,5070,Chapainawabganj,50,Rajshahi,5070,Chapainawabganj,50700066,Chapainawabganj Sadar,15
+district,5070,Chapainawabganj,50,Rajshahi,5070,Chapainawabganj,50700037,Gomastapur,9
+district,5070,Chapainawabganj,50,Rajshahi,5070,Chapainawabganj,50700056,Nachole,5
+district,5070,Chapainawabganj,50,Rajshahi,5070,Chapainawabganj,50700088,Shibganj,16
+district,5038,Joypurhat,50,Rajshahi,5038,Joypurhat,50380013,Akkelpur,6
+district,5038,Joypurhat,50,Rajshahi,5038,Joypurhat,50380047,Joypurhat Sadar,10
+district,5038,Joypurhat,50,Rajshahi,5038,Joypurhat,50380058,Kalai,6
+district,5038,Joypurhat,50,Rajshahi,5038,Joypurhat,50380061,Khetlal,5
+district,5038,Joypurhat,50,Rajshahi,5038,Joypurhat,50380074,Panchbibi,9
+district,5064,Naogaon,50,Rajshahi,5064,Naogaon,50640003,Atrai,8
+district,5064,Naogaon,50,Rajshahi,5064,Naogaon,50640006,Badalgachhi,8
+district,5064,Naogaon,50,Rajshahi,5064,Naogaon,50640028,Dhamoirhat,9
+district,5064,Naogaon,50,Rajshahi,5064,Naogaon,50640050,Mahadebpur,10
+district,5064,Naogaon,50,Rajshahi,5064,Naogaon,50640047,Manda,14
+district,5064,Naogaon,50,Rajshahi,5064,Naogaon,50640060,Naogaon Sadar,13
+district,5064,Naogaon,50,Rajshahi,5064,Naogaon,50640069,Niamatpur,8
+district,5064,Naogaon,50,Rajshahi,5064,Naogaon,50640075,Patnitala,12
+district,5064,Naogaon,50,Rajshahi,5064,Naogaon,50640079,Porsha,6
+district,5064,Naogaon,50,Rajshahi,5064,Naogaon,50640085,Raninagar,8
+district,5064,Naogaon,50,Rajshahi,5064,Naogaon,50640086,Sapahar,6
+district,5069,Natore,50,Rajshahi,5069,Natore,50690009,Bagatipara,6
+district,5069,Natore,50,Rajshahi,5069,Natore,50690015,Baraigram,9
+district,5069,Natore,50,Rajshahi,5069,Natore,50690041,Gurudaspur,7
+district,5069,Natore,50,Rajshahi,5069,Natore,50690044,Lalpur,11
+district,5069,Natore,50,Rajshahi,5069,Natore,50690055,Naldanga,0
+district,5069,Natore,50,Rajshahi,5069,Natore,50690066,Naldanga,0
+district,5069,Natore,50,Rajshahi,5069,Natore,50690063,Natore Sadar,14
+district,5069,Natore,50,Rajshahi,5069,Natore,50690091,Singra,13
+district,5076,Pabna,50,Rajshahi,5076,Pabna,50760005,Atgharia,6
+district,5076,Pabna,50,Rajshahi,5076,Pabna,50760016,Bera,10
+district,5076,Pabna,50,Rajshahi,5076,Pabna,50760019,Bhangura,7
+district,5076,Pabna,50,Rajshahi,5076,Pabna,50760022,Chatmohar,12
+district,5076,Pabna,50,Rajshahi,5076,Pabna,50760033,Faridpur,7
+district,5076,Pabna,50,Rajshahi,5076,Pabna,50760039,Ishwardi,8
+district,5076,Pabna,50,Rajshahi,5076,Pabna,50760055,Pabna Sadar,11
+district,5076,Pabna,50,Rajshahi,5076,Pabna,50760072,Santhia,11
+district,5076,Pabna,50,Rajshahi,5076,Pabna,50760083,Sujanagar,11
+city_corporation,508166,Rajshahi City Corporation,50,Rajshahi,5081,Rajshahi,50816622,Boalia,0
+city_corporation,508166,Rajshahi City Corporation,50,Rajshahi,5081,Rajshahi,50816624,Chandrima,0
+city_corporation,508166,Rajshahi City Corporation,50,Rajshahi,5081,Rajshahi,50816638,Kashiadanga,0
+city_corporation,508166,Rajshahi City Corporation,50,Rajshahi,5081,Rajshahi,50816640,Matihar,0
+city_corporation,508166,Rajshahi City Corporation,50,Rajshahi,5081,Rajshahi,50816685,Rajpara,0
+city_corporation,508166,Rajshahi City Corporation,50,Rajshahi,5081,Rajshahi,50816690,Shah Makhdum,0
+district,5081,Rajshahi,50,Rajshahi,5081,Rajshahi,50810010,Bagha,6
+district,5081,Rajshahi,50,Rajshahi,5081,Rajshahi,50810012,Baghmara,16
+district,5081,Rajshahi,50,Rajshahi,5081,Rajshahi,50810025,Charghat,6
+district,5081,Rajshahi,50,Rajshahi,5081,Rajshahi,50810031,Durgapur,7
+district,5081,Rajshahi,50,Rajshahi,5081,Rajshahi,50810034,Godagari,10
+district,5081,Rajshahi,50,Rajshahi,5081,Rajshahi,50810053,Mohanpur,7
+district,5081,Rajshahi,50,Rajshahi,5081,Rajshahi,50810072,Paba,10
+district,5081,Rajshahi,50,Rajshahi,5081,Rajshahi,50810082,Puthia,6
+district,5081,Rajshahi,50,Rajshahi,5081,Rajshahi,50810094,Tanore,7
+district,5088,Sirajganj,50,Rajshahi,5088,Sirajganj,50880011,Belkuchi,7
+district,5088,Sirajganj,50,Rajshahi,5088,Sirajganj,50880027,Chauhali,7
+district,5088,Sirajganj,50,Rajshahi,5088,Sirajganj,50880044,Kamarkhanda,4
+district,5088,Sirajganj,50,Rajshahi,5088,Sirajganj,50880050,Kazipur,13
+district,5088,Sirajganj,50,Rajshahi,5088,Sirajganj,50880061,Royganj,10
+district,5088,Sirajganj,50,Rajshahi,5088,Sirajganj,50880067,Shahjadpur,14
+district,5088,Sirajganj,50,Rajshahi,5088,Sirajganj,50880078,Sirajganj Sadar,11
+district,5088,Sirajganj,50,Rajshahi,5088,Sirajganj,50880089,Tarash,8
+district,5088,Sirajganj,50,Rajshahi,5088,Sirajganj,50880094,Ullahpara,14
+district,5527,Dinajpur,55,Rangpur,5527,Dinajpur,55270017,Biral,10
+district,5527,Dinajpur,55,Rangpur,5527,Dinajpur,55270010,Birampur,8
+district,5527,Dinajpur,55,Rangpur,5527,Dinajpur,55270012,Birganj,12
+district,5527,Dinajpur,55,Rangpur,5527,Dinajpur,55270021,Bochaganj,7
+district,5527,Dinajpur,55,Rangpur,5527,Dinajpur,55270030,Chirirbandar,12
+district,5527,Dinajpur,55,Rangpur,5527,Dinajpur,55270064,Dinajpur Sadar,11
+district,5527,Dinajpur,55,Rangpur,5527,Dinajpur,55270038,Fulbari,8
+district,5527,Dinajpur,55,Rangpur,5527,Dinajpur,55270043,Ghoraghat,5
+district,5527,Dinajpur,55,Rangpur,5527,Dinajpur,55270047,Hakimpur,4
+district,5527,Dinajpur,55,Rangpur,5527,Dinajpur,55270056,Kaharole,6
+district,5527,Dinajpur,55,Rangpur,5527,Dinajpur,55270060,Khansama,6
+district,5527,Dinajpur,55,Rangpur,5527,Dinajpur,55270069,Nawabganj,9
+district,5527,Dinajpur,55,Rangpur,5527,Dinajpur,55270077,Parbatipur,11
+district,5532,Gaibandha,55,Rangpur,5532,Gaibandha,55320021,Fulchhari,7
+district,5532,Gaibandha,55,Rangpur,5532,Gaibandha,55320024,Gaibandha Sadar,14
+district,5532,Gaibandha,55,Rangpur,5532,Gaibandha,55320030,Gobindaganj,18
+district,5532,Gaibandha,55,Rangpur,5532,Gaibandha,55320067,Palashbari,9
+district,5532,Gaibandha,55,Rangpur,5532,Gaibandha,55320082,Sadullapur,11
+district,5532,Gaibandha,55,Rangpur,5532,Gaibandha,55320088,Saghata,10
+district,5532,Gaibandha,55,Rangpur,5532,Gaibandha,55320091,Sundarganj,16
+district,5549,Kurigram,55,Rangpur,5549,Kurigram,55490006,Bhurungamari,10
+district,5549,Kurigram,55,Rangpur,5549,Kurigram,55490009,Chilmari,6
+district,5549,Kurigram,55,Rangpur,5549,Kurigram,55490052,Kurigram Sadar,9
+district,5549,Kurigram,55,Rangpur,5549,Kurigram,55490061,Nageshwari,15
+district,5549,Kurigram,55,Rangpur,5549,Kurigram,55490018,Phulbari,6
+district,5549,Kurigram,55,Rangpur,5549,Kurigram,55490077,Rajarhat,7
+district,5549,Kurigram,55,Rangpur,5549,Kurigram,55490008,Rajibpur,3
+district,5549,Kurigram,55,Rangpur,5549,Kurigram,55490079,Raumari,5
+district,5549,Kurigram,55,Rangpur,5549,Kurigram,55490094,Ulipur,14
+district,5552,Lalmonirhat,55,Rangpur,5552,Lalmonirhat,55520002,Aditmari,8
+district,5552,Lalmonirhat,55,Rangpur,5552,Lalmonirhat,55520033,Hatibandha,12
+district,5552,Lalmonirhat,55,Rangpur,5552,Lalmonirhat,55520039,Kaliganj,8
+district,5552,Lalmonirhat,55,Rangpur,5552,Lalmonirhat,55520055,Lalmonirhat Sadar,10
+district,5552,Lalmonirhat,55,Rangpur,5552,Lalmonirhat,55520070,Patgram,9
+district,5573,Nilphamari,55,Rangpur,5573,Nilphamari,55730012,Dimla,10
+district,5573,Nilphamari,55,Rangpur,5573,Nilphamari,55730015,Domar,11
+district,5573,Nilphamari,55,Rangpur,5573,Nilphamari,55730036,Jaldhaka,12
+district,5573,Nilphamari,55,Rangpur,5573,Nilphamari,55730045,Kishoreganj,9
+district,5573,Nilphamari,55,Rangpur,5573,Nilphamari,55730064,Nilphamari Sadar,16
+district,5573,Nilphamari,55,Rangpur,5573,Nilphamari,55730085,Saidpur,6
+district,5577,Panchagarh,55,Rangpur,5577,Panchagarh,55770004,Atwari,6
+district,5577,Panchagarh,55,Rangpur,5577,Panchagarh,55770025,Boda,11
+district,5577,Panchagarh,55,Rangpur,5577,Panchagarh,55770034,Debiganj,10
+district,5577,Panchagarh,55,Rangpur,5577,Panchagarh,55770073,Panchagarh Sadar,11
+district,5577,Panchagarh,55,Rangpur,5577,Panchagarh,55770090,Tentulia,7
+city_corporation,558575,Rangpur City Corporation,55,Rangpur,5585,Rangpur,55857531,Hajirhat,0
+city_corporation,558575,Rangpur City Corporation,55,Rangpur,5585,Rangpur,55857533,Haragachh,0
+city_corporation,558575,Rangpur City Corporation,55,Rangpur,5585,Rangpur,55857544,Kotwali,0
+city_corporation,558575,Rangpur City Corporation,55,Rangpur,5585,Rangpur,55857555,Mahiganj,0
+city_corporation,558575,Rangpur City Corporation,55,Rangpur,5585,Rangpur,55857569,Parshuram,0
+city_corporation,558575,Rangpur City Corporation,55,Rangpur,5585,Rangpur,55857549,Rangpur Sadar,12
+city_corporation,558575,Rangpur City Corporation,55,Rangpur,5585,Rangpur,55857589,Tajhat,0
+district,5585,Rangpur,55,Rangpur,5585,Rangpur,55850003,Badarganj,11
+district,5585,Rangpur,55,Rangpur,5585,Rangpur,55850027,Gangachara,10
+district,5585,Rangpur,55,Rangpur,5585,Rangpur,55850042,Kaunia,7
+district,5585,Rangpur,55,Rangpur,5585,Rangpur,55850058,Mithapukur,17
+district,5585,Rangpur,55,Rangpur,5585,Rangpur,55850073,Pirgachha,9
+district,5585,Rangpur,55,Rangpur,5585,Rangpur,55850076,Pirganj,15
+district,5585,Rangpur,55,Rangpur,5585,Rangpur,55850092,Taraganj,5
+district,5594,Thakurgaon,55,Rangpur,5594,Thakurgaon,55940008,Baliadangi,8
+district,5594,Thakurgaon,55,Rangpur,5594,Thakurgaon,55940051,Haripur,6
+district,5594,Thakurgaon,55,Rangpur,5594,Thakurgaon,55940082,Pirganj,11
+district,5594,Thakurgaon,55,Rangpur,5594,Thakurgaon,55940086,Ranisankail,9
+district,5594,Thakurgaon,55,Rangpur,5594,Thakurgaon,55940094,Thakurgaon Sadar,20
+district,6036,Habiganj,60,Sylhet,6036,Habiganj,60360002,Ajmiriganj,6
+district,6036,Habiganj,60,Sylhet,6036,Habiganj,60360005,Bahubal,7
+district,6036,Habiganj,60,Sylhet,6036,Habiganj,60360011,Baniachong,15
+district,6036,Habiganj,60,Sylhet,6036,Habiganj,60360026,Chunarughat,11
+district,6036,Habiganj,60,Sylhet,6036,Habiganj,60360044,Habiganj Sadar,12
+district,6036,Habiganj,60,Sylhet,6036,Habiganj,60360068,Lakhai,6
+district,6036,Habiganj,60,Sylhet,6036,Habiganj,60360071,Madhabpur,12
+district,6036,Habiganj,60,Sylhet,6036,Habiganj,60360077,Nabiganj,14
+district,6036,Habiganj,60,Sylhet,6036,Habiganj,60360087,Shayestaganj,0
+district,6058,Maulvibazar,60,Sylhet,6058,Maulvibazar,60580014,Barlekha,11
+district,6058,Maulvibazar,60,Sylhet,6058,Maulvibazar,60580035,Juri,6
+district,6058,Maulvibazar,60,Sylhet,6058,Maulvibazar,60580056,Kamalganj,10
+district,6058,Maulvibazar,60,Sylhet,6058,Maulvibazar,60580065,Kulaura,14
+district,6058,Maulvibazar,60,Sylhet,6058,Maulvibazar,60580074,Maulvibazar Sadar,13
+district,6058,Maulvibazar,60,Sylhet,6058,Maulvibazar,60580080,Rajnagar,8
+district,6058,Maulvibazar,60,Sylhet,6058,Maulvibazar,60580083,Sreemangal,10
+district,6090,Sunamganj,60,Sylhet,6090,Sunamganj,60900018,Bishwambarpur,5
+district,6090,Sunamganj,60,Sylhet,6090,Sunamganj,60900023,Chhatak,14
+district,6090,Sunamganj,60,Sylhet,6090,Sunamganj,60900029,Derai,10
+district,6090,Sunamganj,60,Sylhet,6090,Sunamganj,60900032,Dharampasha,10
+district,6090,Sunamganj,60,Sylhet,6090,Sunamganj,60900033,Dowarabazar,9
+district,6090,Sunamganj,60,Sylhet,6090,Sunamganj,60900047,Jagannathpur,9
+district,6090,Sunamganj,60,Sylhet,6090,Sunamganj,60900050,Jamalganj,5
+district,6090,Sunamganj,60,Sylhet,6090,Sunamganj,60900063,Madhyanagar,0
+district,6090,Sunamganj,60,Sylhet,6090,Sunamganj,60900087,Shantiganj,0
+district,6090,Sunamganj,60,Sylhet,6090,Sunamganj,60900086,Sulla,4
+district,6090,Sunamganj,60,Sylhet,6090,Sunamganj,60900089,Sunamganj Sadar,10
+district,6090,Sunamganj,60,Sylhet,6090,Sunamganj,60900092,Tahirpur,7
+city_corporation,609150,Sylhet City Corporation,60,Sylhet,6091,Sylhet,60915005,Airport,0
+city_corporation,609150,Sylhet City Corporation,60,Sylhet,6091,Sylhet,60915048,Jalalabad,0
+city_corporation,609150,Sylhet City Corporation,60,Sylhet,6091,Sylhet,60915055,Kotwali,0
+city_corporation,609150,Sylhet City Corporation,60,Sylhet,6091,Sylhet,60915057,Moglabazar,0
+city_corporation,609150,Sylhet City Corporation,60,Sylhet,6091,Sylhet,60915068,Shahparan,0
+city_corporation,609150,Sylhet City Corporation,60,Sylhet,6091,Sylhet,60915062,Sylhet Sadar,35
+district,6091,Sylhet,60,Sylhet,6091,Sylhet,60910008,Balaganj,14
+district,6091,Sylhet,60,Sylhet,6091,Sylhet,60910017,Beanibazar,12
+district,6091,Sylhet,60,Sylhet,6091,Sylhet,60910020,Bishwanath,8
+district,6091,Sylhet,60,Sylhet,6091,Sylhet,60910027,Companiganj,6
+district,6091,Sylhet,60,Sylhet,6091,Sylhet,60910031,Dakshin Surma,9
+district,6091,Sylhet,60,Sylhet,6091,Sylhet,60910035,Fenchuganj,3
+district,6091,Sylhet,60,Sylhet,6091,Sylhet,60910038,Golapganj,12
+district,6091,Sylhet,60,Sylhet,6091,Sylhet,60910041,Gowainghat,8
+district,6091,Sylhet,60,Sylhet,6091,Sylhet,60910053,Jaintiapur,6
+district,6091,Sylhet,60,Sylhet,6091,Sylhet,60910059,Kanaighat,10
+district,6091,Sylhet,60,Sylhet,6091,Sylhet,60910060,Osmaninagar,0
+district,6091,Sylhet,60,Sylhet,6091,Sylhet,60910094,Zakiganj,10

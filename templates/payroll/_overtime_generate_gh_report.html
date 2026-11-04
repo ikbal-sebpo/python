@@ -1,0 +1,108 @@
+{% if inline_error %}
+    <div class="card border border-red-300 dark:border-red-800">
+        <p class="text-sm text-red-600">{{ inline_error }}</p>
+    </div>
+{% elif report %}
+    <div class="card">
+        <h2 class="text-sm font-semibold mb-3">
+            {{ work_date|date:"Y-m-d" }}
+            {% if report.applied %}<span class="badge badge-success">Applied</span>
+            {% else %}<span class="badge badge-muted">Preview</span>{% endif %}
+        </h2>
+
+        {% if not report.is_holiday %}
+            <p class="text-sm text-text-soft dark:text-white/60">
+                {{ work_date|date:"Y-m-d" }} isn't an active government holiday (roster.Holiday) — nothing to do.
+            </p>
+        {% elif report.ot_type_missing %}
+            <p class="text-sm text-red-600">
+                OvertimeType 'holiday_ot' not found — run <span class="font-medium">seed_payroll_components</span> first.
+            </p>
+        {% elif report.departments_missing and not report.rows %}
+            <p class="text-sm text-red-600">
+                Department(s) not found: {{ report.departments_missing|join:", " }}. Nothing to do.
+            </p>
+        {% elif not report.rows %}
+            <p class="text-sm text-text-soft dark:text-white/60">
+                {% if source == 'general_bpo' %}
+                    No worked hours reported by TTMS for General BPO on this date.
+                {% else %}
+                    No present employees in scope for this date — check that attendance has been synced for it
+                    (<span class="font-medium">sync_attendance_punches --date {{ work_date|date:"Y-m-d" }}</span>).
+                {% endif %}
+            </p>
+        {% else %}
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4 text-sm">
+                <div>
+                    <span class="text-text-mute">{% if report.applied %}Created{% else %}Would create{% endif %}</span><br>
+                    <span class="font-semibold">{{ report.created|length }}</span>
+                </div>
+                <div>
+                    <span class="text-text-mute">Already had an entry</span><br>
+                    <span class="font-semibold">{{ report.already_existing|length }}</span>
+                </div>
+                <div>
+                    <span class="text-text-mute">Not employed that day</span><br>
+                    <span class="font-semibold">{{ report.not_employed|length }}</span>
+                </div>
+                <div>
+                    <span class="text-text-mute">Rejected by payroll window</span><br>
+                    <span class="font-semibold">{{ report.window_rejected|length }}</span>
+                </div>
+            </div>
+
+            {% if report.created %}
+                <div class="table-scroll mb-4" style="max-height: 20rem;">
+                    <table class="table-simple table-sticky">
+                        <thead>
+                            <tr>
+                                <th class="text-left">Employee</th>
+                                <th class="text-left">Team</th>
+                                <th class="text-right">OT hours</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in report.created %}
+                                <tr>
+                                    <td>{{ row.employee.display_name }}</td>
+                                    <td>{{ row.employee.team|default:"—" }}</td>
+                                    <td class="text-right tabular-nums">{{ row.hours|floatformat:2 }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% endif %}
+
+            {% if report.window_rejected %}
+                <p class="text-sm text-amber-600 mb-1">Rejected by the payroll window:</p>
+                <ul class="text-sm list-disc list-inside mb-4 text-text-soft dark:text-white/70">
+                    {% for row in report.window_rejected %}
+                        <li>{{ row.employee.display_name }} — {{ row.reason }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+
+            {% if not report.applied and report.created %}
+                <form hx-post="{% url 'payroll_overtime_generate_gh' %}"
+                      hx-target="#gh-ot-result" hx-swap="innerHTML" hx-indicator="#gh-ot-spinner">
+                    {% csrf_token %}
+                    <input type="hidden" name="source" value="{{ source }}">
+                    <input type="hidden" name="work_date" value="{{ work_date|date:'Y-m-d' }}">
+                    <input type="hidden" name="min_hours" value="{{ min_hours }}">
+                    <input type="hidden" name="grant_hours" value="{{ grant_hours }}">
+                    <button type="submit" name="action" value="apply" class="btn-primary">
+                        <i data-lucide="check" class="w-4 h-4"></i>
+                        <span>Apply — create {{ report.created|length }} entr{{ report.created|length|pluralize:"y,ies" }}</span>
+                    </button>
+                </form>
+            {% elif report.applied %}
+                <p class="text-sm text-emerald-600">
+                    Created {{ report.created|length }} GH OT entr{{ report.created|length|pluralize:"y,ies" }}.
+                    <a href="{% url 'payroll_overtime_list' %}?from={{ work_date|date:'Y-m-d' }}&to={{ work_date|date:'Y-m-d' }}"
+                       class="text-brand hover:underline dark:text-brand-accent">View them</a>.
+                </p>
+            {% endif %}
+        {% endif %}
+    </div>
+{% endif %}

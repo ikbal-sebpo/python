@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+{% block title %}Compensatory Leave · Orbis{% endblock %}
+
+{% block content %}
+<div class="page-fill">
+    <div class="card shrink-0">
+        {% comment %}
+            Department -> team -> employee search -> status -> source ->
+            Filter, in that order, all on one row down to laptop width;
+            wraps below that. Same fields/behavior as
+            partials/_employee_filter_controls.html (department/team
+            cascade wiring included) but reordered for this page, so that
+            shared partial isn't used here.
+        {% endcomment %}
+        <form method="get" class="flex flex-wrap items-center gap-2">
+            <select id="employee-filter-department" name="department" class="form-input w-40 shrink-0" onchange="this.form.submit()">
+                {% if can_pick_all_departments %}<option value="">All departments</option>{% endif %}
+                {% for d in departments %}
+                    <option value="{{ d.pk }}" {% if selected_department_id|stringformat:'s' == d.pk|stringformat:'s' %}selected{% endif %}>{{ d.name }}</option>
+                {% endfor %}
+            </select>
+            <select id="employee-filter-team" name="team" class="form-input w-40 shrink-0" onchange="this.form.submit()"
+                    data-team-for="employee-filter-department">
+                <option value="">All teams</option>
+                {% for t in teams %}
+                    <option value="{{ t.pk }}"
+                            data-department="{{ t.department_id|default_if_none:'' }}"
+                            {% if selected_team_id|stringformat:'s' == t.pk|stringformat:'s' %}selected{% endif %}>{{ t.name }}</option>
+                {% endfor %}
+            </select>
+            <div class="relative flex-1 min-w-[160px] max-w-xs">
+                <i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-text-mute"></i>
+                <input type="text" name="q" value="{{ q }}"
+                       placeholder="Employee ID or name" class="form-input pl-9 w-full">
+            </div>
+            <select name="status" class="form-input w-36 shrink-0" onchange="this.form.submit()">
+                <option value="">All statuses</option>
+                {% for value, label in status_choices %}
+                    <option value="{{ value }}" {% if status_filter == value %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+            <select name="source" class="form-input w-36 shrink-0" onchange="this.form.submit()">
+                <option value="">All sources</option>
+                {% for value, label in source_choices %}
+                    <option value="{{ value }}" {% if source_filter == value %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+            <button type="submit" class="btn-secondary shrink-0">Filter</button>
+            <span class="ml-auto flex gap-2">
+                {% if can_add_grant %}
+                    <a href="{% url 'cpl_grant_upload' %}" class="btn-secondary shrink-0">
+                        <i data-lucide="upload-cloud" class="w-4 h-4"></i><span>Upload</span>
+                    </a>
+                {% endif %}
+                <a href="{% url 'leave_balance' %}" class="btn-secondary shrink-0">
+                    <i data-lucide="arrow-left" class="w-4 h-4"></i><span>Balance</span>
+                </a>
+            </span>
+        </form>
+    </div>
+
+    {% include "partials/_result_count.html" with count_noun="grants" %}
+
+    <div class="card p-0 table-scroll">
+        <table class="table-simple table-sticky min-w-full">
+            <thead>
+                <tr class="text-text-mute text-xs uppercase tracking-wider border-b border-bg-soft dark:border-white/10">
+                    <th class="px-4 py-3 text-left">Employee</th>
+                    <th class="px-4 py-3 text-left">Department</th>
+                    <th class="px-4 py-3 text-left">Worked</th>
+                    <th class="px-4 py-3 text-left">Context</th>
+                    <th class="px-4 py-3 text-left">Consumed</th>
+                    <th class="px-4 py-3 text-left">Status</th>
+                    <th class="px-4 py-3 text-left">Source</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for g in grants %}
+                    <tr class="border-b border-bg-soft/50 dark:border-white/5">
+                        <td class="px-4 py-2">
+                            {{ g.employee.display_name }}
+                            <div class="text-xs text-text-mute">{{ g.employee.employee_id }}</div>
+                        </td>
+                        <td class="px-4 py-2">{{ g.department.name }}</td>
+                        <td class="px-4 py-2 tabular-nums">
+                            {{ g.work_date|date:"Y-m-d" }}
+                            {% if g.holiday %}<div class="text-xs text-text-mute">{{ g.holiday.name }}</div>{% endif %}
+                        </td>
+                        <td class="px-4 py-2">{{ g.get_work_context_display }}</td>
+                        <td class="px-4 py-2 tabular-nums">{{ g.consumed_date|date:"Y-m-d"|default:"—" }}</td>
+                        <td class="px-4 py-2">
+                            {% if g.status == 'OPEN' %}<span class="badge badge-info">Open</span>
+                            {% elif g.status == 'CONSUMED' %}<span class="badge badge-success">Consumed</span>
+                            {% else %}<span class="badge badge-muted">Forfeited</span>{% endif %}
+                        </td>
+                        <td class="px-4 py-2 text-text-mute text-xs">{{ g.get_source_display }}</td>
+                    </tr>
+                {% empty %}
+                    <tr><td colspan="7" class="px-4 py-4 text-text-mute italic text-center">
+                        No CpL grants match these filters.
+                    </td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% include "partials/_pagination.html" %}
+</div>
+{% endblock %}

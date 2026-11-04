@@ -1,0 +1,337 @@
+{% extends "base.html" %}
+{% load menu_extras %}
+{% block title %}Dedicated night shift assignments · Orbis{% endblock %}
+
+{% block content %}
+<div x-data="{
+        selectedIds: [],
+        drawer: false,
+        drawerTitle: '',
+        open(title) { this.drawerTitle = title || ''; this.drawer = true; },
+        close() {
+            this.drawer = false;
+            this.drawerTitle = '';
+            const body = document.getElementById('drawer-body');
+            if (body) body.innerHTML = '';
+        },
+     }"
+     x-on:orbis:drawer-close.window="close()"
+     x-on:keydown.escape.window="close()"
+     class="page-fill">
+    <div class="card shrink-0 flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
+        <div class="flex flex-wrap items-center gap-1">
+            {% if show_team_tab %}
+                <a href="?{% qs_replace tab='team' page=None %}" class="btn-secondary {% if tab == 'team' %}!bg-brand !text-white{% endif %}">
+                    My team
+                    <span class="ml-1 text-[11px] opacity-70">({{ team_count }})</span>
+                </a>
+            {% endif %}
+            <a href="?{% qs_replace tab='mine' page=None %}" class="btn-secondary {% if tab == 'mine' %}!bg-brand !text-white{% endif %}">
+                My assignments
+                <span class="ml-1 text-[11px] opacity-70">({{ mine_count }})</span>
+            </a>
+            {% if show_pending_tab %}
+                <a href="?{% qs_replace tab='pending' page=None %}" class="btn-secondary {% if tab == 'pending' %}!bg-brand !text-white{% endif %}">
+                    Pending approvals
+                    <span class="ml-1 text-[11px] {% if pending_count %}!text-brand-accent{% endif %} opacity-70">({{ pending_count }})</span>
+                </a>
+            {% endif %}
+            {% if show_all_tab %}
+                <a href="?{% qs_replace tab='all' page=None %}" class="btn-secondary {% if tab == 'all' %}!bg-brand !text-white{% endif %}">
+                    All
+                    <span class="ml-1 text-[11px] opacity-70">({{ all_count }})</span>
+                </a>
+            {% endif %}
+            {% if has_direct_reports and tab != 'mine' %}
+                {# Scope switch — same control as leave/list.html. Default on; an #}
+                {# unchecked checkbox sends nothing, so the change handler #}
+                {# navigates to ?direct=0 / drops the param explicitly. #}
+                <label class="ml-2 inline-flex cursor-pointer select-none items-center gap-2 text-xs font-medium text-text-soft dark:text-white/70"
+                       title="{% if tab == 'team' %}Show only people who report directly to you{% else %}Show only requests waiting on you: your direct reports, plus anyone whose nearer managers are below the Manager tier a night shift approval needs{% endif %}">
+                    <input type="checkbox"
+                           class="form-checkbox"
+                           {% if direct_only %}checked{% endif %}
+                           onchange="window.location = '?' + (this.checked ? '{% qs_replace direct=None page=None %}' : '{% qs_replace direct='0' page=None %}');">
+                    <span>Direct reports only</span>
+                </label>
+            {% endif %}
+        </div>
+
+        <div class="flex items-center gap-2 xl:ml-auto">
+            <div class="group relative">
+                <button type="button"
+                        class="btn-secondary !h-10 !px-3 {% if filters_active %}!bg-brand !text-white{% endif %}"
+                        aria-label="Filters"
+                        title="Filters">
+                    <i data-lucide="sliders-horizontal" class="w-4 h-4"></i>
+                    {% if q %}
+                        <span class="max-w-28 truncate text-xs">{{ q }}</span>
+                    {% elif filters_active %}
+                        <span class="text-xs">Filtered</span>
+                    {% endif %}
+                </button>
+                <div class="absolute right-0 top-full z-30 hidden w-[min(24rem,calc(100vw-3rem))] pt-2 group-hover:block group-focus-within:block">
+                    <form method="get" class="menu-panel space-y-3 p-3">
+                        <input type="hidden" name="tab" value="{{ tab }}">
+                        {# The scope switch isn't a filter, but a GET form builds the #}
+                        {# querystring from scratch — carry an unticked state through. #}
+                        {% if has_direct_reports and not direct_only %}
+                            <input type="hidden" name="direct" value="0">
+                        {% endif %}
+                        <label for="night-shift-search" class="form-label">Search</label>
+                        <div class="relative">
+                            <i data-lucide="search" class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-text-mute"></i>
+                            <input id="night-shift-search"
+                                   type="search"
+                                   name="q"
+                                   value="{{ q }}"
+                                   placeholder="Name, email, or employee ID"
+                                   class="form-input w-full pl-9"
+                                   autocomplete="off">
+                        </div>
+
+                        <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                            <div>
+                                <label for="night-shift-department" class="form-label">Department</label>
+                                <select id="night-shift-department" name="department" class="form-input">
+                                    {% if can_pick_all_departments %}
+                                        <option value="">All departments</option>
+                                    {% endif %}
+                                    {% for department in departments %}
+                                        <option value="{{ department.pk }}" {% if department.pk == selected_department_id %}selected{% endif %}>
+                                            {{ department.name }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div>
+                                <label for="night-shift-team" class="form-label">Team</label>
+                                {# Narrowed to the picked department client-side #}
+                                {# (base.html::wireDepartmentTeamCascade) — this #}
+                                {# panel is a hover popover, so a reload would close it. #}
+                                <select id="night-shift-team" name="team" class="form-input"
+                                        data-team-for="night-shift-department">
+                                    <option value="">All teams</option>
+                                    {% for team in teams %}
+                                        <option value="{{ team.pk }}"
+                                                data-department="{{ team.department_id|default_if_none:'' }}"
+                                                {% if team.pk == selected_team_id %}selected{% endif %}>
+                                            {{ team.name }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                            <div>
+                                <label for="night-shift-status" class="form-label">Status</label>
+                                <select id="night-shift-status" name="status" class="form-input">
+                                    <option value="">Any status</option>
+                                    {% for value, label in status_choices %}
+                                        <option value="{{ value }}" {% if value == selected_status %}selected{% endif %}>{{ label }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="flatpickr-align-right">
+                                <label for="night-shift-active-on" class="form-label">Active on</label>
+                                <input id="night-shift-active-on"
+                                       type="text"
+                                       name="active_on"
+                                       value="{{ active_on_input }}"
+                                       data-flatpickr
+                                       data-flatpickr-static
+                                       placeholder="YYYY-MM-DD"
+                                       autocomplete="off"
+                                       class="form-input w-full"
+                                       title="Only windows that cover this date">
+                            </div>
+                        </div>
+
+                        <div class="flex items-center justify-end gap-2">
+                            {% if filters_active %}
+                                <a href="?{% qs_replace tab=tab q=None department=None team=None status=None active_on=None page=None %}"
+                                   class="btn-secondary">Clear</a>
+                            {% endif %}
+                            <button type="submit" class="btn-primary">Apply filters</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            {% if can_request %}
+                <button type="button"
+                        class="btn-primary !h-10"
+                        hx-get="{% url 'dedicated_night_shift_request' %}"
+                        hx-target="#drawer-body"
+                        hx-swap="innerHTML"
+                        @click="open('Request dedicated night shift')">
+                    <i data-lucide="plus" class="w-4 h-4"></i><span>New request</span>
+                </button>
+            {% endif %}
+        </div>
+    </div>
+
+    {% include "partials/_result_count.html" with count_noun="assignments" %}
+
+    {# Empty on purpose — its fields live elsewhere in the DOM via the #}
+    {# form="bulk-night-shift-form" attribute (checkboxes in the table, #}
+    {# submit buttons in the toolbar below), so the table doesn't need to #}
+    {# nest inside it — each row already has its own single-row <form>. #}
+    <form id="bulk-night-shift-form" method="post" action="{% url 'dedicated_night_shift_bulk' %}">
+        {% csrf_token %}
+        <input type="hidden" name="tab" value="{{ tab }}">
+    </form>
+
+    <div class="card shrink-0 flex flex-wrap items-center gap-3" x-show="selectedIds.length > 0" x-cloak>
+        <span class="text-sm font-medium" x-text="selectedIds.length + ' selected'"></span>
+        <button type="submit" form="bulk-night-shift-form" name="action" value="approve"
+                class="btn-primary !py-1.5">
+            <i data-lucide="check" class="w-4 h-4"></i><span>Approve selected</span>
+        </button>
+        <button type="submit" form="bulk-night-shift-form" name="action" value="decline"
+                class="btn-secondary !py-1.5 !text-red-600 dark:!text-red-400">
+            <i data-lucide="x" class="w-4 h-4"></i><span>Decline selected</span>
+        </button>
+        <button type="button" class="text-xs text-text-mute hover:underline" @click="selectedIds = []">
+            Clear selection
+        </button>
+    </div>
+
+    <div class="card p-0 table-scroll">
+        <table class="table-simple table-sticky min-w-full text-sm">
+            <thead>
+                <tr>
+                    <th class="w-8">
+                        {% if actionable_pks %}
+                            <input type="checkbox"
+                                   class="form-checkbox"
+                                   aria-label="Select all"
+                                   :checked="selectedIds.length > 0 && selectedIds.length === {{ actionable_pks|length }}"
+                                   @change="selectedIds = $event.target.checked ? [{% for pk in actionable_pks %}'{{ pk }}'{% if not forloop.last %},{% endif %}{% endfor %}] : []">
+                        {% endif %}
+                    </th>
+                    <th class="text-left">Employee</th>
+                    <th class="text-left">Window</th>
+                    <th class="text-left">Status</th>
+                    <th class="text-left">Requested by</th>
+                    <th class="text-left">Decided by</th>
+                    <th class="text-left">Last updated</th>
+                    <th class="text-right">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in rows %}
+                    <tr>
+                        <td>
+                            {% if row.pk in actionable_pks %}
+                                <input type="checkbox" name="ids" value="{{ row.pk }}"
+                                       form="bulk-night-shift-form"
+                                       class="form-checkbox"
+                                       aria-label="Select this assignment"
+                                       x-model="selectedIds">
+                            {% endif %}
+                        </td>
+                        <td class="whitespace-nowrap">
+                            <a href="{% url 'employee_detail' row.employee.pk %}" class="font-medium hover:underline">
+                                {{ row.employee.display_name }}
+                            </a>
+                            {% if row.employee.employee_id %}
+                                <span class="ml-1.5 text-xs text-text-mute">· {{ row.employee.employee_id }}</span>
+                            {% endif %}
+                        </td>
+                        <td class="whitespace-nowrap tabular-nums">{{ row.start_date|date:"Y-m-d" }} → {{ row.end_date|date:"Y-m-d" }}</td>
+                        <td class="whitespace-nowrap">
+                            {% if row.status == 'PENDING' %}
+                                <span class="badge badge-info"><i data-lucide="clock" class="w-3 h-3"></i>Pending</span>
+                            {% elif row.status == 'APPROVED' %}
+                                <span class="badge badge-success"><i data-lucide="check" class="w-3 h-3"></i>Approved</span>
+                                {% if row.night_conflicts %}
+                                    <span class="badge badge-warning ml-1"
+                                          title="Working shifts other than NIG/CUST still in this window — they stay as rostered until the department head changes them: {% for c in row.night_conflicts %}{{ c.date|date:'d M' }} {{ c.label }}{% if c.source != 'roster' %} ({{ c.source }}){% endif %}{% if not forloop.last %}, {% endif %}{% endfor %}">
+                                        <i data-lucide="alert-triangle" class="w-3 h-3"></i>{{ row.night_conflicts|length }} non-night shift{{ row.night_conflicts|length|pluralize }}
+                                    </span>
+                                {% endif %}
+                            {% elif row.status == 'DECLINED' %}
+                                <span class="badge" style="background:rgba(239,68,68,.15); color:#dc2626;"><i data-lucide="x" class="w-3 h-3"></i>Declined</span>
+                            {% else %}
+                                <span class="badge badge-muted"><i data-lucide="slash" class="w-3 h-3"></i>Cancelled</span>
+                            {% endif %}
+                        </td>
+                        <td class="whitespace-nowrap text-xs text-text-soft dark:text-white/60">
+                            {% if row.added_by %}
+                                {{ row.added_by.display_name }}
+                            {% else %}
+                                <span class="badge badge-muted text-[10px]">Imported</span>
+                            {% endif %}
+                        </td>
+                        <td class="whitespace-nowrap text-xs text-text-soft dark:text-white/60">{{ row.approved_by.display_name|default:"—" }}</td>
+                        <td class="whitespace-nowrap text-xs text-text-soft dark:text-white/60">
+                            {% if row.updated_by %}
+                                {{ row.updated_by.display_name }}
+                                <span class="block text-[10px] text-text-mute tabular-nums">{{ row.updated_at|date:"Y-m-d H:i" }}</span>
+                            {% else %}
+                                —
+                            {% endif %}
+                        </td>
+                        <td class="text-right whitespace-nowrap">
+                            {% if row.pk in actionable_pks %}
+                                <form method="post" action="{% url 'dedicated_night_shift_approve' row.pk %}" class="inline">
+                                    {% csrf_token %}
+                                    <button type="submit" class="text-xs text-brand hover:underline dark:text-brand-accent inline-flex items-center gap-1">
+                                        <i data-lucide="check" class="w-3 h-3"></i>Approve
+                                    </button>
+                                </form>
+                                <form method="post" action="{% url 'dedicated_night_shift_decline' row.pk %}" class="inline ml-3">
+                                    {% csrf_token %}
+                                    <button type="submit" class="text-xs text-red-600 dark:text-red-400 hover:underline inline-flex items-center gap-1">
+                                        <i data-lucide="x" class="w-3 h-3"></i>Decline
+                                    </button>
+                                </form>
+                            {% elif row.decline_reason %}
+                                <span class="text-xs text-text-soft dark:text-white/60">{{ row.decline_reason }}</span>
+                            {% endif %}
+                            {% if row.pk in editable_pks %}
+                                <button type="button"
+                                        class="ml-3 text-xs text-brand hover:underline dark:text-brand-accent inline-flex items-center gap-1"
+                                        hx-get="{% url 'dedicated_night_shift_edit' row.pk %}"
+                                        hx-target="#drawer-body"
+                                        hx-swap="innerHTML"
+                                        @click="open('Edit dedicated night shift — {{ row.employee.display_name|escapejs }}')">
+                                    <i data-lucide="pencil" class="w-3 h-3"></i>Edit
+                                </button>
+                            {% endif %}
+                            {% if row.pk in cancellable_pks %}
+                                {# A reason is optional; dismissing the prompt aborts. #}
+                                <form method="post" action="{% url 'dedicated_night_shift_cancel' row.pk %}" class="inline ml-3"
+                                      onsubmit="const r = window.prompt('Cancel this {% if row.status == 'APPROVED' %}approved {% endif %}window for {{ row.employee.display_name|escapejs }}? Reason (optional):', ''); if (r === null) return false; this.reason.value = r; return true;">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="reason" value="">
+                                    <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                                    <button type="submit" class="text-xs text-red-600 dark:text-red-400 hover:underline inline-flex items-center gap-1">
+                                        <i data-lucide="ban" class="w-3 h-3"></i>Cancel
+                                    </button>
+                                </form>
+                            {% endif %}
+                            <button type="button"
+                                    class="ml-3 text-xs text-text-soft dark:text-white/60 hover:text-brand dark:hover:text-brand-accent inline-flex items-center gap-1"
+                                    hx-get="{% url 'dedicated_night_shift_history' row.pk %}"
+                                    hx-target="#drawer-body"
+                                    hx-swap="innerHTML"
+                                    @click="open('History — {{ row.employee.display_name|escapejs }}')">
+                                <i data-lucide="history" class="w-3 h-3"></i>History
+                            </button>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr><td colspan="8" class="text-center italic text-text-mute py-4">No assignments found.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% include "partials/_pagination.html" %}
+
+    {% include "partials/_drawer_shell.html" %}
+</div>
+{% endblock %}

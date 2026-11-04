@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+{% block title %}Upload roster · Orbis{% endblock %}
+
+{% block content %}
+<div class="mb-4 flex items-center justify-between gap-3">
+    <div>
+        <h1 class="text-xl font-semibold">Upload roster</h1>
+        <p class="text-sm text-text-soft dark:text-white/60 mt-1">
+            Bulk-upload shifts for your team from an Excel or CSV file.
+        </p>
+    </div>
+    <a href="{% url 'roster_week' %}" class="btn-secondary">
+        <i data-lucide="arrow-left" class="w-4 h-4"></i><span>Back to roster</span>
+    </a>
+</div>
+
+<div class="card mb-4">
+    <h2 class="text-sm font-semibold mb-2">How it works</h2>
+    <ul class="text-sm text-text-soft dark:text-white/70 list-disc pl-5 space-y-1">
+        <li>Wide template: each row is one employee; each date occupies two columns
+            (<span class="font-medium">Location</span> and
+            <span class="font-medium">Shift</span>). Headers on rows 1 and 2; data from row 3 onward.</li>
+        <li>Flat template: each row is one employee/date with
+            <span class="font-medium">Date</span>,
+            <span class="font-medium">EmployeeID</span>,
+            <span class="font-medium">User Name</span>,
+            <span class="font-medium">Location</span>, and
+            <span class="font-medium">Shift Status</span>.</li>
+        <li>Existing <code>(employee, date)</code> shifts will be <span class="font-medium">overwritten</span>.
+            Days you leave blank are untouched. A day already carrying approved leave (CL/SL/AL/…) is protected
+            by default — check <span class="font-medium">Override approved leave</span> below to force it anyway.</li>
+        <li>Empty <span class="font-medium">Location</span> cells fall back to each employee's
+            default office at display time.</li>
+        <li>You can only upload rows for employees in your managed scope; others are rejected per-row.</li>
+    </ul>
+</div>
+
+<div class="card mb-4">
+    <h2 class="text-sm font-semibold mb-3">1. Download a template</h2>
+    <div class="flex flex-wrap items-center gap-2">
+        <a href="{% url 'roster_upload_template' 'xlsx' %}" class="btn-secondary">
+            <i data-lucide="table-properties" class="w-4 h-4"></i><span>Wide Excel template</span>
+        </a>
+        <a href="{% url 'roster_upload_template' 'flat-xlsx' %}" class="btn-secondary">
+            <i data-lucide="file-spreadsheet" class="w-4 h-4"></i><span>Flat Excel template</span>
+        </a>
+        <span class="text-xs text-text-mute ml-2">
+            Templates are prefilled with your visible employees and the next 7 days.
+            Use the wide version for location + shift, or the flat version for tracker-style shift status rows.
+        </span>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <h2 class="text-sm font-semibold mb-3">2. Upload your filled file</h2>
+    <form id="roster-upload-form"
+          method="post"
+          enctype="multipart/form-data"
+          hx-post="{% url 'roster_upload' %}"
+          hx-encoding="multipart/form-data"
+          hx-target="#upload-result"
+          hx-swap="innerHTML"
+          hx-indicator="#upload-spinner"
+          class="flex flex-wrap items-center gap-3">
+        {% csrf_token %}
+        <input type="file" name="file" accept=".xlsx,.csv" required
+               class="form-input w-auto max-w-xs">
+        <button type="submit" name="action" value="preview" class="btn-secondary">
+            <i data-lucide="eye" class="w-4 h-4"></i><span>Preview only</span>
+        </button>
+        <button type="submit" name="action" value="apply" class="btn-primary">
+            <i data-lucide="upload-cloud" class="w-4 h-4"></i><span>Apply upload</span>
+        </button>
+        <label class="inline-flex items-center gap-2 text-sm text-text-soft dark:text-white/70">
+            <input type="checkbox" name="override_leave" value="1" class="form-checkbox">
+            Override approved leave
+        </label>
+        <span id="upload-spinner" class="htmx-indicator inline-flex items-center gap-1 text-xs text-text-mute">
+            <i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i>Working…
+        </span>
+    </form>
+    <p class="text-xs text-text-mute mt-2">
+        Tip: click <span class="font-medium">Preview only</span> first to see what will change without writing,
+        then click <span class="font-medium">Apply upload</span> — the file stays attached, no need to re-upload.
+        Any errors will reject the whole upload.
+    </p>
+    <p class="text-xs text-amber-700 dark:text-amber-300 mt-1">
+        <span class="font-medium">Override approved leave</span> is normally off — a day that already has an
+        approved leave shift (CL/SL/AL/…) is left alone by default. Only check this for a deliberate historical
+        correction; it will replace that day's shift with whatever your file says, even over existing leave.
+    </p>
+</div>
+
+<div id="upload-result">
+    {% if report or inline_error %}
+        {% include "roster/_upload_report.html" with report=report parsed_preview=parsed_preview preview=preview aborted=aborted inline_error=inline_error %}
+    {% endif %}
+</div>
+
+<script>
+    // Re-render Lucide icons after each HTMX swap so any <i data-lucide> in
+    // the result fragment becomes an icon.
+    document.body.addEventListener('htmx:afterSwap', function (evt) {
+        if (window.lucide && typeof window.lucide.createIcons === 'function') {
+            window.lucide.createIcons();
+        }
+    });
+</script>
+{% endblock %}

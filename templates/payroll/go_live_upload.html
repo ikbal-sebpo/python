@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+{% block title %}Upload go-live · Orbis{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <h1 class="text-xl font-semibold">Upload go-live</h1>
+    <p class="text-sm text-text-soft dark:text-white/60 mt-1">
+        Move a Data Solutions trainee to their new team, dated the real go-live day. The
+        system prices the salary revision and sends it to Finance — you don't enter an amount.
+    </p>
+    <a href="{% url 'payroll_upload_center' %}" class="text-sm text-brand hover:underline dark:text-brand-accent">
+        &larr; Back to Upload Center
+    </a>
+</div>
+
+<div class="card mb-4">
+    <h2 class="text-sm font-semibold mb-3">1. Download a template</h2>
+    <div class="flex flex-wrap items-center gap-2">
+        <a href="{% url 'payroll_go_live_upload_template' %}" class="btn-secondary">
+            <i data-lucide="file-spreadsheet" class="w-4 h-4"></i><span>Excel template</span>
+        </a>
+        <span class="text-xs text-text-mute ml-2">
+            Blank rows for the three columns below, plus a reference sheet of your managed
+            trainees' IDs and names.
+        </span>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <h2 class="text-sm font-semibold mb-2">2. File format</h2>
+    <p class="text-sm text-text-soft dark:text-white/70 mb-2">
+        One row per employee, three columns, header on row 1:
+    </p>
+    <table class="table-simple text-sm mb-2">
+        <thead><tr><th>Employee ID</th><th>Team</th><th>Go-live Date</th></tr></thead>
+        <tbody>
+            <tr><td>55043</td><td>MARS</td><td>2026-09-07</td></tr>
+        </tbody>
+    </table>
+    <ul class="text-sm text-text-soft dark:text-white/70 list-disc pl-5 space-y-1">
+        <li><span class="font-medium">There is no amount column.</span> It's resolved from the
+            team's configured salary package (MARS is 18,000 Tk; every other team is
+            16,000 Tk), so it can never disagree with the seeded policy.</li>
+        <li><span class="font-medium">Trainee to Live only.</span> An employee who isn't
+            currently a Trainee is rejected — this uploader is specifically the go-live
+            transition. A correction after the fact goes through the employee's profile.</li>
+        <li>Use the <span class="font-medium">real go-live date</span>, even if you're
+            uploading it a few days later — the salary revision is dated from it, not from
+            today.</li>
+        <li>The team and status change take effect immediately. The resulting salary
+            revision, like every salary change, is <span class="font-medium">Pending</span>
+            until Finance approves it — the employee keeps their current pay until then.</li>
+        <li>If the employee has no salary on file to revise, the team/status change still
+            applies, but no revision is proposed — the report will say so.</li>
+    </ul>
+</div>
+
+<div class="card mb-4">
+    <h2 class="text-sm font-semibold mb-3">3. Upload your filled file</h2>
+    <form id="go-live-upload-form"
+          method="post"
+          enctype="multipart/form-data"
+          hx-post="{% url 'payroll_go_live_upload' %}"
+          hx-encoding="multipart/form-data"
+          hx-target="#upload-result"
+          hx-swap="innerHTML"
+          hx-indicator="#upload-spinner"
+          class="flex flex-wrap items-center gap-3">
+        {% csrf_token %}
+        <input type="file" name="file" accept=".xlsx,.csv" required class="form-input w-auto max-w-xs">
+        <button type="submit" name="action" value="preview" class="btn-secondary">
+            <i data-lucide="eye" class="w-4 h-4"></i><span>Preview only</span>
+        </button>
+        <button type="submit" name="action" value="apply" class="btn-primary">
+            <i data-lucide="upload-cloud" class="w-4 h-4"></i><span>Apply upload</span>
+        </button>
+        <span id="upload-spinner" class="htmx-indicator inline-flex items-center gap-1 text-xs text-text-mute">
+            <i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i>Working…
+        </span>
+    </form>
+    <p class="text-xs text-text-mute mt-2">
+        Tip: click <span class="font-medium">Preview only</span> first — it validates the rows
+        without writing. Package amounts are resolved on apply.
+    </p>
+</div>
+
+<div id="upload-result">
+    {% if report or inline_error %}
+        {% include "payroll/_go_live_upload_report.html" with report=report parsed_preview=parsed_preview preview=preview aborted=aborted inline_error=inline_error %}
+    {% endif %}
+</div>
+
+<script>
+    document.body.addEventListener('htmx:afterSwap', function (evt) {
+        if (window.lucide && typeof window.lucide.createIcons === 'function') {
+            window.lucide.createIcons();
+        }
+    });
+</script>
+{% endblock %}

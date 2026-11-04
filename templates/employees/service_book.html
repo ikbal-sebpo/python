@@ -1,0 +1,255 @@
+{% extends "base.html" %}
+{% block title %}Service Book · {{ employee.display_name }} · Orbis{% endblock %}
+
+{% block content %}
+<div class="flex items-center justify-between gap-3 mb-6">
+    <div>
+        <h1 class="text-2xl font-semibold text-text-main dark:text-white">Service Book</h1>
+        <p class="text-sm text-text-soft dark:text-white/60 mt-1">
+            Bangladesh Labour Rules 2015, Form-7 (Section 7 / Rule 20), as amended 2022 — {{ employee.display_name }}
+        </p>
+    </div>
+    <div class="flex gap-2 shrink-0">
+        <a href="{% url 'employee_service_book_pdf' employee.pk %}" target="_blank" class="btn-secondary">
+            <i data-lucide="file-text" class="w-4 h-4"></i><span>View PDF</span>
+        </a>
+        <a href="{% url 'employee_detail' employee.pk %}" class="btn-secondary">
+            <i data-lucide="arrow-left" class="w-4 h-4"></i><span>Back to profile</span>
+        </a>
+    </div>
+</div>
+
+{# --- Part 1: Identifying information --- #}
+<div class="card mb-6">
+    <h2 class="text-sm font-semibold uppercase tracking-wider text-text-mute mb-3">Part 1 — Identifying information</h2>
+    <div class="flex items-start gap-6">
+        <dl class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-3 text-sm flex-1">
+            <div><dt class="text-text-mute text-xs">Name</dt><dd>{{ employee.display_name }}</dd></div>
+            <div><dt class="text-text-mute text-xs">Father's name</dt><dd>{{ sb_personal.father_name|default:"—" }}</dd></div>
+            <div><dt class="text-text-mute text-xs">Mother's name</dt><dd>{{ sb_personal.mother_name|default:"—" }}</dd></div>
+            <div><dt class="text-text-mute text-xs">Spouse's name</dt><dd>{{ sb_family.spouse_name|default:"—" }}</dd></div>
+            <div class="md:col-span-2"><dt class="text-text-mute text-xs">Permanent address</dt>
+                <dd>{{ sb_address_permanent|default:"—" }}</dd></div>
+            <div class="md:col-span-2"><dt class="text-text-mute text-xs">Present address</dt>
+                <dd>{{ sb_address_present|default:"—" }}</dd></div>
+            <div><dt class="text-text-mute text-xs">Date of birth / Age</dt>
+                <dd>{{ sb_personal.date_of_birth|date:"Y-m-d"|default:"—" }}{% if sb_age %} (Age {{ sb_age }}){% endif %}</dd></div>
+            {% for id_row in sb_identifications %}
+            <div><dt class="text-text-mute text-xs">{{ id_row.get_id_type_display }}</dt><dd>{{ id_row.id_number }}</dd></div>
+            {% empty %}
+            <div><dt class="text-text-mute text-xs">National ID No.</dt><dd class="text-text-mute italic">—</dd></div>
+            {% endfor %}
+            <div><dt class="text-text-mute text-xs">Educational qualification</dt>
+                <dd>{% if sb_education %}{{ sb_education.get_degree_level_display }}{% if sb_education.degree_name and sb_education.degree_name != sb_education.get_degree_level_display %} ({{ sb_education.degree_name }}){% endif %}{% if sb_education.academic_institution %}, {{ sb_education.academic_institution }}{% endif %}{% if sb_education.passing_year %} ({{ sb_education.passing_year }}){% endif %}{% else %}—{% endif %}</dd></div>
+            <div><dt class="text-text-mute text-xs">Training / special skill</dt>
+                <dd>
+                    {% for c in sb_certifications %}{{ c.certificate_name }}{% if c.certificate_year %} ({{ c.certificate_year }}){% endif %}{% if not forloop.last %}; {% endif %}{% empty %}—{% endfor %}
+                </dd></div>
+            <div><dt class="text-text-mute text-xs">Height</dt><dd>{% if sb_height_cm %}{{ sb_height_cm }} cm{% else %}—{% endif %}</dd></div>
+            <div><dt class="text-text-mute text-xs">Blood group</dt><dd>{{ sb_personal.blood_group|default:"—" }}</dd></div>
+            <div><dt class="text-text-mute text-xs">Identification mark</dt><dd>{{ sb_personal.identification_mark|default:"—" }}</dd></div>
+            <div><dt class="text-text-mute text-xs">Date service book opened</dt><dd>{{ sb_service_book_opened|date:"Y-m-d"|default:"—" }}</dd></div>
+        </dl>
+        <div class="shrink-0 w-20 text-center">
+            {% if sb_photo_data_uri %}
+            <img src="{{ sb_photo_data_uri }}" alt="" class="w-20 h-24 object-cover rounded border border-border">
+            {% else %}
+            <div class="border border-dashed border-text-mute/40 h-24 w-20 flex items-center justify-center text-[10px] text-text-mute italic mx-auto">photo</div>
+            {% endif %}
+            <p class="text-[10px] text-text-mute mt-1">Passport-size photo</p>
+        </div>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6 pt-4 border-t border-border text-xs">
+        <div><div class="border-b border-text-mute/40 h-8"></div><p class="text-text-mute mt-1">Worker's signature</p></div>
+        <div><div class="border-b border-text-mute/40 h-8"></div><p class="text-text-mute mt-1">Employer / management authority's signature</p></div>
+        <div><div class="border border-dashed border-text-mute/40 h-8 w-28"></div><p class="text-text-mute mt-1">Left thumb impression <em>(taken on the printed copy)</em></p></div>
+    </div>
+</div>
+
+{# --- Part 2: Employer & employment --- #}
+<div class="card mb-6">
+    <h2 class="text-sm font-semibold uppercase tracking-wider text-text-mute mb-3">Part 2 — Employer &amp; employment</h2>
+    <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+            <thead><tr class="text-left text-text-mute text-xs">
+                <th class="px-2 py-1">Establishment name &amp; address</th>
+                <th class="px-2 py-1">Employer / management authority</th>
+                <th class="px-2 py-1">Date of joining</th>
+                <th class="px-2 py-1">Job category</th>
+                <th class="px-2 py-1">Date of leaving</th>
+                <th class="px-2 py-1">Type / reason of leaving</th>
+                <th class="px-2 py-1">Employer signature</th>
+                <th class="px-2 py-1">Worker signature</th>
+            </tr></thead>
+            <tbody>
+                <tr class="border-t border-border align-top">
+                    <td class="px-2 py-1">{{ sb_company.company_name }}{% if sb_company.head_office_address %}<br><span class="text-text-mute text-xs">{{ sb_company.head_office_address }}</span>{% endif %}</td>
+                    <td class="px-2 py-1">{{ sb_authorized_signatory.display_name|default:"—" }}</td>
+                    <td class="px-2 py-1">{{ sb_employment.joining_date|date:"Y-m-d"|default:"—" }}</td>
+                    <td class="px-2 py-1 text-text-mute italic">N/A</td>
+                    <td class="px-2 py-1">{{ sb_employment.last_working_date|date:"Y-m-d"|default:"—" }}</td>
+                    <td class="px-2 py-1">{% if sb_employment.resignation %}{{ sb_employment.resignation.get_separation_type_display }} — {{ sb_employment.resignation.reason }}{% else %}—{% endif %}</td>
+                    <td class="px-2 py-1">&nbsp;</td>
+                    <td class="px-2 py-1">&nbsp;</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{# --- Part 3: Service record — position & wage history --- #}
+<div class="card mb-6">
+    <h2 class="text-sm font-semibold uppercase tracking-wider text-text-mute mb-3">Part 3 — Service record, wages &amp; allowances</h2>
+
+    <h3 class="text-xs font-semibold text-text-mute mb-2">Position / post history</h3>
+    <div class="overflow-x-auto mb-4">
+        <table class="w-full text-sm">
+            <thead><tr class="text-left text-text-mute text-xs">
+                <th class="px-2 py-1">From</th><th class="px-2 py-1">To</th>
+                <th class="px-2 py-1">Job post</th><th class="px-2 py-1">Card / register no.</th>
+                <th class="px-2 py-1">Reason</th>
+                <th class="px-2 py-1">Employer signature</th><th class="px-2 py-1">Worker signature</th>
+            </tr></thead>
+            <tbody>
+                {% for row in sb_designation_history %}
+                <tr class="border-t border-border">
+                    <td class="px-2 py-1">{{ row.effective_from|date:"Y-m-d" }}</td>
+                    <td class="px-2 py-1">{{ row.effective_to|date:"Y-m-d"|default:"present" }}</td>
+                    <td class="px-2 py-1">{{ row.designation }}</td>
+                    <td class="px-2 py-1">{{ sb_register_serial_no|default:"—" }}</td>
+                    <td class="px-2 py-1">{{ row.get_reason_display }}</td>
+                    <td class="px-2 py-1">&nbsp;</td>
+                    <td class="px-2 py-1">&nbsp;</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="7" class="px-2 py-2 text-text-mute italic">No position history recorded yet.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <h3 class="text-xs font-semibold text-text-mute mb-2">Monthly wage rate &amp; allowances</h3>
+    <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+            <thead><tr class="text-left text-text-mute text-xs">
+                <th class="px-2 py-1">From</th><th class="px-2 py-1">To</th>
+                <th class="px-2 py-1">Basic wage</th><th class="px-2 py-1">House rent</th>
+                <th class="px-2 py-1">Medical</th><th class="px-2 py-1">Bonus</th>
+                <th class="px-2 py-1">Total monthly wage</th><th class="px-2 py-1">Other allowances</th>
+                <th class="px-2 py-1">Monthly deduction</th>
+                <th class="px-2 py-1">Worker's PF contribution</th><th class="px-2 py-1">Employer's PF contribution</th>
+                <th class="px-2 py-1">Reason</th>
+                <th class="px-2 py-1">Employer signature</th><th class="px-2 py-1">Worker signature</th>
+            </tr></thead>
+            <tbody>
+                {% for row in sb_salary_history %}
+                <tr class="border-t border-border">
+                    <td class="px-2 py-1">{{ row.effective_from|date:"Y-m-d" }}</td>
+                    <td class="px-2 py-1">{{ row.effective_to|date:"Y-m-d"|default:"present" }}</td>
+                    <td class="px-2 py-1 text-text-mute italic">N/A</td>
+                    <td class="px-2 py-1 text-text-mute italic">N/A</td>
+                    <td class="px-2 py-1 text-text-mute italic">N/A</td>
+                    <td class="px-2 py-1 text-text-mute italic">N/A</td>
+                    <td class="px-2 py-1 font-medium tabular-nums">{{ row.gross_monthly|taka }}</td>
+                    <td class="px-2 py-1 text-text-mute italic">N/A</td>
+                    <td class="px-2 py-1 text-text-mute italic">N/A</td>
+                    <td class="px-2 py-1 text-text-mute italic">N/A</td>
+                    <td class="px-2 py-1 text-text-mute italic">N/A</td>
+                    <td class="px-2 py-1">{{ row.get_reason_display }}</td>
+                    <td class="px-2 py-1">&nbsp;</td>
+                    <td class="px-2 py-1">&nbsp;</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="14" class="px-2 py-2 text-text-mute italic">No wage history recorded yet.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <p class="text-[11px] text-text-mute mt-2">Orbis's compensation master tracks gross monthly pay only (no Basic/House Rent/Medical/Bonus component breakdown) and no Provident Fund scheme — those columns are marked N/A above.</p>
+</div>
+
+{# --- Part 4: Record of leaves (Annual Leave, per Rule 21(2)(d)) --- #}
+<div class="card mb-6">
+    <h2 class="text-sm font-semibold uppercase tracking-wider text-text-mute mb-3">Part 4 — Record of leaves</h2>
+
+    {% if sb_al_legacy %}
+    <h3 class="text-xs font-semibold text-text-mute mb-2">Annual Leave record before Orbis (HR records)</h3>
+    <div class="overflow-x-auto mb-4">
+        <table class="w-full text-sm">
+            <thead><tr class="text-left text-text-mute text-xs">
+                <th class="px-2 py-1">Year</th>
+                <th class="px-2 py-1">Accrued to prior year-end</th>
+                <th class="px-2 py-1">Taken in year</th>
+                <th class="px-2 py-1">Year balance</th>
+                <th class="px-2 py-1">Balance carried (60-day cap)</th>
+                <th class="px-2 py-1">Note</th>
+            </tr></thead>
+            <tbody>
+                {% for rec in sb_al_legacy %}
+                <tr class="border-t border-border">
+                    <td class="px-2 py-1">{{ rec.year }}</td>
+                    <td class="px-2 py-1">{{ rec.accrued_prior|floatformat:"-1" }}</td>
+                    <td class="px-2 py-1">{{ rec.taken|floatformat:"-1" }}</td>
+                    <td class="px-2 py-1">{{ rec.year_balance|floatformat:"-1" }}</td>
+                    <td class="px-2 py-1 font-medium">{{ rec.carried|floatformat:"-1" }}</td>
+                    <td class="px-2 py-1">{{ rec.note|default:"—" }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <p class="text-[11px] text-text-mute mt-1">The first year's "Accrued to prior year-end" is the balance HR carried into Orbis; each later year starts from the previous year's carried balance. "Taken in year" and "Year balance" come from Orbis ({{ sb_al_legacy.0.entitlement|floatformat:"-1" }} days' entitlement a year); the carried balance is capped at 60 days.</p>
+    </div>
+    {% endif %}
+    {# "Annual Leave availed (Orbis)" table disabled 2026-10-05 at HR's request — see employees/services.py. #}
+
+    <h3 class="text-xs font-semibold text-text-mute mb-2">Annual Leave encashment</h3>
+    <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+            <thead><tr class="text-left text-text-mute text-xs">
+                <th class="px-2 py-1">Total (days)</th><th class="px-2 py-1">Date</th>
+                <th class="px-2 py-1">Remaining balance</th>
+                <th class="px-2 py-1">Employer signature</th><th class="px-2 py-1">Worker signature</th>
+            </tr></thead>
+            <tbody>
+                {% for row in sb_al_encashment %}
+                <tr class="border-t border-border">
+                    <td class="px-2 py-1">{{ row.total_days }}</td>
+                    <td class="px-2 py-1">{{ row.date|date:"Y-m-d" }}</td>
+                    <td class="px-2 py-1 font-medium">{{ row.remaining }}</td>
+                    <td class="px-2 py-1">&nbsp;</td>
+                    <td class="px-2 py-1">&nbsp;</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="5" class="px-2 py-2 text-text-mute italic">No Annual Leave encashed on file.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{# --- Part 5: Record of conduct --- #}
+<div class="card mb-6">
+    <h2 class="text-sm font-semibold uppercase tracking-wider text-text-mute mb-3">Part 5 — Record of conduct</h2>
+    <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+            <thead><tr class="text-left text-text-mute text-xs">
+                <th class="px-2 py-1">Date</th><th class="px-2 py-1">Description</th>
+                <th class="px-2 py-1">Employer / authorized person's signature</th>
+                <th class="px-2 py-1">Worker's signature / thumb impression</th>
+            </tr></thead>
+            <tbody>
+                {% for entry in sb_conduct %}
+                <tr class="border-t border-border">
+                    <td class="px-2 py-1">{{ entry.processed_at|date:"Y-m-d"|default:"—" }}</td>
+                    <td class="px-2 py-1">{{ entry.component.name }} — {{ entry.reason }}</td>
+                    <td class="px-2 py-1">{{ entry.processed_by.display_name|default:"—" }}</td>
+                    <td class="px-2 py-1">&nbsp;</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="4" class="px-2 py-2 text-text-mute italic">No proven fines or commendations on file.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

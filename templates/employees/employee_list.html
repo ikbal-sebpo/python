@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+{% block title %}Employees · Orbis{% endblock %}
+
+{% block content %}
+<div class="page-fill">
+<div class="card shrink-0 flex flex-wrap items-center gap-3">
+    <form method="get" class="flex flex-wrap items-center gap-2 flex-1 min-w-[240px]">
+        {% include "partials/_employee_filter_controls.html" %}
+        <button type="submit" class="btn-secondary">Search</button>
+        <button type="submit" name="export" value="xlsx" class="btn-secondary">
+            <i data-lucide="download" class="w-4 h-4"></i><span>Download Excel</span>
+        </button>
+    </form>
+    {% if can_bulk_upload %}
+        <a href="{% url 'employee_bulk_upload' %}" class="btn-secondary">
+            <i data-lucide="upload" class="w-4 h-4"></i><span>Bulk update (Excel)</span>
+        </a>
+    {% endif %}
+    {% if can_manage_profile_self_service %}
+        <a href="{% url 'profile_self_service_list' %}" class="btn-secondary">
+            <i data-lucide="unlock" class="w-4 h-4"></i><span>Self-service audit</span>
+        </a>
+    {% endif %}
+    {% if request.user.is_staff %}
+        <a href="{% url 'user_create' %}" class="btn-primary">
+            <i data-lucide="user-plus" class="w-4 h-4"></i><span>New employee</span>
+        </a>
+    {% endif %}
+</div>
+
+{% include "partials/_result_count.html" with count_noun="employees" %}
+
+<div class="table-scroll">
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+    {% for emp in employees %}
+        <a href="{% url 'employee_detail' emp.pk %}" class="employee-card">
+            <div class="flex items-center gap-3">
+                <div class="w-12 h-12 rounded-full bg-brand-accent/20 flex items-center justify-center text-brand font-semibold shrink-0">
+                    {% if emp.profile_picture %}
+                        <img src="{{ emp.profile_picture.url }}" alt="" class="w-12 h-12 rounded-full object-cover">
+                    {% else %}
+                        {{ emp.first_name|default:emp.email|slice:":1"|upper }}{{ emp.last_name|slice:":1"|upper }}
+                    {% endif %}
+                </div>
+                <div class="min-w-0 flex-1">
+                    <div class="font-semibold text-text-main dark:text-white truncate">{{ emp.display_name }}</div>
+                    <div class="text-xs text-text-soft dark:text-white/60 truncate">{{ emp.designation|default:"—" }}</div>
+                </div>
+            </div>
+            {# Two columns: identity/contact on the left, org placement on the right. #}
+            <div class="grid grid-cols-2 gap-x-3 text-xs text-text-soft dark:text-white/60 mt-1">
+                <div class="min-w-0 space-y-1">
+                    <div class="flex items-center gap-2" title="Employee ID">
+                        <i data-lucide="hash" class="w-3.5 h-3.5 shrink-0"></i>
+                        <span class="truncate">{{ emp.employee_id|default:"—" }}</span>
+                    </div>
+                    <div class="flex items-center gap-2" title="{{ emp.email }}">
+                        <i data-lucide="mail" class="w-3.5 h-3.5 shrink-0"></i>
+                        <span class="truncate">{{ emp.email }}</span>
+                    </div>
+                    <div class="flex items-center gap-2" title="Phone">
+                        <i data-lucide="phone" class="w-3.5 h-3.5 shrink-0"></i>
+                        <span class="truncate">{{ emp.contact_number|default:"—" }}</span>
+                    </div>
+                    <div class="flex items-center gap-2" title="Joining date">
+                        <i data-lucide="calendar" class="w-3.5 h-3.5 shrink-0"></i>
+                        <span class="truncate">Joined {{ emp.joining_date|date:"d M Y"|default:"—" }}</span>
+                    </div>
+                </div>
+                <div class="min-w-0 space-y-1">
+                    <div class="flex items-center gap-2" title="Department">
+                        <i data-lucide="building-2" class="w-3.5 h-3.5 shrink-0"></i>
+                        <span class="truncate">{{ emp.department|default:"No department" }}</span>
+                    </div>
+                    <div class="flex items-center gap-2" title="Team">
+                        <i data-lucide="users" class="w-3.5 h-3.5 shrink-0"></i>
+                        <span class="truncate">{{ emp.team|default:"No team" }}</span>
+                    </div>
+                    <div class="flex items-center gap-2" title="Reports to">
+                        <i data-lucide="user-check" class="w-3.5 h-3.5 shrink-0"></i>
+                        <span class="truncate">{{ emp.job_info.reports_to.display_name|default:"—" }}</span>
+                    </div>
+                    <div class="flex items-center gap-2" title="Confirmation date">
+                        <i data-lucide="calendar-check" class="w-3.5 h-3.5 shrink-0"></i>
+                        <span class="truncate">Confirmed {{ emp.confirmation_date|date:"d M Y"|default:"—" }}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="flex items-center justify-between pt-2 mt-auto">
+                {% if emp.is_active %}
+                    <span class="badge badge-success"><i data-lucide="check" class="w-3 h-3"></i>Active</span>
+                {% else %}
+                    <span class="badge badge-muted"><i data-lucide="x" class="w-3 h-3"></i>Disabled</span>
+                {% endif %}
+                <span class="text-xs text-brand hover:underline dark:text-brand-accent">View profile →</span>
+            </div>
+        </a>
+    {% empty %}
+        <div class="col-span-full card text-center text-text-mute">No employees yet.</div>
+    {% endfor %}
+</div>
+</div>
+
+{% include "partials/_pagination.html" %}
+</div>
+{% endblock %}

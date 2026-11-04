@@ -1,0 +1,303 @@
+state_kind,state_code,state_name,city_kind,city_code,city_name,district_code,district,division_code,division
+district,1004,Barguna,paurashava,BD10040999,Amtali Paurashava,1004,Barguna,10,Barisal
+district,1004,Barguna,paurashava,BD10042899,Barguna Sadar Paurashava,1004,Barguna,10,Barisal
+district,1004,Barguna,paurashava,BD10044799,Betagi Paurashava,1004,Barguna,10,Barisal
+district,1004,Barguna,paurashava,BD10048599,Patharghata Paurashava,1004,Barguna,10,Barisal
+district,1006,Barisal,paurashava,BD10060799,Bakerganj Paurashava,1006,Barisal,10,Barisal
+district,1006,Barisal,paurashava,BD10061099,Banari Para Paurashava,1006,Barisal,10,Barisal
+district,1006,Barisal,paurashava,BD10063299,Gaurnadi Paurashava,1006,Barisal,10,Barisal
+district,1006,Barisal,paurashava,BD10066299,Mehendiganj Paurashava,1006,Barisal,10,Barisal
+district,1006,Barisal,paurashava,BD10066999,Muladi Paurashava,1006,Barisal,10,Barisal
+district,1009,Bhola,paurashava,BD10091899,Bhola Sadar Paurashava,1009,Bhola,10,Barisal
+district,1009,Bhola,paurashava,BD10092199,Burhanuddin Paurashava,1009,Bhola,10,Barisal
+district,1009,Bhola,paurashava,BD10092599,Char Fasson Paurashava,1009,Bhola,10,Barisal
+district,1009,Bhola,paurashava,BD10092999,Daulatkhan Paurashava,1009,Bhola,10,Barisal
+district,1009,Bhola,paurashava,BD10095499,Lalmohan Paurashava,1009,Bhola,10,Barisal
+district,1042,Jhalokati,paurashava,BD10424099,Jhalokati Sadar Paurashava,1042,Jhalokati,10,Barisal
+district,1042,Jhalokati,paurashava,BD10427399,Nalchity Paurashava,1042,Jhalokati,10,Barisal
+district,1078,Patuakhali,paurashava,BD10783899,Bauphal Paurashava,1078,Patuakhali,10,Barisal
+district,1078,Patuakhali,paurashava,BD10785799,Galachipa Paurashava,1078,Patuakhali,10,Barisal
+district,1078,Patuakhali,paurashava,BD10786699,Kala Para Paurashava,1078,Patuakhali,10,Barisal
+district,1078,Patuakhali,paurashava,BD10789599,Patuakhali Sadar Paurashava,1078,Patuakhali,10,Barisal
+district,1079,Pirojpur,paurashava,BD10795899,Mathbaria Paurashava,1079,Pirojpur,10,Barisal
+district,1079,Pirojpur,paurashava,BD10798799,Nesarabad (Swarupkati) Paurashava,1079,Pirojpur,10,Barisal
+district,1079,Pirojpur,paurashava,BD10798099,Pirojpur Sadar Paurashava,1079,Pirojpur,10,Barisal
+district,2003,Bandarban,paurashava,BD20031499,Bandarban Paurashava,2003,Bandarban,20,Chittagong
+district,2003,Bandarban,paurashava,BD20035199,Lama Paurashava,2003,Bandarban,20,Chittagong
+district,2012,Brahamanbaria,paurashava,BD20120299,Akhaura Paurashava,2012,Brahamanbaria,20,Chittagong
+district,2012,Brahamanbaria,paurashava,BD20121399,Brahmanbaria Paurashava,2012,Brahamanbaria,20,Chittagong
+district,2012,Brahamanbaria,paurashava,BD20126399,Kasba Paurashava,2012,Brahamanbaria,20,Chittagong
+district,2012,Brahamanbaria,paurashava,BD20128599,Nabinagar Paurashava,2012,Brahamanbaria,20,Chittagong
+district,2013,Chandpur,paurashava,BD20132299,Chandpur Paurashava,2013,Chandpur,20,Chittagong
+district,2013,Chandpur,paurashava,BD20134599,Faridganj Paurashava,2013,Chandpur,20,Chittagong
+district,2013,Chandpur,paurashava,BD20134999,Hajiganj Paurashava,2013,Chandpur,20,Chittagong
+district,2013,Chandpur,paurashava,BD20135899,Kachua Paurashava,2013,Chandpur,20,Chittagong
+district,2013,Chandpur,paurashava,BD20137699,Matlab Paurashava,2013,Chandpur,20,Chittagong
+district,2013,Chandpur,paurashava,BD20137999,Sengarchar Paurashava,2013,Chandpur,20,Chittagong
+district,2013,Chandpur,paurashava,BD20139599,Shahrasti Paurashava,2013,Chandpur,20,Chittagong
+district,2015,Chittagong,paurashava,BD20150899,Banshkhali Paurashava,2015,Chittagong,20,Chittagong
+district,2015,Chittagong,paurashava,BD20155300,Baroiar Hat Paurashava,2015,Chittagong,20,Chittagong
+district,2015,Chittagong,paurashava,BD20151899,Chandanaish Paurashava,2015,Chittagong,20,Chittagong
+district,2015,Chittagong,paurashava,BD20155399,Mirsharai Paurashava,2015,Chittagong,20,Chittagong
+district,2015,Chittagong,paurashava,BD20156199,Patiya Paurashava,2015,Chittagong,20,Chittagong
+district,2015,Chittagong,paurashava,BD20157099,Rangunia Paurashava,2015,Chittagong,20,Chittagong
+district,2015,Chittagong,paurashava,BD20157499,Raozan Paurashava,2015,Chittagong,20,Chittagong
+district,2015,Chittagong,paurashava,BD20157899,Sandwip Paurashava,2015,Chittagong,20,Chittagong
+district,2015,Chittagong,paurashava,BD20158299,Satkania Paurashava,2015,Chittagong,20,Chittagong
+district,2015,Chittagong,paurashava,BD20158699,Sitakunda Paurashava,2015,Chittagong,20,Chittagong
+district,2019,Comilla,paurashava,BD20190999,Barura Paurashava,2019,Comilla,20,Chittagong
+district,2019,Comilla,paurashava,BD20192799,Chandina Paurashava,2019,Comilla,20,Chittagong
+district,2019,Comilla,paurashava,BD20193199,Chauddagram Paurashava,2019,Comilla,20,Chittagong
+district,2019,Comilla,paurashava,BD20193399,Comilla Dakshin Paurashava,2019,Comilla,20,Chittagong
+district,2019,Comilla,paurashava,BD20196799,Comilla Paurashava,2019,Comilla,20,Chittagong
+district,2019,Comilla,paurashava,BD20193699,Daudkandi Paurashava,2019,Comilla,20,Chittagong
+district,2019,Comilla,paurashava,BD20194099,Debidwar Paurashava,2019,Comilla,20,Chittagong
+district,2019,Comilla,paurashava,BD20195499,Homna Paurashava,2019,Comilla,20,Chittagong
+district,2019,Comilla,paurashava,BD20197299,Laksam Paurashava,2019,Comilla,20,Chittagong
+district,2019,Comilla,paurashava,BD20198799,Nangalkot Paurashava,2019,Comilla,20,Chittagong
+district,2022,Cox's Bazar,paurashava,BD20221699,Chakaria Paurashava,2022,Cox's Bazar,20,Chittagong
+district,2022,Cox's Bazar,paurashava,BD20222499,Cox's Bazar Paurashava,2022,Cox's Bazar,20,Chittagong
+district,2022,Cox's Bazar,paurashava,BD20224999,Maheshkhali Paurashava,2022,Cox's Bazar,20,Chittagong
+district,2022,Cox's Bazar,paurashava,BD20229099,Teknaf Paurashava,2022,Cox's Bazar,20,Chittagong
+district,2030,Feni,paurashava,BD20301499,Chhagalnaiya Paurashava,2030,Feni,20,Chittagong
+district,2030,Feni,paurashava,BD20302599,Daganbhuiyan Paurashava,2030,Feni,20,Chittagong
+district,2030,Feni,paurashava,BD20302999,Feni Paurashava,2030,Feni,20,Chittagong
+district,2030,Feni,paurashava,BD20305199,Parshuram Paurashava,2030,Feni,20,Chittagong
+district,2030,Feni,paurashava,BD20309499,Sonagazi Paurashava,2030,Feni,20,Chittagong
+district,2046,Khagrachhari,paurashava,BD20464999,Khagrachhari Paurashava,2046,Khagrachhari,20,Chittagong
+district,2046,Khagrachhari,paurashava,BD20467099,Matiranga Paurashava,2046,Khagrachhari,20,Chittagong
+district,2046,Khagrachhari,paurashava,BD20468099,Ramgarh Paurashava,2046,Khagrachhari,20,Chittagong
+district,2051,Lakshmipur,paurashava,BD20514399,Lakshmipur Paurashava,2051,Lakshmipur,20,Chittagong
+district,2051,Lakshmipur,paurashava,BD20516599,Ramganj Paurashava,2051,Lakshmipur,20,Chittagong
+district,2051,Lakshmipur,paurashava,BD20517399,Ramgati Paurashava,2051,Lakshmipur,20,Chittagong
+district,2051,Lakshmipur,paurashava,BD20515899,Roypur Paurashava,2051,Lakshmipur,20,Chittagong
+district,2075,Noakhali,paurashava,BD20752199,Basurhat Paurashava,2075,Noakhali,20,Chittagong
+district,2075,Noakhali,paurashava,BD20751099,Chatkhil Paurashava,2075,Noakhali,20,Chittagong
+district,2075,Noakhali,paurashava,BD20750799,Chaumohani Paurashava,2075,Noakhali,20,Chittagong
+district,2075,Noakhali,paurashava,BD20753699,Hatiya Paurashava,2075,Noakhali,20,Chittagong
+district,2075,Noakhali,paurashava,BD20754799,Kabirhat Paurashava,2075,Noakhali,20,Chittagong
+district,2075,Noakhali,paurashava,BD20758799,Noakhali Paurashava,2075,Noakhali,20,Chittagong
+district,2075,Noakhali,paurashava,BD20758099,Senbagh Paurashava,2075,Noakhali,20,Chittagong
+district,2075,Noakhali,paurashava,BD20758399,Sonaimuri Paurashava,2075,Noakhali,20,Chittagong
+district,2084,Rangamati,paurashava,BD20840799,Baghaichhari Paurashava,2084,Rangamati,20,Chittagong
+district,2084,Rangamati,paurashava,BD20848799,Rangamati Paurashava,2084,Rangamati,20,Chittagong
+district,3026,Dhaka,paurashava,BD30261499,Dhamrai Paurashava,3026,Dhaka,30,Dhaka
+district,3026,Dhaka,paurashava,BD30261899,Dohar Paurashava,3026,Dhaka,30,Dhaka
+district,3026,Dhaka,paurashava,BD30267299,Savar Paurashava,3026,Dhaka,30,Dhaka
+district,3029,Faridpur,paurashava,BD30291099,Bhanga Paurashava,3029,Faridpur,30,Dhaka
+district,3029,Faridpur,paurashava,BD30291899,Boalmari Paurashava,3029,Faridpur,30,Dhaka
+district,3029,Faridpur,paurashava,BD30294799,Faridpur Paurashava,3029,Faridpur,30,Dhaka
+district,3029,Faridpur,paurashava,BD30296299,Nagarkanda Paurashava,3029,Faridpur,30,Dhaka
+district,3033,Gazipur,paurashava,BD30333099,Gazipur Paurashava,3033,Gazipur,30,Dhaka
+district,3033,Gazipur,paurashava,BD30333299,Kaliakair Paurashava,3033,Gazipur,30,Dhaka
+district,3033,Gazipur,paurashava,BD30333499,Kaliganj Paurashava,3033,Gazipur,30,Dhaka
+district,3033,Gazipur,paurashava,BD30338699,Sreepur Paurashava,3033,Gazipur,30,Dhaka
+district,3033,Gazipur,paurashava,BD30333000,Tongi Paurashava,3033,Gazipur,30,Dhaka
+district,3035,Gopalganj,paurashava,BD30353299,Gopalganj Paurashava,3035,Gopalganj,30,Dhaka
+district,3035,Gopalganj,paurashava,BD30355199,Kotalipara Paurashava,3035,Gopalganj,30,Dhaka
+district,3035,Gopalganj,paurashava,BD30355899,Muksudpur Paurashava,3035,Gopalganj,30,Dhaka
+district,3035,Gopalganj,paurashava,BD30359199,Tungipara Paurashava,3035,Gopalganj,30,Dhaka
+district,3048,Kishoreganj,paurashava,BD30480699,Bajitpur Paurashava,3048,Kishoreganj,30,Dhaka
+district,3048,Kishoreganj,paurashava,BD30481199,Bhairab Paurashava,3048,Kishoreganj,30,Dhaka
+district,3048,Kishoreganj,paurashava,BD30482799,Hossainpur Paurashava,3048,Kishoreganj,30,Dhaka
+district,3048,Kishoreganj,paurashava,BD30484299,Karimganj Paurashava,3048,Kishoreganj,30,Dhaka
+district,3048,Kishoreganj,paurashava,BD30484599,Katiadi Paurashava,3048,Kishoreganj,30,Dhaka
+district,3048,Kishoreganj,paurashava,BD30484999,Kishoreganj Paurashava,3048,Kishoreganj,30,Dhaka
+district,3048,Kishoreganj,paurashava,BD30485499,Kuliar Char Paurashava,3048,Kishoreganj,30,Dhaka
+district,3048,Kishoreganj,paurashava,BD30487999,Pakundia Paurashava,3048,Kishoreganj,30,Dhaka
+district,3054,Madaripur,paurashava,BD30544099,Kalkini Paurashava,3054,Madaripur,30,Dhaka
+district,3054,Madaripur,paurashava,BD30545499,Madaripur Paurashava,3054,Madaripur,30,Dhaka
+district,3054,Madaripur,paurashava,BD30548799,Shib Char Paurashava,3054,Madaripur,30,Dhaka
+district,3056,Manikganj,paurashava,BD30564699,Manikganj Paurashava,3056,Manikganj,30,Dhaka
+district,3056,Manikganj,paurashava,BD30568299,Singair Paurashava,3056,Manikganj,30,Dhaka
+district,3059,Munshiganj,paurashava,BD30595600,Mirkadim Paurashava,3059,Munshiganj,30,Dhaka
+district,3059,Munshiganj,paurashava,BD30595699,Munshiganj Paurashava,3059,Munshiganj,30,Dhaka
+district,3067,Narayanganj,paurashava,BD30670699,Kadam Rasul Paurashava,3067,Narayanganj,30,Dhaka
+district,3067,Narayanganj,paurashava,BD30676800,Kanchan Paurashava,3067,Narayanganj,30,Dhaka
+district,3067,Narayanganj,paurashava,BD30675899,Narayanganj Paurashava,3067,Narayanganj,30,Dhaka
+district,3067,Narayanganj,paurashava,BD30675800,Siddirganj Paurashava,3067,Narayanganj,30,Dhaka
+district,3067,Narayanganj,paurashava,BD30670499,Sonargaon Paurashava,3067,Narayanganj,30,Dhaka
+district,3067,Narayanganj,paurashava,BD30676899,Tarabo Paurashava,3067,Narayanganj,30,Dhaka
+district,3068,Narsingdi,paurashava,BD30686399,Ghorashal Paurashava,3068,Narsingdi,30,Dhaka
+district,3068,Narsingdi,paurashava,BD30686000,Madhabdi Paurashava,3068,Narsingdi,30,Dhaka
+district,3068,Narsingdi,paurashava,BD30685299,Manohardi Paurashava,3068,Narsingdi,30,Dhaka
+district,3068,Narsingdi,paurashava,BD30686099,Narsingdi Paurashava,3068,Narsingdi,30,Dhaka
+district,3068,Narsingdi,paurashava,BD30686499,Roypura Paurashava,3068,Narsingdi,30,Dhaka
+district,3068,Narsingdi,paurashava,BD30687699,Shibpur Paurashava,3068,Narsingdi,30,Dhaka
+district,3082,Rajbari,paurashava,BD30822999,Goalandaghat Paurashava,3082,Rajbari,30,Dhaka
+district,3082,Rajbari,paurashava,BD30827399,Pangsha Paurashava,3082,Rajbari,30,Dhaka
+district,3082,Rajbari,paurashava,BD30827699,Rajbari Paurashava,3082,Rajbari,30,Dhaka
+district,3086,Shariatpur,paurashava,BD30861499,Bhedarganj Paurashava,3086,Shariatpur,30,Dhaka
+district,3086,Shariatpur,paurashava,BD30862599,Damudya Paurashava,3086,Shariatpur,30,Dhaka
+district,3086,Shariatpur,paurashava,BD30866599,Naria Paurashava,3086,Shariatpur,30,Dhaka
+district,3086,Shariatpur,paurashava,BD30866999,Shariatpur Paurashava,3086,Shariatpur,30,Dhaka
+district,3086,Shariatpur,paurashava,BD30869499,Zanjira Paurashava,3086,Shariatpur,30,Dhaka
+district,3093,Tangail,paurashava,BD30931999,Bhuapur Paurashava,3093,Tangail,30,Dhaka
+district,3093,Tangail,paurashava,BD30932599,Dhanbari Paurashava,3093,Tangail,30,Dhaka
+district,3093,Tangail,paurashava,BD30932899,Ghatail Paurashava,3093,Tangail,30,Dhaka
+district,3093,Tangail,paurashava,BD30933899,Gopalpur Paurashava,3093,Tangail,30,Dhaka
+district,3093,Tangail,paurashava,BD30934799,Kalihati Paurashava,3093,Tangail,30,Dhaka
+district,3093,Tangail,paurashava,BD30935799,Madhupur Paurashava,3093,Tangail,30,Dhaka
+district,3093,Tangail,paurashava,BD30936699,Mirzapur Paurashava,3093,Tangail,30,Dhaka
+district,3093,Tangail,paurashava,BD30938599,Sakhipur Paurashava,3093,Tangail,30,Dhaka
+district,3093,Tangail,paurashava,BD30939599,Tangail Paurashava,3093,Tangail,30,Dhaka
+district,4001,Bagerhat,paurashava,BD40010899,Bagerhat Paurashava,4001,Bagerhat,40,Khulna
+district,4001,Bagerhat,paurashava,BD40015899,Mongla Port Paurashava,4001,Bagerhat,40,Khulna
+district,4001,Bagerhat,paurashava,BD40016099,Morrelganj Paurashava,4001,Bagerhat,40,Khulna
+district,4018,Chuadanga,paurashava,BD40180799,Alamdanga Paurashava,4018,Chuadanga,40,Khulna
+district,4018,Chuadanga,paurashava,BD40182399,Chuadanga Paurashava,4018,Chuadanga,40,Khulna
+district,4018,Chuadanga,paurashava,BD40183199,Darshana Paurashava,4018,Chuadanga,40,Khulna
+district,4018,Chuadanga,paurashava,BD40185599,Jiban Nagar Paurashava,4018,Chuadanga,40,Khulna
+district,4041,Jessore,paurashava,BD40410999,Bagher Para Paurashava,4041,Jessore,40,Khulna
+district,4041,Jessore,paurashava,BD40419099,Benapole Paurashava,4041,Jessore,40,Khulna
+district,4041,Jessore,paurashava,BD40411199,Chaugachha Paurashava,4041,Jessore,40,Khulna
+district,4041,Jessore,paurashava,BD40414799,Jessore Paurashava,4041,Jessore,40,Khulna
+district,4041,Jessore,paurashava,BD40412399,Jhikargachha Paurashava,4041,Jessore,40,Khulna
+district,4041,Jessore,paurashava,BD40413899,Keshabpur Paurashava,4041,Jessore,40,Khulna
+district,4041,Jessore,paurashava,BD40416199,Manirampur Paurashava,4041,Jessore,40,Khulna
+district,4041,Jessore,paurashava,BD40410499,Noapara Paurashava,4041,Jessore,40,Khulna
+district,4044,Jhenaidah,paurashava,BD40441499,Harinakunda Paurashava,4044,Jhenaidah,40,Khulna
+district,4044,Jhenaidah,paurashava,BD40441999,Jhenaidah Paurashava,4044,Jhenaidah,40,Khulna
+district,4044,Jhenaidah,paurashava,BD40443399,Kaliganj Paurashava,4044,Jhenaidah,40,Khulna
+district,4044,Jhenaidah,paurashava,BD40444299,Kotchandpur Paurashava,4044,Jhenaidah,40,Khulna
+district,4044,Jhenaidah,paurashava,BD40447199,Maheshpur Paurashava,4044,Jhenaidah,40,Khulna
+district,4044,Jhenaidah,paurashava,BD40448099,Shailkupa Paurashava,4044,Jhenaidah,40,Khulna
+district,4047,Khulna,paurashava,BD40471799,Chalna Paurashava,4047,Khulna,40,Khulna
+district,4047,Khulna,paurashava,BD40476499,Paikgachha Paurashava,4047,Khulna,40,Khulna
+district,4050,Kushtia,paurashava,BD40501599,Bheramara Paurashava,4050,Kushtia,40,Khulna
+district,4050,Kushtia,paurashava,BD40506399,Khoksa Paurashava,4050,Kushtia,40,Khulna
+district,4050,Kushtia,paurashava,BD40507199,Kumarkhali Paurashava,4050,Kushtia,40,Khulna
+district,4050,Kushtia,paurashava,BD40507999,Kushtia Paurashava,4050,Kushtia,40,Khulna
+district,4050,Kushtia,paurashava,BD40509499,Mirpur Paurashava,4050,Kushtia,40,Khulna
+district,4055,Magura,paurashava,BD40555799,Magura Paurashava,4055,Magura,40,Khulna
+district,4057,Meherpur,paurashava,BD40574799,Gangni Paurashava,4057,Meherpur,40,Khulna
+district,4057,Meherpur,paurashava,BD40578799,Meherpur Paurashava,4057,Meherpur,40,Khulna
+district,4065,Narail,paurashava,BD40652899,Kalia Paurashava,4065,Narail,40,Khulna
+district,4065,Narail,paurashava,BD40655299,Lohagara Paurashava,4065,Narail,40,Khulna
+district,4065,Narail,paurashava,BD40657699,Narail Paurashava,4065,Narail,40,Khulna
+district,4087,Satkhira,paurashava,BD40874399,Kalaroa Paurashava,4087,Satkhira,40,Khulna
+district,4087,Satkhira,paurashava,BD40878299,Satkhira Paurashava,4087,Satkhira,40,Khulna
+district,4539,Jamalpur,paurashava,BD45391599,Dewanganj Paurashava,4539,Jamalpur,45,Mymensingh
+district,4539,Jamalpur,paurashava,BD45392999,Islampur Paurashava,4539,Jamalpur,45,Mymensingh
+district,4539,Jamalpur,paurashava,BD45393699,Jamalpur Paurashava,4539,Jamalpur,45,Mymensingh
+district,4539,Jamalpur,paurashava,BD45395899,Madarganj Paurashava,4539,Jamalpur,45,Mymensingh
+district,4539,Jamalpur,paurashava,BD45396199,Melandaha Paurashava,4539,Jamalpur,45,Mymensingh
+district,4539,Jamalpur,paurashava,BD45398599,Sarishabari Paurashava,4539,Jamalpur,45,Mymensingh
+district,4561,Mymensingh,paurashava,BD45611399,Bhaluka Paurashava,4561,Mymensingh,45,Mymensingh
+district,4561,Mymensingh,paurashava,BD45612099,Fulbaria Paurashava,4561,Mymensingh,45,Mymensingh
+district,4561,Mymensingh,paurashava,BD45612299,Gaffargaon Paurashava,4561,Mymensingh,45,Mymensingh
+district,4561,Mymensingh,paurashava,BD45612399,Gauripur Paurashava,4561,Mymensingh,45,Mymensingh
+district,4561,Mymensingh,paurashava,BD45613199,Ishwarganj Paurashava,4561,Mymensingh,45,Mymensingh
+district,4561,Mymensingh,paurashava,BD45616599,Muktagachha Paurashava,4561,Mymensingh,45,Mymensingh
+district,4561,Mymensingh,paurashava,BD45615299,Mymensingh Paurashava,4561,Mymensingh,45,Mymensingh
+district,4561,Mymensingh,paurashava,BD45617299,Nandail Paurashava,4561,Mymensingh,45,Mymensingh
+district,4561,Mymensingh,paurashava,BD45618199,Phulpur Paurashava,4561,Mymensingh,45,Mymensingh
+district,4561,Mymensingh,paurashava,BD45619499,Trishal Paurashava,4561,Mymensingh,45,Mymensingh
+district,4572,Netrakona,paurashava,BD45721899,Durgapur Paurashava,4572,Netrakona,45,Mymensingh
+district,4572,Netrakona,paurashava,BD45724799,Kendua Paurashava,4572,Netrakona,45,Mymensingh
+district,4572,Netrakona,paurashava,BD45725699,Madan Paurashava,4572,Netrakona,45,Mymensingh
+district,4572,Netrakona,paurashava,BD45726399,Mohanganj Paurashava,4572,Netrakona,45,Mymensingh
+district,4572,Netrakona,paurashava,BD45727499,Netrokona Paurashava,4572,Netrakona,45,Mymensingh
+district,4572,Netrakona,paurashava,BD45728399,Purbadhala Paurashava,4572,Netrakona,45,Mymensingh
+district,4589,Sherpur,paurashava,BD45896799,Nakla Paurashava,4589,Sherpur,45,Mymensingh
+district,4589,Sherpur,paurashava,BD45897099,Nalitabari Paurashava,4589,Sherpur,45,Mymensingh
+district,4589,Sherpur,paurashava,BD45898899,Sherpur Paurashava,4589,Sherpur,45,Mymensingh
+district,4589,Sherpur,paurashava,BD45899099,Sreebardi Paurashava,4589,Sherpur,45,Mymensingh
+district,5010,Bogra,paurashava,BD50102099,Bogra Paurashava,5010,Bogra,50,Rajshahi
+district,5010,Bogra,paurashava,BD50102799,Dhunat Paurashava,5010,Bogra,50,Rajshahi
+district,5010,Bogra,paurashava,BD50103399,Dhupchanchia Paurashava,5010,Bogra,50,Rajshahi
+district,5010,Bogra,paurashava,BD50104099,Gabtali Paurashava,5010,Bogra,50,Rajshahi
+district,5010,Bogra,paurashava,BD50105499,Kahaloo Paurashava,5010,Bogra,50,Rajshahi
+district,5010,Bogra,paurashava,BD50106799,Nandigram Paurashava,5010,Bogra,50,Rajshahi
+district,5010,Bogra,paurashava,BD50100699,Santahar Paurashava,5010,Bogra,50,Rajshahi
+district,5010,Bogra,paurashava,BD50108199,Sariakandi Paurashava,5010,Bogra,50,Rajshahi
+district,5010,Bogra,paurashava,BD50108599,Shajahanpur Paurashava,5010,Bogra,50,Rajshahi
+district,5010,Bogra,paurashava,BD50108899,Sherpur Paurashava,5010,Bogra,50,Rajshahi
+district,5010,Bogra,paurashava,BD50109499,Shibganj Paurashava,5010,Bogra,50,Rajshahi
+district,5010,Bogra,paurashava,BD50109599,Sonatola Paurashava,5010,Bogra,50,Rajshahi
+district,5038,Joypurhat,paurashava,BD50381399,Akkelpur Paurashava,5038,Joypurhat,50,Rajshahi
+district,5038,Joypurhat,paurashava,BD50384799,Joypurhat Paurashava,5038,Joypurhat,50,Rajshahi
+district,5038,Joypurhat,paurashava,BD50385899,Kalai Paurashava,5038,Joypurhat,50,Rajshahi
+district,5038,Joypurhat,paurashava,BD50387499,Panchbibi Paurashava,5038,Joypurhat,50,Rajshahi
+district,5064,Naogaon,paurashava,BD50642899,Dhamoirhat Paurashava,5064,Naogaon,50,Rajshahi
+district,5064,Naogaon,paurashava,BD50646099,Naogaon Paurashava,5064,Naogaon,50,Rajshahi
+district,5064,Naogaon,paurashava,BD50647599,Nozipur Paurashava,5064,Naogaon,50,Rajshahi
+district,5069,Natore,paurashava,BD50690999,Bagatipara Paurashava,5069,Natore,50,Rajshahi
+district,5069,Natore,paurashava,BD50691500,Banpara Paurashava,5069,Natore,50,Rajshahi
+district,5069,Natore,paurashava,BD50691599,Baraigram Paurashava,5069,Natore,50,Rajshahi
+district,5069,Natore,paurashava,BD50694499,Gopalpur (Lalpur) Paurashava,5069,Natore,50,Rajshahi
+district,5069,Natore,paurashava,BD50694199,Gurudaspur Paurashava,5069,Natore,50,Rajshahi
+district,5069,Natore,paurashava,BD50696300,Naldanga Paurashava,5069,Natore,50,Rajshahi
+district,5069,Natore,paurashava,BD50696399,Natore Paurashava,5069,Natore,50,Rajshahi
+district,5069,Natore,paurashava,BD50699199,Singra Paurashava,5069,Natore,50,Rajshahi
+district,5070,Nawabganj,paurashava,BD50706699,Chapai Nababganj Paurashava,5070,Nawabganj,50,Rajshahi
+district,5070,Nawabganj,paurashava,BD50705699,Nachole Paurashava,5070,Nawabganj,50,Rajshahi
+district,5070,Nawabganj,paurashava,BD50703799,Rahanpur Paurashava,5070,Nawabganj,50,Rajshahi
+district,5070,Nawabganj,paurashava,BD50708899,Shibganj Paurashava,5070,Nawabganj,50,Rajshahi
+district,5076,Pabna,paurashava,BD50760599,Atgharia Paurashava,5076,Pabna,50,Rajshahi
+district,5076,Pabna,paurashava,BD50761699,Bera Paurashava,5076,Pabna,50,Rajshahi
+district,5076,Pabna,paurashava,BD50761999,Bhangura Paurashava,5076,Pabna,50,Rajshahi
+district,5076,Pabna,paurashava,BD50762299,Chatmohar Paurashava,5076,Pabna,50,Rajshahi
+district,5076,Pabna,paurashava,BD50763399,Faridpur Paurashava,5076,Pabna,50,Rajshahi
+district,5076,Pabna,paurashava,BD50763999,Ishwardi Paurashava,5076,Pabna,50,Rajshahi
+district,5076,Pabna,paurashava,BD50765599,Pabna Paurashava,5076,Pabna,50,Rajshahi
+district,5076,Pabna,paurashava,BD50767299,Santhia Paurashava,5076,Pabna,50,Rajshahi
+district,5076,Pabna,paurashava,BD50768399,Sujanagar Paurashava,5076,Pabna,50,Rajshahi
+district,5081,Rajshahi,paurashava,BD50811299,Bhabanigonj Paurashava,5081,Rajshahi,50,Rajshahi
+district,5081,Rajshahi,paurashava,BD50813499,Godagari Paurashava,5081,Rajshahi,50,Rajshahi
+district,5081,Rajshahi,paurashava,BD50817200,Katakhali Paurashava,5081,Rajshahi,50,Rajshahi
+district,5081,Rajshahi,paurashava,BD50815399,Kesharhat Paurashava,5081,Rajshahi,50,Rajshahi
+district,5081,Rajshahi,paurashava,BD50817299,Noahata Paurashava,5081,Rajshahi,50,Rajshahi
+district,5088,Sirajganj,paurashava,BD50881199,Belkuchi Paurashava,5088,Sirajganj,50,Rajshahi
+district,5088,Sirajganj,paurashava,BD50885099,Kazipur Paurashava,5088,Sirajganj,50,Rajshahi
+district,5088,Sirajganj,paurashava,BD50886199,Royganj Paurashava,5088,Sirajganj,50,Rajshahi
+district,5088,Sirajganj,paurashava,BD50886799,Shahjadpur Paurashava,5088,Sirajganj,50,Rajshahi
+district,5088,Sirajganj,paurashava,BD50887899,Sirajganj Paurashava,5088,Sirajganj,50,Rajshahi
+district,5088,Sirajganj,paurashava,BD50889499,Ullah Para Paurashava,5088,Sirajganj,50,Rajshahi
+district,5527,Dinajpur,paurashava,BD55271099,Birampur Paurashava,5527,Dinajpur,55,Rangpur
+district,5527,Dinajpur,paurashava,BD55271299,Birganj Paurashava,5527,Dinajpur,55,Rangpur
+district,5527,Dinajpur,paurashava,BD55276499,Dinajpur Sadar Paurashava,5527,Dinajpur,55,Rangpur
+district,5527,Dinajpur,paurashava,BD55273899,Fulbari Paurashava,5527,Dinajpur,55,Rangpur
+district,5527,Dinajpur,paurashava,BD55274399,Ghoraghat Paurashava,5527,Dinajpur,55,Rangpur
+district,5527,Dinajpur,paurashava,BD55274799,Hakimpur Paurashava,5527,Dinajpur,55,Rangpur
+district,5527,Dinajpur,paurashava,BD55277799,Parbatipur Paurashava,5527,Dinajpur,55,Rangpur
+district,5527,Dinajpur,paurashava,BD55272199,Setabganj Paurashava,5527,Dinajpur,55,Rangpur
+district,5532,Gaibandha,paurashava,BD55322499,Gaibandha Sadar Paurashava,5532,Gaibandha,55,Rangpur
+district,5532,Gaibandha,paurashava,BD55323099,Gobindaganj Paurashava,5532,Gaibandha,55,Rangpur
+district,5532,Gaibandha,paurashava,BD55329199,Sundarganj Paurashava,5532,Gaibandha,55,Rangpur
+district,5549,Kurigram,paurashava,BD55495299,Kurigram Sadar Paurashava,5549,Kurigram,55,Rangpur
+district,5549,Kurigram,paurashava,BD55496199,Nageshwari Paurashava,5549,Kurigram,55,Rangpur
+district,5549,Kurigram,paurashava,BD55499499,Ulipur Paurashava,5549,Kurigram,55,Rangpur
+district,5552,Lalmonirhat,paurashava,BD55525599,Lalmonirhat Sadar Paurashava,5552,Lalmonirhat,55,Rangpur
+district,5552,Lalmonirhat,paurashava,BD55527099,Patgram Paurashava,5552,Lalmonirhat,55,Rangpur
+district,5573,Nilphamari,paurashava,BD55731599,Domar Paurashava,5573,Nilphamari,55,Rangpur
+district,5573,Nilphamari,paurashava,BD55733699,Jaldhaka Paurashava,5573,Nilphamari,55,Rangpur
+district,5573,Nilphamari,paurashava,BD55736499,Nilphamari Sadar Paurashava,5573,Nilphamari,55,Rangpur
+district,5573,Nilphamari,paurashava,BD55738599,Saidpur Paurashava,5573,Nilphamari,55,Rangpur
+district,5577,Panchagarh,paurashava,BD55772599,Boda Paurashava,5577,Panchagarh,55,Rangpur
+district,5577,Panchagarh,paurashava,BD55777399,Panchagarh Sadar Paurashava,5577,Panchagarh,55,Rangpur
+district,5585,Rangpur,paurashava,BD55850399,Badarganj Paurashava,5585,Rangpur,55,Rangpur
+district,5585,Rangpur,paurashava,BD55854299,Kaunia Paurashava,5585,Rangpur,55,Rangpur
+district,5585,Rangpur,paurashava,BD55854999,Rangpur Sadar Paurashava,5585,Rangpur,55,Rangpur
+district,5594,Thakurgaon,paurashava,BD55948299,Pirganj Paurashava,5594,Thakurgaon,55,Rangpur
+district,5594,Thakurgaon,paurashava,BD55948699,Ranisankail Paurashava,5594,Thakurgaon,55,Rangpur
+district,5594,Thakurgaon,paurashava,BD55949499,Thakurgaon Sadar Paurashava,5594,Thakurgaon,55,Rangpur
+district,6036,Habiganj,paurashava,BD60360299,Ajmiriganj Paurashava,6036,Habiganj,60,Sylhet
+district,6036,Habiganj,paurashava,BD60362699,Chunarughat Paurashava,6036,Habiganj,60,Sylhet
+district,6036,Habiganj,paurashava,BD60364499,Habiganj Paurashava,6036,Habiganj,60,Sylhet
+district,6036,Habiganj,paurashava,BD60367199,Madhabpur Paurashava,6036,Habiganj,60,Sylhet
+district,6036,Habiganj,paurashava,BD60367799,Nabiganj Paurashava,6036,Habiganj,60,Sylhet
+district,6036,Habiganj,paurashava,BD60364400,Shayestagang Paurashava,6036,Habiganj,60,Sylhet
+district,6058,Maulvibazar,paurashava,BD60581499,Barlekha Paurashava,6058,Maulvibazar,60,Sylhet
+district,6058,Maulvibazar,paurashava,BD60585699,Kamalganj Paurashava,6058,Maulvibazar,60,Sylhet
+district,6058,Maulvibazar,paurashava,BD60586599,Kulaura Paurashava,6058,Maulvibazar,60,Sylhet
+district,6058,Maulvibazar,paurashava,BD60587499,Maulvibazar Paurashava,6058,Maulvibazar,60,Sylhet
+district,6058,Maulvibazar,paurashava,BD60588399,Sreemangal Paurashava,6058,Maulvibazar,60,Sylhet
+district,6090,Sunamganj,paurashava,BD60902399,Chhatak Paurashava,6090,Sunamganj,60,Sylhet
+district,6090,Sunamganj,paurashava,BD60902999,Derai Paurashava,6090,Sunamganj,60,Sylhet
+district,6090,Sunamganj,paurashava,BD60904799,Jagannathpur Paurashava,6090,Sunamganj,60,Sylhet
+district,6090,Sunamganj,paurashava,BD60908999,Sunamganj Paurashava,6090,Sunamganj,60,Sylhet
+district,6091,Sylhet,paurashava,BD60911799,Beani Bazar Paurashava,6091,Sylhet,60,Sylhet
+district,6091,Sylhet,paurashava,BD60913899,Golapganj Paurashava,6091,Sylhet,60,Sylhet
+district,6091,Sylhet,paurashava,BD60915999,Kanaighat Paurashava,6091,Sylhet,60,Sylhet
+district,6091,Sylhet,paurashava,BD60919499,Zakiganj Paurashava,6091,Sylhet,60,Sylhet

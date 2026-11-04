@@ -1,0 +1,42 @@
+{% comment %}
+    Upload-new-version drawer body. Multipart (PDF upload). On failing POST the
+    view returns this fragment with errors; on success, 204 + HX-Redirect.
+{% endcomment %}
+<form method="post" action="{{ action_url }}"
+      hx-post="{{ action_url }}"
+      hx-target="#drawer-body"
+      hx-swap="innerHTML"
+      hx-encoding="multipart/form-data"
+      enctype="multipart/form-data"
+      class="flex flex-col flex-1 min-h-0">
+    {% csrf_token %}
+
+    <div class="drawer-body space-y-4">
+        {% if form.non_field_errors %}
+            <div class="rounded border border-red-200 bg-red-50 text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-300 px-3 py-2 text-sm">
+                {{ form.non_field_errors|striptags }}
+            </div>
+        {% endif %}
+
+        {% include "accounts/_field.html" with field=form.pdf %}
+        {% include "accounts/_field.html" with field=form.change_note %}
+
+        <label class="flex items-center gap-2 text-sm text-text-main dark:text-white">
+            {{ form.requires_reack }}
+            <span>{{ form.requires_reack.label }}</span>
+        </label>
+        {% if form.requires_reack.errors %}
+            <p class="text-xs text-red-600 dark:text-red-400">{{ form.requires_reack.errors|striptags }}</p>
+        {% endif %}
+        <p class="text-xs text-text-soft dark:text-white/50">
+            When checked, everyone who already signed an earlier version is asked to re-sign.
+        </p>
+    </div>
+
+    <div class="drawer-footer justify-end">
+        <button type="button" class="btn-secondary" @click="close()">Cancel</button>
+        <button type="submit" class="btn-primary">
+            <i data-lucide="upload" class="w-4 h-4"></i><span>Upload version</span>
+        </button>
+    </div>
+</form>

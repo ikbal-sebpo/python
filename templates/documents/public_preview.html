@@ -1,0 +1,15 @@
+{% extends "documents/_public_base.html" %}
+{% block title %}Preview · {{ doc.document_type.display_name }}{% endblock %}
+
+{% block content %}
+<div class="bg-white rounded-lg shadow p-4 border border-bg-soft">
+  <div class="flex items-center justify-between mb-3">
+    <div>
+      <h1 class="text-lg font-semibold">{{ doc.document_type.display_name }}</h1>
+      <div class="text-xs text-text-soft font-mono">{{ doc.id }}</div>
+    </div>
+    <a href="{{ verify_url }}" class="text-sm text-brand-accent hover:underline">Verify ↗</a>
+  </div>
+  <iframe src="{{ pdf_url }}" class="w-full" style="height: 80vh;" frameborder="0"></iframe>
+</div>
+{% endblock %}

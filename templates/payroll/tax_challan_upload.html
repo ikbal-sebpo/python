@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+{% block title %}Upload tax challans · Orbis{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <h1 class="text-xl font-semibold">Tax challans</h1>
+    <p class="text-sm text-text-soft dark:text-white/60 mt-1">
+        One row per treasury deposit of TDS — the challan number, date, bank and total as printed on the challan,
+        and the payroll month it paid. Record every month's deposit here as it happens; the tax certificate's challan
+        table is a read of these rows. A challan already in Orbis is corrected by its number, never duplicated.
+        The tax year is the one the deposit date falls in.
+    </p>
+</div>
+
+<div class="card mb-4">
+    <h2 class="text-sm font-semibold mb-3">1. Download a template</h2>
+    <div class="flex flex-wrap items-center gap-2">
+        <a href="{% url 'payroll_tax_challan_upload_template' %}" class="btn-secondary">
+            <i data-lucide="file-spreadsheet" class="w-4 h-4"></i><span>Excel template</span>
+        </a>
+        <span class="text-xs text-text-mute ml-2">Headers only — one line per challan.</span>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <h2 class="text-sm font-semibold mb-2">2. File format</h2>
+    <table class="table-simple text-sm mb-2">
+        <thead><tr><th>Challan No</th><th>Date</th><th>Bank</th><th>Total Challan Amount</th><th>Payroll month (optional)</th><th>Note</th></tr></thead>
+        <tbody>
+            <tr><td>2627-00042394161</td><td>2026-08-14</td><td>Bank Asia PLC</td><td>817256</td><td>2026-07</td><td>July payroll</td></tr>
+            <tr><td>2627-00227484341</td><td>2027-01-14</td><td>MDB</td><td>9167</td><td><span class="text-text-mute italic">blank</span></td><td>Bonus deposit</td></tr>
+        </tbody>
+    </table>
+    <ul class="text-sm text-text-soft dark:text-white/70 list-disc pl-5 space-y-1">
+        <li><span class="font-medium">Bank</span> — matched by name or short code against Payroll › Banks ("BankAsia PLC", "Bank Asia", "BAL" all resolve). An unknown bank is an error, not auto-created.</li>
+        <li><span class="font-medium">Total Challan Amount</span> — the whole deposit, every employee's tax it carried.</li>
+        <li><span class="font-medium">Payroll month</span> — YYYY-MM, the period the deposit paid (named for the month it closes in: 2026-10 is 16 Sep – 15 Oct).
+            For a month Orbis ran, the challan is linked to that calculated run; if the run isn't calculated yet the challan is still recorded (a warning) and re-uploading later links it.
+            For a pre-Orbis month it is recorded as the month the deposit paid.</li>
+        <li>Several challans may pay one month (the deposit can be split across banks); each employee's tax sits in exactly one of them.
+            Which employees, and how much of each, is the next step — <a href="{% url 'payroll_tax_challan_allocation_upload' %}" class="underline">TDS by challan (per employee)</a>.</li>
+    </ul>
+</div>
+
+<div class="card mb-4">
+    <h2 class="text-sm font-semibold mb-3">3. Upload your filled file</h2>
+    <form id="tax-challan-upload-form"
+          method="post"
+          enctype="multipart/form-data"
+          hx-post="{% url 'payroll_tax_challan_upload' %}"
+          hx-encoding="multipart/form-data"
+          hx-target="#upload-result"
+          hx-swap="innerHTML"
+          hx-indicator="#upload-spinner"
+          class="flex flex-wrap items-end gap-3">
+        {% csrf_token %}
+        <input type="file" name="file" accept=".xlsx,.csv" required class="form-input w-auto max-w-xs">
+        <button type="submit" name="action" value="preview" class="btn-secondary">
+            <i data-lucide="eye" class="w-4 h-4"></i><span>Preview only</span>
+        </button>
+        <button type="submit" name="action" value="apply" class="btn-primary">
+            <i data-lucide="upload-cloud" class="w-4 h-4"></i><span>Upload</span>
+        </button>
+        <span id="upload-spinner" class="htmx-indicator inline-flex items-center gap-1 text-xs text-text-mute">
+            <i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i>Working…
+        </span>
+    </form>
+</div>
+
+<div id="upload-result">
+    {% if report or inline_error %}
+        {% include "payroll/_tax_challan_upload_report.html" with report=report parsed=parsed preview=preview aborted=aborted inline_error=inline_error %}
+    {% endif %}
+</div>
+
+{% if recent_challans %}
+<div class="card mb-4">
+    <h2 class="text-sm font-semibold mb-2">Recent challans</h2>
+    <div class="overflow-x-auto">
+        <table class="table-simple text-sm">
+            <thead><tr><th>Challan No</th><th>Date</th><th>Bank</th><th>Total</th><th>Tax year</th><th>Payroll month</th><th>Payroll run</th><th>Note</th></tr></thead>
+            <tbody>
+                {% for c in recent_challans %}
+                    <tr>
+                        <td>{{ c.challan_number }}</td>
+                        <td>{{ c.deposit_date|date:"Y-m-d" }}</td>
+                        <td>{{ c.bank.name }}</td>
+                        <td>{{ c.total_amount|taka }}</td>
+                        <td>{{ c.tax_year.code }}</td>
+                        <td>{{ c.month_label|default:"—" }}</td>
+                        <td>{% if c.run %}{{ c.run.period }}{% else %}<span class="text-text-mute">—</span>{% endif %}</td>
+                        <td>{{ c.note|default:"—" }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endif %}
+
+<script>
+    document.body.addEventListener('htmx:afterSwap', function (evt) {
+        if (window.lucide && typeof window.lucide.createIcons === 'function') {
+            window.lucide.createIcons();
+        }
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+{% block title %}Upload TDS by challan · Orbis{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <h1 class="text-xl font-semibold">TDS by challan (per employee){% if tax_year %} · {{ tax_year.code }}{% endif %}</h1>
+    <p class="text-sm text-text-soft dark:text-white/60 mt-1">
+        Restricted to Payroll Admins. For every treasury deposit, which employees' tax it carried and
+        <span class="font-medium">how much of each</span>. Record the deposit first under
+        <a href="{% url 'payroll_tax_challan_upload' %}" class="underline">Tax challans</a>, then upload this sheet — every month,
+        for a pre-Orbis month and an Orbis payroll run alike. The tax certificate's challan table is a read of these rows.
+        Re-uploading an employee / challan pair overwrites its amount — these are facts about a deposit that already happened, not a ledger.
+    </p>
+</div>
+
+<div class="card mb-4">
+    <h2 class="text-sm font-semibold mb-3">1. Download a template</h2>
+    <div class="flex flex-wrap items-center gap-2">
+        <a href="{% url 'payroll_tax_challan_allocation_upload_template' %}" class="btn-secondary">
+            <i data-lucide="file-spreadsheet" class="w-4 h-4"></i><span>Excel template</span>
+        </a>
+        <span class="text-xs text-text-mute ml-2">
+            Prefilled: one row per employee per payroll month that has a challan recorded, amount = that month's TDS.
+            The challan number is filled in when the month has exactly one challan; otherwise fill it in yourself.
+        </span>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <h2 class="text-sm font-semibold mb-2">2. File format</h2>
+    <table class="table-simple text-sm mb-2">
+        <thead><tr>{% for h in allocation_headers %}<th>{{ h }}</th>{% endfor %}</tr></thead>
+        <tbody>
+            <tr><td>539</td><td>2627-00042394161</td><td>2960</td><td><span class="text-text-mute italic">reference</span></td></tr>
+            <tr><td>540</td><td>2627-00042394161</td><td>11250</td><td><span class="text-text-mute italic">reference</span></td></tr>
+        </tbody>
+    </table>
+    <ul class="text-sm text-text-soft dark:text-white/70 list-disc pl-5 space-y-1">
+        <li>One row per employee per challan. <span class="font-medium">Challan No</span> must already be in Orbis for this tax year;
+            <span class="font-medium">Amount</span> is the taka of that employee's tax inside that deposit (whole taka; must be above zero).</li>
+        <li>Errors (unknown employee or challan, zero amount, the same pair twice) abort the file. Everything else is a warning:
+            allocations not adding up to the challan's total, not equalling an employee's TDS for the month, employees with TDS in no challan yet,
+            or one employee split across two challans of the same month (Finance's rule is exactly one).</li>
+        <li>A second tab, <span class="font-medium">Challans</span>, lists the year's challans for reference and is ignored on upload. CSV with the first tab's columns works too.</li>
+    </ul>
+</div>
+
+<div class="card mb-4">
+    <h2 class="text-sm font-semibold mb-3">3. Upload your filled file</h2>
+    <form id="challan-allocation-upload-form"
+          method="post"
+          enctype="multipart/form-data"
+          hx-post="{% url 'payroll_tax_challan_allocation_upload' %}"
+          hx-encoding="multipart/form-data"
+          hx-target="#upload-result"
+          hx-swap="innerHTML"
+          hx-indicator="#upload-spinner"
+          class="flex flex-wrap items-end gap-3">
+        {% csrf_token %}
+        <input type="file" name="file" accept=".xlsx,.csv" required class="form-input w-auto max-w-xs">
+        <button type="submit" name="action" value="preview" class="btn-secondary">
+            <i data-lucide="eye" class="w-4 h-4"></i><span>Preview only</span>
+        </button>
+        <button type="submit" name="action" value="apply" class="btn-primary">
+            <i data-lucide="upload-cloud" class="w-4 h-4"></i><span>Upload</span>
+        </button>
+        <span id="upload-spinner" class="htmx-indicator inline-flex items-center gap-1 text-xs text-text-mute">
+            <i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i>Working…
+        </span>
+    </form>
+    <p class="text-xs text-text-mute mt-2">Preview checks the file and shows the warnings without writing.</p>
+</div>
+
+<div id="upload-result">
+    {% if report or inline_error %}
+        {% include "payroll/_tax_challan_allocation_upload_report.html" with report=report parsed=parsed preview=preview aborted=aborted inline_error=inline_error %}
+    {% endif %}
+</div>
+
+{% if challan_summary %}
+<div class="card mb-4">
+    <h2 class="text-sm font-semibold mb-2">Challans · {{ tax_year.code }}</h2>
+    <p class="text-xs text-text-mute mb-2">Every challan of the year with what has been allocated so far. A difference is fine while the split is still being entered.</p>
+    <div class="overflow-x-auto">
+        <table class="table-simple text-sm">
+            <thead><tr><th>Challan No</th><th>Date</th><th>Bank</th><th>Payroll month</th><th>Total</th><th>Employees</th><th>Allocated</th><th>Difference</th></tr></thead>
+            <tbody>
+                {% for s in challan_summary %}
+                    <tr>
+                        <td>{{ s.challan.challan_number }}</td>
+                        <td>{{ s.challan.deposit_date|date:"Y-m-d" }}</td>
+                        <td>{{ s.challan.bank.name }}</td>
+                        <td>{{ s.month_label|default:"—" }}</td>
+                        <td>{{ s.challan.total_amount|taka }}</td>
+                        <td>{{ s.count }}</td>
+                        <td>{{ s.allocated|taka }}</td>
+                        <td>{% if s.difference %}<span class="text-amber-700 dark:text-amber-300">{{ s.difference|taka }}</span>{% else %}<span class="badge-success">0</span>{% endif %}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endif %}
+
+<script>
+    document.body.addEventListener('htmx:afterSwap', function (evt) {
+        if (window.lucide && typeof window.lucide.createIcons === 'function') {
+            window.lucide.createIcons();
+        }
+    });
+</script>
+{% endblock %}

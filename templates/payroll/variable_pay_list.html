@@ -1,0 +1,183 @@
+{% extends "base.html" %}
+{% load menu_extras %}
+{% block title %}Variable pay · Orbis{% endblock %}
+
+{% block content %}
+<div x-data="{
+        selected: 0,
+        recount() {
+            this.selected = document.querySelectorAll('.row-check:checked').length;
+        },
+        toggleAll(on) {
+            document.querySelectorAll('.row-check').forEach(c => { c.checked = on; });
+            this.recount();
+        },
+     }"
+     class="page-fill">
+
+    <div class="card shrink-0">
+        <form method="get" class="flex flex-wrap items-center gap-2">
+            {% include "partials/_employee_filter_controls.html" %}
+            <select name="component" class="form-input w-40" onchange="this.form.submit()" aria-label="Component">
+                <option value="">All types</option>
+                {% for c in components %}
+                    <option value="{{ c.pk }}" {% if selected_component_id == c.pk|stringformat:'s' %}selected{% endif %}>{{ c.name }}</option>
+                {% endfor %}
+            </select>
+            <select name="period" class="form-input w-44" onchange="this.form.submit()" aria-label="Payroll period">
+                <option value="">All periods</option>
+                {% for p in periods %}
+                    <option value="{{ p.pk }}" {% if selected_period_id == p.pk|stringformat:'s' %}selected{% endif %}>{{ p }}</option>
+                {% endfor %}
+            </select>
+            <select name="status" class="form-input w-32" onchange="this.form.submit()" aria-label="Status">
+                <option value="">All statuses</option>
+                {% for value, label in status_choices %}
+                    <option value="{{ value }}" {% if selected_status == value %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+            <button type="submit" class="btn-secondary">Search</button>
+            <a href="{% url 'payroll_sla_upload' %}" class="btn-primary">
+                <i data-lucide="upload" class="w-4 h-4"></i><span>Upload SLA achievement</span>
+            </a>
+            <a href="{% url 'payroll_test_salary_upload' %}" class="btn-secondary">
+                <i data-lucide="upload" class="w-4 h-4"></i><span>Upload test salary</span>
+            </a>
+        </form>
+        <p class="mt-3 text-xs text-text-mute">
+            Bonuses, incentives, SLA achievement pay and deductions. Each one is approved by the
+            employee's <span class="font-medium">department head</span> — not HR — and the payroll run
+            must be recalculated afterwards before an approved row is actually paid.
+        </p>
+        {% if pending_total %}
+            <p class="mt-2 text-xs">
+                <a href="?status=PENDING" class="badge badge-warning hover:underline">
+                    {{ pending_total }} entr{{ pending_total|pluralize:"y,ies" }} awaiting approval
+                </a>
+                <span class="text-text-mute ml-1">
+                    {% if can_decide_any %}Approve or reject them, then recalculate the run.
+                    {% else %}The department head has to approve these before they are paid.{% endif %}
+                </span>
+            </p>
+        {% endif %}
+    </div>
+
+    {% if can_decide_any %}
+        {% comment %} The checkboxes live in the table, so this form is bound to them by the HTML5 form= attribute rather than wrapping them — the per-row single-action forms can't be nested inside a wrapping one. Same shape as payroll/overtime_list.html. {% endcomment %}
+        <form method="post" id="bulk-variable-pay-form"
+              action="{% url 'payroll_variable_pay_bulk_decide' %}" class="shrink-0">
+            {% csrf_token %}
+            <input type="hidden" name="next_qs" value="{% qs_replace %}">
+        </form>
+        <div class="shrink-0 flex items-center gap-2 mt-2" x-show="selected > 0" x-cloak>
+            <span class="text-xs text-text-mute"><span x-text="selected"></span> selected</span>
+            <button type="submit" form="bulk-variable-pay-form" name="decision" value="approve"
+                    class="btn-secondary text-xs">Approve selected</button>
+            <button type="submit" form="bulk-variable-pay-form" name="decision" value="reject"
+                    class="btn-secondary text-xs">Reject selected</button>
+        </div>
+    {% endif %}
+
+    {% include "partials/_result_count.html" with count_noun="entries" %}
+
+    <div class="card p-0 table-scroll">
+        <table class="table-simple table-sticky min-w-full text-sm">
+            <thead>
+                <tr>
+                    {% if can_decide_any %}
+                        <th class="w-8">
+                            <input type="checkbox" class="form-checkbox" title="Select all pending on this page"
+                                   x-on:change="toggleAll($event.target.checked)">
+                        </th>
+                    {% endif %}
+                    <th class="text-left">Emp ID</th>
+                    <th class="text-left">Name</th>
+                    <th class="text-left">Department</th>
+                    <th class="text-left">Team</th>
+                    <th class="text-left">Type</th>
+                    <th class="text-left">Reason</th>
+                    <th class="text-right">Amount</th>
+                    <th class="text-left">Period</th>
+                    <th class="text-left">Status</th>
+                    <th class="text-left">Added by</th>
+                    <th class="text-right">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for entry in entries %}
+                    <tr class="{% if entry.status == 'REJECTED' %}opacity-60{% endif %}">
+                        {% if can_decide_any %}
+                            <td class="w-8">
+                                {% if entry.can_decide %}
+                                    <input type="checkbox" name="entry_ids" value="{{ entry.pk }}"
+                                           form="bulk-variable-pay-form" class="form-checkbox row-check"
+                                           x-on:change="recount()">
+                                {% endif %}
+                            </td>
+                        {% endif %}
+                        <td class="tabular-nums">{{ entry.employee.employee_id|default:"—" }}</td>
+                        <td class="font-medium whitespace-nowrap">{{ entry.employee.display_name }}</td>
+                        <td class="whitespace-nowrap">{{ entry.employee.department|default:"—" }}</td>
+                        <td class="whitespace-nowrap">{{ entry.employee.team|default:"—" }}</td>
+                        <td class="whitespace-nowrap">
+                            {{ entry.component.name }}
+                            {% if entry.component.kind == 'DEDUCTION' %}
+                                <span class="badge badge-muted" title="Deducted from pay">Deduction</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ entry.reason|default:"—" }}</td>
+                        <td class="text-right tabular-nums font-semibold">
+                            {% if entry.component.kind == 'DEDUCTION' %}&minus;{% endif %}{{ entry.amount|taka  }}
+                        </td>
+                        <td class="whitespace-nowrap text-text-mute">{{ entry.period }}</td>
+                        <td class="whitespace-nowrap">
+                            {% if entry.status == 'REJECTED' %}
+                                <span class="badge badge-muted">Rejected</span>
+                            {% elif entry.status == 'PENDING' %}
+                                <span class="badge badge-warning" title="Not paid until the department head approves it and the run is recalculated">Pending</span>
+                            {% else %}
+                                <span class="badge badge-success">Approved</span>
+                            {% endif %}
+                        </td>
+                        <td class="whitespace-nowrap text-text-mute">{{ entry.added_by.display_name|default:"—" }}</td>
+                        <td class="text-right whitespace-nowrap">
+                            {% if entry.can_decide %}
+                                <form method="post" action="{% url 'payroll_variable_pay_decide' entry.pk 'approve' %}" class="inline">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="next_qs" value="{% qs_replace %}">
+                                    <button type="submit"
+                                            class="p-1.5 rounded text-text-mute hover:bg-bg-soft hover:text-emerald-600 dark:hover:bg-white/5"
+                                            title="Approve — counts towards payroll once the run is recalculated">
+                                        <i data-lucide="check" class="w-4 h-4"></i>
+                                    </button>
+                                </form>
+                                <form method="post" action="{% url 'payroll_variable_pay_decide' entry.pk 'reject' %}" class="inline">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="next_qs" value="{% qs_replace %}">
+                                    <button type="submit"
+                                            class="p-1.5 rounded text-text-mute hover:bg-bg-soft hover:text-red-600 dark:hover:bg-white/5"
+                                            title="Reject — this entry will not be paid">
+                                        <i data-lucide="x" class="w-4 h-4"></i>
+                                    </button>
+                                </form>
+                            {% elif entry.status == 'PENDING' %}
+                                <span class="text-xs text-text-mute" title="Only the employee's department head can decide this">—</span>
+                            {% else %}
+                                <span class="text-xs text-text-mute">—</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="12" class="text-center text-text-mute py-8">
+                            No variable pay entries match these filters.
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% include "partials/_pagination.html" %}
+</div>
+{% endblock %}

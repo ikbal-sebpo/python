@@ -1,0 +1,304 @@
+{% extends "base.html" %}
+{% load menu_extras %}
+{% block title %}Timesheet corrections · Orbis{% endblock %}
+
+{% block content %}
+<div x-data="{
+        drawer: false,
+        drawerTitle: '',
+        open(title) { this.drawerTitle = title || ''; this.drawer = true; },
+        close() {
+            this.drawer = false;
+            this.drawerTitle = '';
+            const body = document.getElementById('drawer-body');
+            if (body) body.innerHTML = '';
+        },
+        selectedIds: [],
+     }"
+     x-on:orbis:drawer-close.window="close()"
+     x-on:keydown.escape.window="close()"
+     class="page-fill">
+    <div class="card shrink-0 flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
+        <div class="flex flex-wrap items-center gap-1">
+            <a href="?{% qs_replace tab='mine' page=None %}" class="btn-secondary {% if tab == 'mine' %}!bg-brand !text-white{% endif %}">
+                My requests
+                <span class="ml-1 text-[11px] opacity-70">({{ mine_count }})</span>
+            </a>
+            {% if show_pending_tab %}
+                <a href="?{% qs_replace tab='pending' page=None %}" class="btn-secondary {% if tab == 'pending' %}!bg-brand !text-white{% endif %}">
+                    Pending approvals
+                    <span class="ml-1 text-[11px] {% if pending_count %}!text-brand-accent{% endif %} opacity-70">({{ pending_count }})</span>
+                </a>
+            {% endif %}
+            {% if show_all_tab %}
+                <a href="?{% qs_replace tab='all' page=None %}" class="btn-secondary {% if tab == 'all' %}!bg-brand !text-white{% endif %}">
+                    All
+                    <span class="ml-1 text-[11px] opacity-70">({{ all_count }})</span>
+                </a>
+            {% endif %}
+            {% if has_direct_reports and tab != 'mine' %}
+                {# Scope switch, not a filter — same control as leave/list.html. #}
+                {# Default on; an unchecked checkbox sends nothing, so the change #}
+                {# handler navigates to ?direct=0 / drops the param explicitly. #}
+                <label class="ml-2 inline-flex cursor-pointer select-none items-center gap-2 text-xs font-medium text-text-soft dark:text-white/70"
+                       title="Show only requests from people who report directly to you">
+                    <input type="checkbox"
+                           class="form-checkbox"
+                           {% if direct_only %}checked{% endif %}
+                           onchange="window.location = '?' + (this.checked ? '{% qs_replace direct=None page=None %}' : '{% qs_replace direct='0' page=None %}');">
+                    <span>Direct reports only</span>
+                </label>
+            {% endif %}
+        </div>
+
+        <div class="group relative xl:ml-auto">
+            <button type="button"
+                    class="btn-secondary !h-10 !px-3 {% if filters_active %}!bg-brand !text-white{% endif %}"
+                    aria-label="Filters"
+                    title="Filters">
+                <i data-lucide="sliders-horizontal" class="w-4 h-4"></i>
+                {% if q %}
+                    <span class="max-w-28 truncate text-xs">{{ q }}</span>
+                {% elif filters_active %}
+                    <span class="text-xs">Filtered</span>
+                {% endif %}
+            </button>
+            <div class="absolute right-0 top-full z-30 hidden w-[min(24rem,calc(100vw-3rem))] pt-2 group-hover:block group-focus-within:block">
+                <form method="get" class="menu-panel space-y-3 p-3">
+                    <input type="hidden" name="tab" value="{{ tab }}">
+                    {# The scope switch isn't a filter, but a GET form builds the #}
+                    {# querystring from scratch — carry an unticked state through. #}
+                    {% if has_direct_reports and not direct_only %}
+                        <input type="hidden" name="direct" value="0">
+                    {% endif %}
+                    <label for="correction-search" class="form-label">Search</label>
+                    <div class="relative">
+                        <i data-lucide="search" class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-text-mute"></i>
+                        <input id="correction-search"
+                               type="search"
+                               name="q"
+                               value="{{ q }}"
+                               placeholder="Name, email, or employee ID"
+                               class="form-input w-full pl-9"
+                               autocomplete="off">
+                    </div>
+
+                    <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                        <div>
+                            <label for="correction-department" class="form-label">Department</label>
+                            <select id="correction-department" name="department" class="form-input">
+                                {% if can_pick_all_departments %}
+                                    <option value="">All departments</option>
+                                {% endif %}
+                                {% for department in departments %}
+                                    <option value="{{ department.pk }}" {% if department.pk == selected_department_id %}selected{% endif %}>
+                                        {{ department.name }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div>
+                            <label for="correction-team" class="form-label">Team</label>
+                            {# Narrowed to the picked department client-side #}
+                            {# (base.html::wireDepartmentTeamCascade) -- this #}
+                            {# panel is a hover popover, so re-scoping via a #}
+                            {# page reload would close it mid-edit. #}
+                            <select id="correction-team" name="team" class="form-input"
+                                    data-team-for="correction-department">
+                                <option value="">All teams</option>
+                                {% for team in teams %}
+                                    <option value="{{ team.pk }}"
+                                            data-department="{{ team.department_id|default_if_none:'' }}"
+                                            {% if team.pk == selected_team_id %}selected{% endif %}>
+                                        {{ team.name }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                        <div>
+                            <label for="correction-date-from" class="form-label">Working date from</label>
+                            <input id="correction-date-from"
+                                   type="text"
+                                   name="date_from"
+                                   value="{{ date_from_input }}"
+                                   data-flatpickr
+                                   data-flatpickr-static
+                                   placeholder="YYYY-MM-DD"
+                                   autocomplete="off"
+                                   class="form-input w-full">
+                        </div>
+                        <div class="flatpickr-align-right">
+                            <label for="correction-date-to" class="form-label">Working date to</label>
+                            <input id="correction-date-to"
+                                   type="text"
+                                   name="date_to"
+                                   value="{{ date_to_input }}"
+                                   data-flatpickr
+                                   data-flatpickr-static
+                                   placeholder="YYYY-MM-DD"
+                                   autocomplete="off"
+                                   class="form-input w-full">
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-end gap-2">
+                        {% if filters_active %}
+                            <a href="?{% qs_replace tab=tab q=None department=None team=None date_from=None date_to=None page=None %}"
+                               class="btn-secondary">Clear</a>
+                        {% endif %}
+                        <button type="submit" class="btn-primary">Apply filters</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    {% if date_errors %}
+        <div class="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-200">
+            {% for error in date_errors %}
+                <div>{{ error }}</div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    {% include "partials/_result_count.html" with count_noun="requests" %}
+
+    {# Empty on purpose — its fields live elsewhere in the DOM via the #}
+    {# form="bulk-corrections-form" attribute (checkboxes in the table, #}
+    {# submit buttons in the toolbar below), so the table doesn't need to #}
+    {# nest inside it — each row already has its own single-row <form>. #}
+    <form id="bulk-corrections-form" method="post" action="{% url 'attendance_correction_bulk' %}">
+        {% csrf_token %}
+        <input type="hidden" name="tab" value="{{ tab }}">
+    </form>
+
+    <div class="card shrink-0 flex flex-wrap items-center gap-3" x-show="selectedIds.length > 0" x-cloak>
+        <span class="text-sm font-medium" x-text="selectedIds.length + ' selected'"></span>
+        <button type="submit" form="bulk-corrections-form" name="action" value="approve"
+                class="btn-primary !py-1.5">
+            <i data-lucide="check" class="w-4 h-4"></i><span>Approve selected</span>
+        </button>
+        <button type="submit" form="bulk-corrections-form" name="action" value="decline"
+                class="btn-secondary !py-1.5 !text-red-600 dark:!text-red-400">
+            <i data-lucide="x" class="w-4 h-4"></i><span>Decline selected</span>
+        </button>
+        <button type="button" class="text-xs text-text-mute hover:underline" @click="selectedIds = []">
+            Clear selection
+        </button>
+    </div>
+
+    <div class="card p-0 table-scroll">
+        <table class="table-simple table-sticky min-w-full text-sm">
+            <thead>
+                <tr>
+                    <th class="w-8">
+                        {% if actionable_pks %}
+                            <input type="checkbox"
+                                   class="form-checkbox"
+                                   aria-label="Select all"
+                                   :checked="selectedIds.length > 0 && selectedIds.length === {{ actionable_pks|length }}"
+                                   @change="selectedIds = $event.target.checked ? [{% for pk in actionable_pks %}'{{ pk }}'{% if not forloop.last %},{% endif %}{% endfor %}] : []">
+                        {% endif %}
+                    </th>
+                    <th class="text-left">Employee</th>
+                    <th class="text-left">Date</th>
+                    <th class="text-left">Original</th>
+                    <th class="text-left">Requested</th>
+                    <th class="text-left">Time in office</th>
+                    <th class="text-left">Reason</th>
+                    <th class="text-left">Status</th>
+                    <th class="text-left">Requested by</th>
+                    <th class="text-right">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in rows %}
+                    <tr>
+                        <td>
+                            {% if row.status == 'PENDING' and row.employee_id != current_user_pk or row.status == 'PENDING' and user_can_edit_all %}
+                                <input type="checkbox" name="ids" value="{{ row.pk }}"
+                                       form="bulk-corrections-form"
+                                       class="form-checkbox"
+                                       aria-label="Select this request"
+                                       x-model="selectedIds">
+                            {% endif %}
+                        </td>
+                        <td class="whitespace-nowrap">
+                            <span class="font-medium">{{ row.employee.display_name }}</span>
+                            {% if row.employee.employee_id %}
+                                <span class="ml-1.5 text-xs text-text-mute">· {{ row.employee.employee_id }}</span>
+                            {% endif %}
+                        </td>
+                        <td class="whitespace-nowrap">{{ row.date|date:"Y-m-d" }}</td>
+                        <td class="tabular-nums whitespace-nowrap">
+                            {{ row.original_check_in|time:"H:i"|default:"—" }} → {{ row.original_check_out|time:"H:i"|default:"—" }}
+                        </td>
+                        <td class="tabular-nums whitespace-nowrap">
+                            {{ row.requested_check_in|time:"H:i" }} → {{ row.requested_check_out|time:"H:i" }}
+                        </td>
+                        <td class="tabular-nums whitespace-nowrap">
+                            {{ row.effective_time_in_office|default:"—" }}
+                            {% if row.requested_time_in_office %}<span class="text-text-mute" title="Manual override">*</span>{% endif %}
+                        </td>
+                        <td class="max-w-xs truncate" title="{{ row.reason }}">{{ row.reason }}</td>
+                        <td class="whitespace-nowrap">
+                            {% if row.status == 'PENDING' %}
+                                <span class="badge badge-info"><i data-lucide="clock" class="w-3 h-3"></i>Pending</span>
+                            {% elif row.status == 'APPROVED' %}
+                                <span class="badge badge-success"><i data-lucide="check" class="w-3 h-3"></i>Approved</span>
+                            {% elif row.status == 'DECLINED' %}
+                                <span class="badge" style="background:rgba(239,68,68,.15); color:#dc2626;"><i data-lucide="x" class="w-3 h-3"></i>Declined</span>
+                            {% else %}
+                                <span class="badge badge-muted"><i data-lucide="slash" class="w-3 h-3"></i>Cancelled</span>
+                            {% endif %}
+                        </td>
+                        <td class="whitespace-nowrap text-xs text-text-soft dark:text-white/60">{{ row.requested_by.display_name }}</td>
+                        <td class="text-right whitespace-nowrap">
+                            {% if row.status == 'PENDING' and row.employee_id != current_user_pk or row.status == 'PENDING' and user_can_edit_all %}
+                                <form method="post" action="{% url 'attendance_correction_approve' row.pk %}" class="inline">
+                                    {% csrf_token %}
+                                    <button type="submit" class="text-xs text-brand hover:underline dark:text-brand-accent inline-flex items-center gap-1">
+                                        <i data-lucide="check" class="w-3 h-3"></i>Approve
+                                    </button>
+                                </form>
+                                <form method="post" action="{% url 'attendance_correction_decline' row.pk %}" class="inline ml-3">
+                                    {% csrf_token %}
+                                    <button type="submit" class="text-xs text-red-600 dark:text-red-400 hover:underline inline-flex items-center gap-1">
+                                        <i data-lucide="x" class="w-3 h-3"></i>Decline
+                                    </button>
+                                </form>
+                            {% elif row.status == 'PENDING' and row.employee_id == current_user_pk %}
+                                <button type="button"
+                                        class="text-xs text-brand hover:underline dark:text-brand-accent inline-flex items-center gap-1"
+                                        hx-get="{% url 'attendance_correction_edit' row.pk %}"
+                                        hx-target="#drawer-body"
+                                        hx-swap="innerHTML"
+                                        @click="open('Edit correction request — {{ row.employee.display_name|escapejs }}')">
+                                    <i data-lucide="pencil" class="w-3 h-3"></i>Edit
+                                </button>
+                                <form method="post" action="{% url 'attendance_correction_cancel' row.pk %}" class="inline ml-3">
+                                    {% csrf_token %}
+                                    <button type="submit" class="text-xs text-text-mute hover:underline inline-flex items-center gap-1">
+                                        <i data-lucide="slash" class="w-3 h-3"></i>Cancel
+                                    </button>
+                                </form>
+                            {% else %}
+                                <span class="text-xs text-text-soft dark:text-white/60">{{ row.process_note|default:"—" }}</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr><td colspan="10" class="text-center italic text-text-mute py-4">No requests found.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% include "partials/_pagination.html" %}
+
+    {% include "partials/_drawer_shell.html" %}
+</div>
+{% endblock %}

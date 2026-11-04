@@ -1,0 +1,10 @@
+{# Header button opening the salary-adjustment drawer; the badge is the run's current instruction. #}
+<button type="button" class="btn-secondary"
+        hx-get="{% url 'payroll_run_adjustment' run.pk %}"
+        hx-target="#drawer-body"
+        hx-swap="innerHTML"
+        @click="open('Salary adjustment — {{ run.period|escapejs }}')"
+        title="How many months of owed salary adjustment this run settles">
+    <i data-lucide="calendar-plus" class="w-4 h-4"></i><span>Salary adjustment</span>
+    {% if run.adjustment_instruction_label %}<span class="badge-info ml-1">{{ run.adjustment_instruction_label }}</span>{% endif %}
+</button>

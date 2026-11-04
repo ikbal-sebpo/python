@@ -1,0 +1,49 @@
+[
+    {"model": "employees.country", "pk": 1, "fields": {"name": "Bangladesh", "iso_code": "BD", "is_active": true}},
+    {"model": "employees.country", "pk": 2, "fields": {"name": "India", "iso_code": "IN", "is_active": true}},
+    {"model": "employees.country", "pk": 3, "fields": {"name": "Pakistan", "iso_code": "PK", "is_active": true}},
+    {"model": "employees.country", "pk": 4, "fields": {"name": "United States", "iso_code": "US", "is_active": true}},
+
+    {"model": "employees.division", "pk": 1, "fields": {"country": 1, "name": "Dhaka", "is_active": true}},
+    {"model": "employees.division", "pk": 2, "fields": {"country": 1, "name": "Chattogram", "is_active": true}},
+    {"model": "employees.division", "pk": 3, "fields": {"country": 1, "name": "Rajshahi", "is_active": true}},
+    {"model": "employees.division", "pk": 4, "fields": {"country": 1, "name": "Khulna", "is_active": true}},
+    {"model": "employees.division", "pk": 5, "fields": {"country": 1, "name": "Barishal", "is_active": true}},
+    {"model": "employees.division", "pk": 6, "fields": {"country": 1, "name": "Sylhet", "is_active": true}},
+    {"model": "employees.division", "pk": 7, "fields": {"country": 1, "name": "Rangpur", "is_active": true}},
+    {"model": "employees.division", "pk": 8, "fields": {"country": 1, "name": "Mymensingh", "is_active": true}},
+
+    {"model": "employees.religion", "pk": 1, "fields": {"name": "Islam", "is_active": true}},
+    {"model": "employees.religion", "pk": 2, "fields": {"name": "Hinduism", "is_active": true}},
+    {"model": "employees.religion", "pk": 3, "fields": {"name": "Christianity", "is_active": true}},
+    {"model": "employees.religion", "pk": 4, "fields": {"name": "Buddhism", "is_active": true}},
+    {"model": "employees.religion", "pk": 5, "fields": {"name": "Others", "is_active": true}},
+
+    {"model": "employees.relation", "pk": 1,  "fields": {"name": "Father", "is_active": true}},
+    {"model": "employees.relation", "pk": 2,  "fields": {"name": "Mother", "is_active": true}},
+    {"model": "employees.relation", "pk": 3,  "fields": {"name": "Brother", "is_active": true}},
+    {"model": "employees.relation", "pk": 4,  "fields": {"name": "Sister", "is_active": true}},
+    {"model": "employees.relation", "pk": 5,  "fields": {"name": "Spouse", "is_active": true}},
+    {"model": "employees.relation", "pk": 6,  "fields": {"name": "Son", "is_active": true}},
+    {"model": "employees.relation", "pk": 7,  "fields": {"name": "Daughter", "is_active": true}},
+    {"model": "employees.relation", "pk": 8,  "fields": {"name": "Uncle", "is_active": true}},
+    {"model": "employees.relation", "pk": 9,  "fields": {"name": "Aunt", "is_active": true}},
+    {"model": "employees.relation", "pk": 10, "fields": {"name": "Cousin", "is_active": true}},
+    {"model": "employees.relation", "pk": 11, "fields": {"name": "Friend", "is_active": true}},
+    {"model": "employees.relation", "pk": 12, "fields": {"name": "Colleague", "is_active": true}},
+    {"model": "employees.relation", "pk": 13, "fields": {"name": "Other", "is_active": true}},
+
+    {"model": "employees.vaccine", "pk": 1, "fields": {"name": "COVID-19", "is_active": true}},
+    {"model": "employees.vaccine", "pk": 2, "fields": {"name": "Hepatitis-B", "is_active": true}},
+    {"model": "employees.vaccine", "pk": 3, "fields": {"name": "Tetanus", "is_active": true}},
+    {"model": "employees.vaccine", "pk": 4, "fields": {"name": "MMR", "is_active": true}},
+
+    {"model": "employees.dose", "pk": 1, "fields": {"name": "1st dose", "is_active": true}},
+    {"model": "employees.dose", "pk": 2, "fields": {"name": "2nd dose", "is_active": true}},
+    {"model": "employees.dose", "pk": 3, "fields": {"name": "Booster", "is_active": true}},
+    {"model": "employees.dose", "pk": 4, "fields": {"name": "N/A", "is_active": true}},
+
+    {"model": "employees.client", "pk": 1, "fields": {"name": "Client A", "code": "CL-A", "is_active": true}},
+    {"model": "employees.client", "pk": 2, "fields": {"name": "Client B", "code": "CL-B", "is_active": true}},
+    {"model": "employees.client", "pk": 3, "fields": {"name": "Client C", "code": "CL-C", "is_active": true}}
+]

@@ -1,0 +1,22 @@
+{% comment %}Inline edit+delete buttons for a repeating-section row.
+    Required context: employee, spec, row.{% endcomment %}
+{% if spec.slug in editable_section_slugs %}
+<div class="flex items-center gap-2 shrink-0">
+    <button type="button"
+            class="text-xs text-brand hover:underline dark:text-brand-accent inline-flex items-center gap-1"
+            hx-get="{% url 'section_edit_row' employee.pk spec.slug row.pk %}"
+            hx-target="#drawer-body"
+            hx-swap="innerHTML"
+            @click="open('Edit {{ spec.singular_label|lower|escapejs }}')">
+        <i data-lucide="pencil" class="w-3.5 h-3.5"></i>Edit
+    </button>
+    <button type="button"
+            class="text-xs text-red-600 dark:text-red-400 hover:underline inline-flex items-center gap-1"
+            hx-get="{% url 'section_delete_row' employee.pk spec.slug row.pk %}"
+            hx-target="#drawer-body"
+            hx-swap="innerHTML"
+            @click="open('Delete {{ spec.singular_label|lower|escapejs }}')">
+        <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>Delete
+    </button>
+</div>
+{% endif %}

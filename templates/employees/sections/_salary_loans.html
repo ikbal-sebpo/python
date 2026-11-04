@@ -1,0 +1,55 @@
+{% comment %}
+    Salary loans (docs/SALARY_LOAN_PLAN.md §5.3) — read-only card: one line
+    per non-cancelled loan with the balance recovered so far. Shown to the
+    employee and to can_manage_salary_loans; `salary_loans` comes from
+    EmployeeDetailView (empty for anyone else, and the card then hides).
+{% endcomment %}
+{% if salary_loans %}
+<div class="card" id="section-card-salary-loans">
+    <div class="flex items-start justify-between gap-3 mb-3">
+        <div class="flex items-center gap-2">
+            <i data-lucide="hand-coins" class="w-4 h-4 text-brand-accent"></i>
+            <h3 class="text-sm font-semibold uppercase tracking-wider text-text-mute">Salary loans</h3>
+        </div>
+        {% if can_manage_salary_loans %}
+            <a href="{% url 'payroll_loan_list' %}?q={{ employee.employee_id|urlencode }}"
+               class="text-xs text-brand hover:underline dark:text-brand-accent">Manage</a>
+        {% endif %}
+    </div>
+    <ul class="space-y-3 text-sm">
+        {% for loan in salary_loans %}
+            <li>
+                <div class="flex items-center justify-between gap-3">
+                    <div class="font-medium text-text-main dark:text-white tabular-nums">
+                        {{ loan.principal|taka }}
+                        <span class="text-xs text-text-mute font-normal">· {{ loan.installment_amount|taka }} × {{ loan.installment_count }} · approved {{ loan.approved_on|date:"Y-m-d" }}</span>
+                    </div>
+                    {% if loan.is_pending %}
+                        <span class="badge badge-warning text-[10px]">Awaiting disbursement</span>
+                    {% elif loan.balance.is_settled %}
+                        <span class="badge badge-success text-[10px]">Settled</span>
+                    {% else %}
+                        <span class="badge badge-info text-[10px]">Active</span>
+                    {% endif %}
+                </div>
+                {% if not loan.is_pending %}
+                    <div class="text-xs text-text-soft dark:text-white/60 mt-0.5 tabular-nums">
+                        {{ loan.balance.instalments_deducted }} of {{ loan.installment_count }} instalments deducted ·
+                        outstanding <span class="font-medium">{{ loan.balance.outstanding|taka }}</span>
+                        {% if loan.first_deduction_period and not loan.balance.is_settled %}· from {{ loan.first_deduction_period }}{% endif %}
+                    </div>
+                    <div class="h-1.5 w-full rounded bg-bg-soft dark:bg-white/10 mt-1">
+                        <div class="h-1.5 rounded bg-brand dark:bg-brand-accent" style="width: {{ loan.balance.progress_pct }}%"></div>
+                    </div>
+                {% endif %}
+                <div class="text-xs text-text-mute mt-0.5">
+                    {{ loan.file_reference }}
+                    {% if loan.approval_document %}
+                        · <a href="{% url 'payroll_loan_document' loan.pk %}" target="_blank" rel="noopener" class="text-brand hover:underline dark:text-brand-accent">document</a>
+                    {% endif %}
+                </div>
+            </li>
+        {% endfor %}
+    </ul>
+</div>
+{% endif %}

@@ -1,0 +1,27 @@
+{# Topbar notification bell — "waiting on you" approvals (core/approvals.py). #}
+{# v1 real-time = htmx polling: on load, every 30s while the tab is visible, #}
+{# on returning to the tab, and on the orbis:approvals-changed event (sent #}
+{# via HX-Trigger after the viewer's own htmx actions, and re-fired across #}
+{# tabs by base.html's bell wiring). The body is the swap target, so an open #}
+{# dropdown stays open through a refresh; the badge arrives out-of-band. #}
+<div class="relative"
+     x-data="{ bellOpen: false }"
+     @click.outside="bellOpen = false"
+     @keydown.escape.window="bellOpen = false">
+    <button type="button" aria-label="Notifications" aria-haspopup="true"
+            :aria-expanded="bellOpen.toString()"
+            @click="bellOpen = !bellOpen"
+            class="relative p-2 rounded hover:bg-bg-soft dark:hover:bg-white/5 text-text-soft dark:text-white/70">
+        <i data-lucide="bell" class="w-5 h-5"></i>
+        <span id="notification-bell-badge" class="hidden" aria-hidden="true"></span>
+    </button>
+    <div x-show="bellOpen" x-cloak x-transition.opacity
+         class="absolute right-0 mt-2 w-[min(24rem,calc(100vw-2rem))] menu-panel z-30 overflow-hidden">
+        <div id="notification-bell-body"
+             hx-get="{% url 'notification_bell' %}"
+             hx-trigger="load, every 30s [document.visibilityState === 'visible'], orbis:approvals-changed from:body, visibilitychange[document.visibilityState === 'visible'] from:document"
+             hx-swap="innerHTML">
+            <div class="px-4 py-8 text-center text-sm text-text-mute dark:text-white/50">Loading…</div>
+        </div>
+    </div>
+</div>

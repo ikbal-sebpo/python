@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}{{ page_title }} · Orbis{% endblock %}
+
+{% block content %}
+{% if form.non_field_errors %}
+    <div class="mb-4 rounded border border-red-200 bg-red-50 text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-300 px-3 py-2 text-sm">
+        {{ form.non_field_errors|striptags }}
+    </div>
+{% endif %}
+
+<form method="post" enctype="multipart/form-data" data-dept-team-cascade
+      {% if is_create %}data-identity-autofill{% endif %}>
+    {% csrf_token %}
+    {% if next_url %}<input type="hidden" name="next" value="{{ next_url }}">{% endif %}
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+        {# Left column #}
+        <div class="space-y-6">
+            <div class="card">
+                <h2 class="text-sm font-semibold uppercase tracking-wider text-text-mute mb-4">Org structure</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {% include "accounts/_field.html" with field=form.department %}
+                    {% include "accounts/_field.html" with field=form.team %}
+                    {% if form.subteam %}{% include "accounts/_field.html" with field=form.subteam %}{% endif %}
+                    {% include "accounts/_field.html" with field=form.designation %}
+                    {% if form.grade %}{% include "accounts/_field.html" with field=form.grade %}{% endif %}
+                    {% if form.access_level %}{% include "accounts/_field.html" with field=form.access_level %}{% endif %}
+                    {% include "accounts/_field.html" with field=form.job_location %}
+                    {% include "accounts/_field.html" with field=form.work_location %}
+                </div>
+            </div>
+
+            <div class="card">
+                <h2 class="text-sm font-semibold uppercase tracking-wider text-text-mute mb-4">Access</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {% if form.password1 %}
+                        {% include "accounts/_field.html" with field=form.password1 %}
+                        {% include "accounts/_field.html" with field=form.password2 %}
+                    {% endif %}
+
+                    {% if form.is_active %}
+                        <label class="flex items-center gap-2 text-sm text-text-soft dark:text-white/70 md:col-span-2">
+                            {{ form.is_active }} <span>Active</span>
+                        </label>
+                    {% endif %}
+
+                    {% if form.groups %}
+                        <div class="md:col-span-2">
+                            <label class="form-label">Groups</label>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-1">
+                                {% for checkbox in form.groups %}
+                                    <label class="flex items-center gap-2 text-sm text-text-soft dark:text-white/70">
+                                        {{ checkbox.tag }}
+                                        <span>{{ checkbox.choice_label }}</span>
+                                    </label>
+                                {% endfor %}
+                            </div>
+                            <p class="text-xs text-text-mute mt-1">Used by dynamic menu to gate access.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        {# Right column #}
+        <div class="space-y-6">
+            <div class="card">
+                <h2 class="text-sm font-semibold uppercase tracking-wider text-text-mute mb-4">Identity</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {% include "accounts/_field.html" with field=form.first_name %}
+                    {% include "accounts/_field.html" with field=form.last_name %}
+                    {% include "accounts/_field.html" with field=form.email %}
+                    {% if form.username %}{% include "accounts/_field.html" with field=form.username %}{% endif %}
+                    {% include "accounts/_field.html" with field=form.employee_id %}
+                    {% if form.nid_number %}{% include "accounts/_field.html" with field=form.nid_number %}{% endif %}
+                    {% include "accounts/_field.html" with field=form.contact_number %}
+                </div>
+            </div>
+
+            {% if form.joining_date %}
+                <div class="card">
+                    <h2 class="text-sm font-semibold uppercase tracking-wider text-text-mute mb-4">Employment</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {% include "accounts/_field.html" with field=form.joining_date %}
+                        {% include "accounts/_field.html" with field=form.probation_month %}
+                        {% if form.notice_period_months %}{% include "accounts/_field.html" with field=form.notice_period_months %}{% endif %}
+                        {% if form.confirmation_date %}{% include "accounts/_field.html" with field=form.confirmation_date %}{% endif %}
+                        {% if form.last_working_date %}{% include "accounts/_field.html" with field=form.last_working_date %}{% endif %}
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+
+    </div>
+
+    <div class="mt-8 pt-6 border-t border-bg-soft dark:border-white/10 flex items-center gap-3">
+        <button type="submit" class="btn-primary">
+            <i data-lucide="save" class="w-4 h-4"></i><span>{{ submit_label }}</span>
+        </button>
+        <a href="{{ cancel_url|default:'/' }}" class="btn-secondary">Cancel</a>
+    </div>
+</form>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{% static 'js/dept-team-cascade.js' %}" defer></script>
+{% if is_create %}<script src="{% static 'js/user-identity-autofill.js' %}" defer></script>{% endif %}
+{% endblock %}

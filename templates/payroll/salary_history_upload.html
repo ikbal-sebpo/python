@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+{% block title %}Import salary history · Orbis{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <h1 class="text-xl font-semibold">Import salary history</h1>
+    <p class="text-sm text-text-soft dark:text-white/60 mt-1">
+        Restricted to Payroll Admins. One-time load of an employee's full gross-salary history — every past
+        figure with its dates, plus the current one. Only for employees with <span class="font-medium">no salary
+        records in Orbis yet</span>; anyone who already has records is skipped. Day-to-day changes go through
+        <a href="{% url 'payroll_salary_upload' %}" class="text-brand hover:underline dark:text-brand-accent">Upload gross salary</a>.
+    </p>
+</div>
+
+<div class="card mb-4">
+    <h2 class="text-sm font-semibold mb-3">1. Download a template</h2>
+    <div class="flex flex-wrap items-center gap-2">
+        <a href="{% url 'payroll_salary_upload_history_template' %}" class="btn-secondary">
+            <i data-lucide="file-spreadsheet" class="w-4 h-4"></i><span>Excel template</span>
+        </a>
+        <span class="text-xs text-text-mute ml-2">
+            One line per employee without salary records (ID, name and joining date for reference). Add one row
+            per historical salary beneath each — the Employee ID repeats on every row.
+        </span>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <h2 class="text-sm font-semibold mb-2">2. File format</h2>
+    <p class="text-sm text-text-soft dark:text-white/70 mb-2">
+        Several rows per employee, five columns, header on row 1:
+    </p>
+    <table class="table-simple text-sm mb-2">
+        <thead><tr><th>Employee ID</th><th>Gross monthly salary</th><th>Effective from</th><th>Effective to</th><th>Reason</th></tr></thead>
+        <tbody>
+            <tr><td>104</td><td>33146</td><td>2009-01-01</td><td>2009-12-31</td><td></td></tr>
+            <tr><td>104</td><td>36829</td><td>2010-01-01</td><td>2010-12-31</td><td>Annual increment</td></tr>
+            <tr><td>104</td><td>145917</td><td>2026-01-01</td><td><span class="text-text-mute italic">blank</span></td><td></td></tr>
+        </tbody>
+    </table>
+    <ul class="text-sm text-text-soft dark:text-white/70 list-disc pl-5 space-y-1">
+        <li>Rows for one employee must form an unbroken chain: each <span class="font-medium">Effective to</span> is the
+            day before the next row's <span class="font-medium">Effective from</span>. A gap or overlap rejects that
+            employee's whole history.</li>
+        <li>Exactly one row per employee has a blank Effective to — the current salary.</li>
+        <li>A first row that starts before the joining date (HR's calendar-year sheets usually do) is clamped to the
+            joining date and reported as a warning, not an error.</li>
+        <li>Reason is optional: blank means <span class="font-medium">New hire</span> for the oldest row and
+            <span class="font-medium">Annual increment</span> for later ones. Accepted values:
+            {% for value, label in reason_choices %}<span class="font-medium">{{ label }}</span>{% if not forloop.last %}, {% endif %}{% endfor %}.</li>
+        <li>Past rows are stored as closed-out history (Superseded) and the last row as the current Approved salary,
+            so payroll prices every historical period at the rate actually in force.</li>
+    </ul>
+</div>
+
+<div class="card mb-4">
+    <h2 class="text-sm font-semibold mb-3">3. Upload your filled file</h2>
+    <form id="salary-history-upload-form"
+          method="post"
+          enctype="multipart/form-data"
+          hx-post="{% url 'payroll_salary_upload_history' %}"
+          hx-encoding="multipart/form-data"
+          hx-target="#upload-result"
+          hx-swap="innerHTML"
+          hx-indicator="#upload-spinner"
+          class="flex flex-wrap items-end gap-3">
+        {% csrf_token %}
+        <div>
+            <label class="block text-xs font-medium text-text-soft dark:text-white/70 mb-1" for="{{ form.note.id_for_label }}">
+                Note (optional — defaults to the file name)
+            </label>
+            {{ form.note }}
+        </div>
+        <input type="file" name="file" accept=".xlsx,.csv" required class="form-input w-auto max-w-xs">
+        <button type="submit" name="action" value="preview" class="btn-secondary">
+            <i data-lucide="eye" class="w-4 h-4"></i><span>Preview only</span>
+        </button>
+        <button type="submit" name="action" value="apply" class="btn-primary">
+            <i data-lucide="upload-cloud" class="w-4 h-4"></i><span>Import</span>
+        </button>
+        <span id="upload-spinner" class="htmx-indicator inline-flex items-center gap-1 text-xs text-text-mute">
+            <i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i>Working…
+        </span>
+    </form>
+    <p class="text-xs text-text-mute mt-2">
+        Tip: click <span class="font-medium">Preview only</span> first — it shows every chain, the clamp warnings and
+        who would be skipped — then <span class="font-medium">Import</span>. Any error anywhere in the file aborts
+        the whole import before anything is written.
+    </p>
+</div>
+
+<div id="upload-result">
+    {% if report or inline_error %}
+        {% include "payroll/_salary_history_upload_report.html" with report=report parsed_preview=parsed_preview preview=preview aborted=aborted inline_error=inline_error %}
+    {% endif %}
+</div>
+
+<script>
+    document.body.addEventListener('htmx:afterSwap', function (evt) {
+        if (window.lucide && typeof window.lucide.createIcons === 'function') {
+            window.lucide.createIcons();
+        }
+    });
+</script>
+{% endblock %}

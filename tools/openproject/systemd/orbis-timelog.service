@@ -1,0 +1,7 @@
+[Unit]
+Description=Log yesterday's Orbis hours into OpenProject
+After=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=%h/projects/orbis/tools/openproject/daily_timelog.sh

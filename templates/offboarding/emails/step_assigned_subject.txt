@@ -1,0 +1,1 @@
+[Orbis] Offboarding step assigned: {{ step.step_name }} for {{ resignation.employee.display_name }}

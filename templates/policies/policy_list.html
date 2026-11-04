@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block title %}Policies · Orbis{% endblock %}
+
+{% block content %}
+<div x-data="{
+        drawer: false,
+        drawerTitle: '',
+        open(title) { this.drawerTitle = title || ''; this.drawer = true; },
+        close() {
+            this.drawer = false;
+            this.drawerTitle = '';
+            const body = document.getElementById('drawer-body');
+            if (body) body.innerHTML = '';
+        },
+     }"
+     x-on:orbis:drawer-close.window="close()"
+     x-on:keydown.escape.window="close()"
+     class="page-fill">
+
+  <div class="shrink-0 flex items-center justify-between gap-4">
+    <h1 class="text-2xl font-semibold text-text-main dark:text-white">Policies</h1>
+    <button type="button" class="btn-primary"
+            hx-get="{% url 'policies:create' %}"
+            hx-target="#drawer-body"
+            hx-swap="innerHTML"
+            @click="open('New policy')">
+      <i data-lucide="plus" class="w-4 h-4"></i><span>New policy</span>
+    </button>
+  </div>
+
+  {% include "partials/_result_count.html" with count_noun="policies" %}
+
+  <div class="card p-0 table-scroll">
+    {% if policies %}
+      <table class="table-sticky min-w-full text-sm">
+        <thead>
+          <tr class="text-left text-xs uppercase tracking-wide text-text-soft dark:text-white/50 border-b border-bg-soft dark:border-white/10">
+            <th class="py-2.5 pr-4">Key</th>
+            <th class="py-2.5 pr-4">Title</th>
+            <th class="py-2.5 pr-4">Status</th>
+            <th class="py-2.5 pr-4">Department</th>
+            <th class="py-2.5 pr-4">Owner</th>
+            <th class="py-2.5 pr-4 text-right">Signed</th>
+            <th class="py-2.5 pr-4 text-right">Outstanding</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-bg-soft dark:divide-white/10">
+          {% for policy in policies %}
+            <tr class="hover:bg-bg-soft dark:hover:bg-white/5">
+              <td class="py-2.5 pr-4 font-mono text-xs">
+                <a href="{% url 'policies:detail' policy.pk %}" class="text-brand-accent hover:underline">{{ policy.key }}</a>
+              </td>
+              <td class="py-2.5 pr-4">
+                <a href="{% url 'policies:detail' policy.pk %}" class="font-medium text-text-main dark:text-white hover:underline">{{ policy.title }}</a>
+                {% if policy.category %}<div class="text-xs text-text-soft dark:text-white/50">{{ policy.category }}</div>{% endif %}
+              </td>
+              <td class="py-2.5 pr-4">
+                {% if policy.is_active %}<span class="badge badge-success">Active</span>
+                {% elif policy.is_draft %}<span class="badge badge-muted">Draft</span>
+                {% else %}<span class="badge badge-info">Retired</span>{% endif %}
+              </td>
+              <td class="py-2.5 pr-4 text-text-soft dark:text-white/70">{{ policy.department.name }}</td>
+              <td class="py-2.5 pr-4 text-text-soft dark:text-white/70">{{ policy.owner.display_name }}</td>
+              <td class="py-2.5 pr-4 text-right">{{ policy.signed_total }}</td>
+              <td class="py-2.5 pr-4 text-right">
+                {% if policy.outstanding_total %}
+                  <span class="text-amber-600 dark:text-amber-400 font-medium">{{ policy.outstanding_total }}</span>
+                {% else %}<span class="text-text-soft dark:text-white/40">0</span>{% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <p class="text-sm text-text-soft dark:text-white/60 py-4">No policies yet. Click “New policy” to create the first one.</p>
+    {% endif %}
+  </div>
+
+  {% include "partials/_pagination.html" %}
+
+  {% include "partials/_drawer_shell.html" %}
+</div>
+{% endblock %}

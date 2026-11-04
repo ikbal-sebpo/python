@@ -1,0 +1,15 @@
+{% if rows %}
+    <ul class="space-y-2 text-sm">
+        {% for row in rows %}
+            <li class="flex items-center justify-between gap-3">
+                <div class="min-w-0 flex items-center gap-2">
+                    <span class="badge badge-muted">{{ row.get_email_type_display }}</span>
+                    <span class="truncate">{{ row.email_address }}</span>
+                </div>
+                {% include "employees/sections/_row_actions.html" %}
+            </li>
+        {% endfor %}
+    </ul>
+{% else %}
+    {% include "employees/sections/_empty.html" %}
+{% endif %}

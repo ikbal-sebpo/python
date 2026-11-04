@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}Asset return · Orbis{% endblock %}
+{% block content %}
+<div class="max-w-xl space-y-6">
+  <h1 class="text-2xl font-semibold text-text-main dark:text-white">
+    {% if row %}Edit asset{% else %}Add asset{% endif %}
+  </h1>
+  {% include "offboarding/_page_form_body.html" with submit_label="Save asset" %}
+</div>
+{% endblock %}

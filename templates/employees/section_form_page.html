@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}{{ page_title }} · Orbis{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl">
+    {% if form.non_field_errors %}
+        <div class="mb-4 rounded border border-red-200 bg-red-50 text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-300 px-3 py-2 text-sm">
+            {{ form.non_field_errors|striptags }}
+        </div>
+    {% endif %}
+
+    <form method="post" action="{{ action_url }}" enctype="multipart/form-data" class="card space-y-4" data-section="{{ spec.slug }}">
+        {% csrf_token %}
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {% for field in form %}
+                {% include "accounts/_field.html" with field=field %}
+            {% endfor %}
+        </div>
+        <div class="pt-4 border-t border-bg-soft dark:border-white/10 flex items-center gap-3">
+            <button type="submit" class="btn-primary">
+                <i data-lucide="save" class="w-4 h-4"></i><span>Save</span>
+            </button>
+            <a href="{% url 'employee_detail' employee.pk %}" class="btn-secondary">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

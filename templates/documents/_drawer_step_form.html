@@ -1,0 +1,36 @@
+{% comment %}
+Shared drawer body for ReviewActionView + ApprovalActionView. Both action
+forms have the same shape (status + remarks), so one partial covers both.
+{% endcomment %}
+<form method="post" action="{{ action_url }}"
+      hx-post="{{ action_url }}"
+      {% if form.has_salary_month_wizard %}x-data="{ step: 0, last: 4 }"{% endif %}
+      class="flex flex-col h-full">
+  {% csrf_token %}
+
+  <div class="drawer-body space-y-4">
+    <div class="text-sm">
+      <div class="text-text-soft">Document request</div>
+      <div class="font-medium text-text-main dark:text-white">
+        {{ doc_request.employee.display_name }} · {{ doc_request.document_type.display_name }}
+      </div>
+    </div>
+
+    {% include "documents/_step_action_fields.html" %}
+  </div>
+
+  <div class="drawer-footer justify-end">
+    <button type="button" class="btn-secondary" @click="close()">Cancel</button>
+    {% if form.has_salary_month_wizard %}
+      <button type="button" class="btn-secondary" x-show="step > 0" @click="step--">
+        <i data-lucide="arrow-left" class="w-4 h-4"></i><span>Previous</span>
+      </button>
+      <button type="button" class="btn-primary" x-show="step < last" @click="step++">
+        <span>Next</span><i data-lucide="arrow-right" class="w-4 h-4"></i>
+      </button>
+    {% endif %}
+    <button type="submit" class="btn-primary" {% if form.has_salary_month_wizard %}x-show="step === last"{% endif %}>
+      <i data-lucide="check" class="w-4 h-4"></i><span>Submit</span>
+    </button>
+  </div>
+</form>

@@ -1,0 +1,20 @@
+{% if rows %}
+    <ul class="space-y-3 text-sm">
+        {% for row in rows %}
+            <li class="flex items-start justify-between gap-3">
+                <div class="min-w-0">
+                    <div class="text-xs text-text-mute uppercase tracking-wider">{{ row.get_address_type_display }}</div>
+                    <div>
+                        {% if row.village_area %}{{ row.village_area }}{% endif %}{% if row.holding_no %}{% if row.village_area %}, {% endif %}{{ row.holding_no }}{% endif %}{% if row.flat_no %}{% if row.village_area or row.holding_no %}, {% endif %}{{ row.flat_no }}{% endif %}{% if row.post_code %}{% if row.village_area or row.holding_no or row.flat_no %}, {% endif %}{{ row.post_code }}{% endif %}
+                    </div>
+                    <div class="text-text-soft dark:text-white/60 text-xs">
+                        {% if row.union_ward %}{{ row.union_ward }}{% elif row.union_name %}{{ row.union_name }}{% endif %}{% if row.union_ward or row.union_name %}, {% endif %}{{ row.city|default:"" }}{% if row.city and row.state %}, {% endif %}{{ row.state|default:"" }}, {{ row.country }}
+                    </div>
+                </div>
+                {% include "employees/sections/_row_actions.html" %}
+            </li>
+        {% endfor %}
+    </ul>
+{% else %}
+    {% include "employees/sections/_empty.html" %}
+{% endif %}

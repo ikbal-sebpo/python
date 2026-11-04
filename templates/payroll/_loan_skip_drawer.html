@@ -1,0 +1,27 @@
+{% comment %}Skip one payroll's instalment on HR's approval (Q68). The balance is unchanged; the schedule stretches a month.{% endcomment %}
+<div class="drawer-body space-y-4">
+    {% if form.non_field_errors %}
+        <div class="rounded border border-red-200 bg-red-50 text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-300 px-3 py-2 text-sm">
+            {{ form.non_field_errors|striptags }}
+        </div>
+    {% endif %}
+    <p class="text-sm text-text-soft dark:text-white/60">
+        {{ loan.employee.display_name }} · loan {{ loan.file_reference }} · {{ loan.installment_amount|taka }} per month.
+        Nothing is deducted for this loan in the chosen payroll and the run shows a warning saying why. If that payroll
+        is already calculated, recalculate it afterwards.
+    </p>
+    <form method="post" id="loan-skip-form" action="{{ action_url }}"
+          hx-post="{{ action_url }}" hx-target="#drawer-body" hx-swap="innerHTML"
+          class="grid grid-cols-1 gap-4">
+        {% csrf_token %}
+        {% include "accounts/_field.html" with field=form.period %}
+        {% include "accounts/_field.html" with field=form.approved_by_hr %}
+        {% include "accounts/_field.html" with field=form.reason %}
+    </form>
+</div>
+<div class="drawer-footer justify-end">
+    <button type="button" class="btn-secondary" @click="close()">Cancel</button>
+    <button type="submit" form="loan-skip-form" class="btn-primary">
+        <i data-lucide="calendar-off" class="w-4 h-4"></i><span>Skip this payroll</span>
+    </button>
+</div>

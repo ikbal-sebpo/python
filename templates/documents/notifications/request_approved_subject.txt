@@ -1,0 +1,1 @@
+[Orbis] Your document is ready: {{ request_obj.document_type.display_name }}

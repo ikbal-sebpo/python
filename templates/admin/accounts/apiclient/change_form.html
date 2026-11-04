@@ -1,0 +1,15 @@
+{% extends "admin/change_form.html" %}
+
+{% block object-tools-items %}
+  {% if original.pk %}
+    <li>
+      {# Its own POST form, outside the change form: issuing a token is a write. #}
+      <form method="post" action="{% url 'admin:accounts_apiclient_generate_token' original.pk %}" style="display:inline"
+            onsubmit="return confirm('{% if original.token_prefix %}Generate a new token? The current one ({{ original.token_prefix }}…) stops working immediately.{% else %}Generate a token for {{ original.name }}?{% endif %}');">
+        {% csrf_token %}
+        <button type="submit" style="display:block;float:left;padding:3px 12px;border:0;border-radius:15px;cursor:pointer;background:var(--object-tools-bg);color:var(--object-tools-fg);font-family:inherit;font-weight:400;font-size:0.6875rem;text-transform:uppercase;letter-spacing:0.5px;">Generate new token</button>
+      </form>
+    </li>
+  {% endif %}
+  {{ block.super }}
+{% endblock %}

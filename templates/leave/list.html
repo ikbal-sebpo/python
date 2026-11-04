@@ -1,0 +1,386 @@
+{% extends "base.html" %}
+{% load menu_extras %}
+{% block title %}Leave · Orbis{% endblock %}
+
+{% block extra_head %}
+<style>
+    .leave-calendar-shell {
+        background: #ffffff;
+    }
+    .leave-calendar-weekdays {
+        background: #ECEFF1;
+    }
+    .leave-calendar-day {
+        background: #ffffff;
+    }
+    .leave-calendar-day-muted {
+        background: #F5F7F8;
+    }
+    .leave-calendar-popover {
+        background: #ffffff;
+    }
+    .dark .leave-calendar-shell {
+        background: rgba(11, 51, 63, 0.62);
+    }
+    .dark .leave-calendar-weekdays {
+        background: rgba(255, 255, 255, 0.06);
+    }
+    .dark .leave-calendar-day {
+        background: rgba(11, 51, 63, 0.72);
+    }
+    .dark .leave-calendar-day-muted {
+        background: rgba(255, 255, 255, 0.035);
+    }
+    .dark .leave-calendar-popover {
+        background: #0B333F;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+{# Calendar view scrolls in normal flow so day popovers aren't clipped; #}
+{# the table view fills the shell so its header can pin. #}
+<div x-data="{
+        drawer: false,
+        drawerTitle: '',
+        open(title) { this.drawerTitle = title || ''; this.drawer = true; },
+        close() {
+            this.drawer = false;
+            this.drawerTitle = '';
+            const body = document.getElementById('drawer-body');
+            if (body) body.innerHTML = '';
+        },
+     }"
+     x-on:orbis:drawer-close.window="close()"
+     x-on:keydown.escape.window="close()"
+     class="{% if view_mode == 'calendar' %}space-y-4{% else %}page-fill{% endif %}">
+<div class="card shrink-0">
+    <div class="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
+    <div class="flex flex-wrap items-center gap-1">
+        <a href="?tab=mine&view={{ view_mode }}{% if view_mode == 'calendar' %}&month={{ leave_calendar.current_month }}{% endif %}{{ query_suffix }}"
+           class="btn-secondary {% if tab == 'mine' %}!bg-brand !text-white{% endif %}">
+            My leaves
+            <span class="ml-1 text-[11px] opacity-70">({{ mine_count }})</span>
+        </a>
+        {% if show_pending_tab %}
+            <a href="?tab=pending&view={{ view_mode }}{% if view_mode == 'calendar' %}&month={{ leave_calendar.current_month }}{% endif %}{{ query_suffix }}"
+               class="btn-secondary {% if tab == 'pending' %}!bg-brand !text-white{% endif %}">
+                Pending approvals
+                <span class="ml-1 text-[11px] {% if pending_count %}!text-brand-accent{% endif %} opacity-70">({{ pending_count }})</span>
+            </a>
+        {% endif %}
+        {% if show_all_tab %}
+            <a href="?tab=all&view={{ view_mode }}{% if view_mode == 'calendar' %}&month={{ leave_calendar.current_month }}{% endif %}{{ query_suffix }}"
+               class="btn-secondary {% if tab == 'all' %}!bg-brand !text-white{% endif %}">
+                All leaves
+                <span class="ml-1 text-[11px] opacity-70">({{ all_count }})</span>
+            </a>
+        {% endif %}
+        {% if has_direct_reports and tab != 'mine' %}
+            {# Scope switch, not a filter: lives here, not in the popover, so a #}
+            {# default that hides rows is visible without opening anything. #}
+            {# Default on; an unchecked checkbox sends nothing, so the change #}
+            {# handler navigates to ?direct=0 / drops the param explicitly. #}
+            <label class="ml-2 inline-flex cursor-pointer select-none items-center gap-2 text-xs font-medium text-text-soft dark:text-white/70"
+                   title="Show only requests from people who report directly to you">
+                <input type="checkbox"
+                       class="form-checkbox"
+                       {% if direct_only %}checked{% endif %}
+                       onchange="window.location = '?' + (this.checked ? '{% qs_replace direct=None page=None %}' : '{% qs_replace direct='0' page=None %}');">
+                <span>Direct reports only</span>
+            </label>
+        {% endif %}
+    </div>
+
+    <div class="flex items-center rounded-md border border-bg-soft bg-bg-soft/60 p-1 dark:border-white/10 dark:bg-white/5">
+        <a href="{{ list_url }}"
+           class="inline-flex h-8 items-center gap-1.5 rounded px-3 text-xs font-medium transition {% if view_mode == 'list' %}bg-bg-card text-brand shadow-sm dark:bg-white/10 dark:text-white{% else %}text-text-soft hover:text-text-main dark:text-white/70 dark:hover:text-white{% endif %}">
+            <i data-lucide="list" class="h-4 w-4"></i><span>List</span>
+        </a>
+        <a href="{{ calendar_url }}"
+           class="inline-flex h-8 items-center gap-1.5 rounded px-3 text-xs font-medium transition {% if view_mode == 'calendar' %}bg-bg-card text-brand shadow-sm dark:bg-white/10 dark:text-white{% else %}text-text-soft hover:text-text-main dark:text-white/70 dark:hover:text-white{% endif %}">
+            <i data-lucide="calendar-days" class="h-4 w-4"></i><span>Calendar</span>
+        </a>
+    </div>
+
+    <div class="flex flex-wrap items-center gap-2 xl:ml-auto xl:justify-end">
+        <div class="group relative">
+            <button type="button"
+                    class="btn-secondary !h-10 !px-3 {% if filters_active %}!bg-brand !text-white{% endif %}"
+                    aria-label="Filters"
+                    title="Filters">
+                <i data-lucide="sliders-horizontal" class="w-4 h-4"></i>
+                {% if q %}
+                    <span class="max-w-28 truncate text-xs">{{ q }}</span>
+                {% elif filters_active %}
+                    <span class="text-xs">Filtered</span>
+                {% endif %}
+            </button>
+            <div class="absolute right-0 top-full z-30 hidden w-[min(24rem,calc(100vw-3rem))] pt-2 group-hover:block group-focus-within:block">
+                <form method="get" class="menu-panel space-y-3 p-3">
+                    <input type="hidden" name="tab" value="{{ tab }}">
+                    <input type="hidden" name="view" value="{{ view_mode }}">
+                    {% if view_mode == 'calendar' %}
+                        <input type="hidden" name="month" value="{{ leave_calendar.current_month }}">
+                    {% endif %}
+                    {# The scope switch isn't a filter, but a GET form builds the #}
+                    {# querystring from scratch — carry an unticked state through. #}
+                    {% if has_direct_reports and not direct_only %}
+                        <input type="hidden" name="direct" value="0">
+                    {% endif %}
+                    <label for="leave-search" class="form-label">Search</label>
+                    <div class="relative">
+                        <i data-lucide="search" class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-text-mute"></i>
+                        <input id="leave-search"
+                               type="search"
+                               name="q"
+                               value="{{ q }}"
+                               placeholder="Name, email, or employee ID"
+                               class="form-input w-full pl-9"
+                               autocomplete="off">
+                    </div>
+
+                    <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                        <div>
+                            <label for="leave-department" class="form-label">Department</label>
+                            <select id="leave-department" name="department" class="form-input">
+                                {% if can_pick_all_departments %}
+                                    <option value="">All departments</option>
+                                {% endif %}
+                                {% for department in departments %}
+                                    <option value="{{ department.pk }}" {% if department.pk == selected_department_id %}selected{% endif %}>
+                                        {{ department.name }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div>
+                            <label for="leave-team" class="form-label">Team</label>
+                            {# Narrowed to the picked department client-side #}
+                            {# (base.html::wireDepartmentTeamCascade) -- this #}
+                            {# panel is a hover popover, so re-scoping via a #}
+                            {# page reload would close it mid-edit. #}
+                            <select id="leave-team" name="team" class="form-input"
+                                    data-team-for="leave-department">
+                                <option value="">All teams</option>
+                                {% for team in teams %}
+                                    <option value="{{ team.pk }}"
+                                            data-department="{{ team.department_id|default_if_none:'' }}"
+                                            {% if team.pk == selected_team_id %}selected{% endif %}>
+                                        {{ team.name }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                        <div>
+                            <label for="leave-start-date" class="form-label">Working date from</label>
+                            <input id="leave-start-date"
+                                   type="text"
+                                   name="start_date"
+                                   value="{{ date_from_input }}"
+                                   data-flatpickr
+                                   data-flatpickr-static
+                                   placeholder="YYYY-MM-DD"
+                                   autocomplete="off"
+                                   class="form-input w-full">
+                        </div>
+                        <div class="flatpickr-align-right">
+                            <label for="leave-end-date" class="form-label">Working date to</label>
+                            <input id="leave-end-date"
+                                   type="text"
+                                   name="end_date"
+                                   value="{{ date_to_input }}"
+                                   data-flatpickr
+                                   data-flatpickr-static
+                                   placeholder="YYYY-MM-DD"
+                                   autocomplete="off"
+                                   class="form-input w-full">
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-end gap-2">
+                        {% if filters_active %}
+                            <a href="?tab={{ tab }}&view={{ view_mode }}{% if view_mode == 'calendar' %}&month={{ leave_calendar.current_month }}{% endif %}{% if has_direct_reports and not direct_only %}&direct=0{% endif %}"
+                               class="btn-secondary">Clear</a>
+                        {% endif %}
+                        <button type="submit" class="btn-primary">Apply filters</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        {% if user_can_edit_all %}
+            {# Pre-Orbis AL record import (docs/LEGACY_60_IMPORT_PLAN.md §4) — HR/Admins, same gate as the uploader. #}
+            <a href="{% url 'leave_al_history_upload' %}" class="btn-secondary"
+               title="Upload HR's pre-Orbis annual-leave figures (Service Book only)">
+                <i data-lucide="archive" class="w-4 h-4"></i><span>Import pre-Orbis AL</span>
+            </a>
+        {% endif %}
+        <a href="{% url 'leave_apply' %}" class="btn-primary">
+            <i data-lucide="plane" class="w-4 h-4"></i><span>Apply for leave</span>
+        </a>
+    </div>
+    </div>
+
+    {% if date_errors %}
+        <div class="mt-3 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-200">
+            {% for error in date_errors %}
+                <div>{{ error }}</div>
+            {% endfor %}
+        </div>
+    {% endif %}
+</div>
+
+{% if view_mode == 'calendar' %}
+    <div class="card leave-calendar-shell p-0 overflow-visible">
+        <div class="flex flex-wrap items-center gap-3 border-b border-bg-soft px-4 py-3 dark:border-white/10">
+            <div>
+                <h2 class="text-base font-semibold text-text-main dark:text-white">
+                    {{ leave_calendar.month_start|date:"F Y" }}
+                </h2>
+                <p class="text-xs text-text-mute">
+                    {% if tab == 'mine' %}
+                        Your leave applications by date.
+                    {% elif tab == 'pending' and direct_only %}
+                        Pending leave applications from your direct reports.
+                    {% elif tab == 'pending' %}
+                        Pending leave applications from employees in your approval scope.
+                    {% elif direct_only %}
+                        Leave applications from your direct reports.
+                    {% else %}
+                        Leave applications in your visible employee scope.
+                    {% endif %}
+                </p>
+            </div>
+            <div class="ml-auto flex items-center gap-2">
+                <a class="btn-secondary !px-3" href="{{ previous_month_url }}" aria-label="Previous month">
+                    <i data-lucide="chevron-left" class="h-4 w-4"></i>
+                </a>
+                <a class="btn-secondary min-w-28" href="{{ calendar_url }}">{{ leave_calendar.month_start|date:"F Y" }}</a>
+                <a class="btn-secondary !px-3" href="{{ next_month_url }}" aria-label="Next month">
+                    <i data-lucide="chevron-right" class="h-4 w-4"></i>
+                </a>
+            </div>
+        </div>
+
+        <div class="min-w-[760px]">
+                <div class="leave-calendar-weekdays grid grid-cols-7 border-b border-bg-soft text-center text-[11px] font-semibold uppercase text-text-mute dark:border-white/10">
+                    <div class="px-2 py-2">Sun</div>
+                    <div class="px-2 py-2">Mon</div>
+                    <div class="px-2 py-2">Tue</div>
+                    <div class="px-2 py-2">Wed</div>
+                    <div class="px-2 py-2">Thu</div>
+                    <div class="px-2 py-2">Fri</div>
+                    <div class="px-2 py-2">Sat</div>
+                </div>
+
+                <div class="grid grid-cols-7">
+                    {% for week in leave_calendar.weeks %}
+                        {% for day in week %}
+                            <div class="group relative min-h-32 border-b border-r border-bg-soft p-2 last:border-r-0 dark:border-white/10 {% if not day.in_month %}leave-calendar-day-muted text-text-mute{% else %}leave-calendar-day{% endif %}">
+                                <div class="mb-2 flex items-center justify-between gap-2">
+                                    <span class="flex h-6 w-6 items-center justify-center rounded-full text-xs font-semibold {% if day.date == leave_calendar.today %}bg-brand text-white dark:bg-brand-accent dark:text-brand-navy{% else %}text-text-soft dark:text-white/80{% endif %}">
+                                        {{ day.date|date:"j" }}
+                                    </span>
+                                    {% if day.applications %}
+                                        <span class="rounded-full bg-brand-accent/15 px-2 py-0.5 text-[11px] font-semibold text-brand dark:bg-brand-accent/20 dark:text-brand-accent">
+                                            {{ day.applications|length }}
+                                        </span>
+                                    {% endif %}
+                                </div>
+
+                                <div class="space-y-1">
+                                    {% for app in day.preview %}
+                                        <a href="{% url 'leave_detail' app.pk %}"
+                                           class="block truncate rounded border border-brand-accent/20 bg-brand-accent/10 px-2 py-1 text-xs font-medium text-brand hover:bg-brand-accent/20 dark:border-brand-accent/20 dark:bg-brand-accent/10 dark:text-brand-accent dark:hover:bg-brand-accent/20"
+                                           title="{{ app.employee.display_name }} - {{ app.leave_type.name }}">
+                                            {{ app.employee.display_name }}
+                                        </a>
+                                    {% endfor %}
+                                    {% if day.overflow %}
+                                        <button type="button" class="w-full rounded bg-bg-soft px-2 py-1 text-left text-xs font-medium text-text-soft dark:bg-white/10 dark:text-white/80">
+                                            +{{ day.overflow }} more
+                                        </button>
+                                    {% endif %}
+                                </div>
+
+                                {% if day.applications %}
+                                    <div class="leave-calendar-popover pointer-events-none absolute top-12 z-30 hidden w-80 rounded-lg border border-bg-soft p-3 text-left shadow-xl ring-1 ring-black/5 group-hover:block group-focus-within:block dark:border-white/10 dark:ring-white/10 {% if forloop.counter > 5 %}right-2{% else %}left-2{% endif %}">
+                                        <div class="mb-2 flex items-center justify-between gap-2">
+                                            <div class="font-semibold text-text-main dark:text-white">{{ day.date|date:"M j, Y" }}</div>
+                                            <div class="text-xs text-text-mute dark:text-white/60">{{ day.applications|length }} on leave</div>
+                                        </div>
+                                        <div class="max-h-72 space-y-2 overflow-y-auto pr-1">
+                                            {% for app in day.applications %}
+                                                <a href="{% url 'leave_detail' app.pk %}" class="pointer-events-auto block rounded-md px-2 py-1.5 hover:bg-bg-soft dark:hover:bg-white/5">
+                                                    <div class="flex items-center justify-between gap-2">
+                                                        <span class="truncate text-sm font-medium text-text-main dark:text-white">{{ app.employee.display_name }}</span>
+                                                        <span class="shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold {% if app.status == 'PENDING' %}bg-amber-100 text-amber-700 dark:bg-amber-500/15 dark:text-amber-200{% elif app.status == 'APPROVED' %}bg-emerald-100 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-200{% elif app.status == 'DECLINED' %}bg-red-100 text-red-700 dark:bg-red-500/15 dark:text-red-200{% else %}bg-slate-100 text-slate-600 dark:bg-white/10 dark:text-white/70{% endif %}">
+                                                            {{ app.get_status_display }}
+                                                        </span>
+                                                    </div>
+                                                    <div class="mt-0.5 truncate text-xs text-text-mute dark:text-white/60">
+                                                        {{ app.leave_type.name }} - {{ app.start_date|date:"M j" }} to {{ app.end_date|date:"M j" }}
+                                                    </div>
+                                                </a>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                {% endif %}
+                                            </div>
+                        {% endfor %}
+                    {% endfor %}
+                </div>
+        </div>
+    </div>
+{% else %}
+    {% include "partials/_result_count.html" with count_noun="leave applications" %}
+
+    <div class="card p-0 table-scroll">
+        <table class="table-simple table-sticky">
+            <thead>
+                <tr>
+                    <th>Employee</th>
+                    <th class="!px-2 text-center" title="Leave balance"><span class="sr-only">Balance</span></th>
+                    <th>Team</th>
+                    <th>Type</th>
+                    <th>Dates</th>
+                    <th class="text-center">Days</th>
+                    <th>Status</th>
+                    <th>Applied</th>
+                    <th class="text-right">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in rows %}
+                    {% include "leave/_row.html" with row=row current_user_pk=current_user_pk oob=False show_actions=True %}
+                {% empty %}
+                    <tr><td colspan="9" class="text-center py-8 text-text-mute">
+                        {% if tab == 'mine' %}
+                            You haven't applied for any leave yet.
+                        {% elif tab == 'pending' and direct_only %}
+                            No pending leave requests from your direct reports.
+                            Untick <span class="font-medium">Direct reports only</span> to see everyone in your approval scope.
+                        {% elif tab == 'pending' %}
+                            No pending leave requests from your team.
+                        {% elif direct_only %}
+                            No leave applications from your direct reports.
+                            Untick <span class="font-medium">Direct reports only</span> to see everyone in your scope.
+                        {% else %}
+                            No leave applications on record.
+                        {% endif %}
+                    </td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% include "partials/_pagination.html" %}
+{% endif %}
+
+{% include "partials/_drawer_shell.html" %}
+</div>
+{% endblock %}

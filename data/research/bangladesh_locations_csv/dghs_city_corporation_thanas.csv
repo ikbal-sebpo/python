@@ -1,0 +1,105 @@
+code,name,parent_code,parent,district_code,district,division_code,division
+10065051,Barishal Sadar,100650,Barishal City Corporation,1006,Barishal,10,Barishal
+20151602,Akbarshah,201516,Chattogram City Corporation,2015,Chattogram,20,Chattogram
+20151610,Bakalia,201516,Chattogram City Corporation,2015,Chattogram,20,Chattogram
+20151606,Bayejid Bostami,201516,Chattogram City Corporation,2015,Chattogram,20,Chattogram
+20151616,Chalk Bazar,201516,Chattogram City Corporation,2015,Chattogram,20,Chattogram
+20151619,Chandgaon,201516,Chattogram City Corporation,2015,Chattogram,20,Chattogram
+20151620,Chittogram Port,201516,Chattogram City Corporation,2015,Chattogram,20,Chattogram
+20151628,Double Mooring,201516,Chattogram City Corporation,2015,Chattogram,20,Chattogram
+20151631,EPZ,201516,Chattogram City Corporation,2015,Chattogram,20,Chattogram
+20151635,Halishahar,201516,Chattogram City Corporation,2015,Chattogram,20,Chattogram
+20151643,Khulshi,201516,Chattogram City Corporation,2015,Chattogram,20,Chattogram
+20151641,Kotwali,201516,Chattogram City Corporation,2015,Chattogram,20,Chattogram
+20151655,Pahartali,201516,Chattogram City Corporation,2015,Chattogram,20,Chattogram
+20151657,Panchlaish,201516,Chattogram City Corporation,2015,Chattogram,20,Chattogram
+20151665,Patenga,201516,Chattogram City Corporation,2015,Chattogram,20,Chattogram
+20151677,Sadarghat,201516,Chattogram City Corporation,2015,Chattogram,20,Chattogram
+20195067,Cumilla Adarsha Sadar,201950,Cumilla City Corporation,2019,Cumilla,20,Chattogram
+20195033,Cumilla Sadar Dakshin,201950,Cumilla City Corporation,2019,Cumilla,20,Chattogram
+30262502,Adabor,302625,Dhaka North City Corperation,3026,Dhaka,30,Dhaka
+30262504,Badda,302625,Dhaka North City Corperation,3026,Dhaka,30,Dhaka
+30262507,Banani,302625,Dhaka North City Corperation,3026,Dhaka,30,Dhaka
+30262005,Bangshal,302620,Dhaka South City Corporation,3026,Dhaka,30,Dhaka
+30262521,Bhasan Tek,302625,Dhaka North City Corperation,3026,Dhaka,30,Dhaka
+30262522,Bhatara,302625,Dhaka North City Corperation,3026,Dhaka,30,Dhaka
+30262506,Biman Bandar,302625,Dhaka North City Corperation,3026,Dhaka,30,Dhaka
+30262508,Cantonment,302625,Dhaka North City Corperation,3026,Dhaka,30,Dhaka
+30262009,Chak Bazar,302620,Dhaka South City Corporation,3026,Dhaka,30,Dhaka
+30262510,Dakshinkhan,302625,Dhaka North City Corperation,3026,Dhaka,30,Dhaka
+30262511,Darus Salam,302625,Dhaka North City Corperation,3026,Dhaka,30,Dhaka
+30262012,Demra,302620,Dhaka South City Corporation,3026,Dhaka,30,Dhaka
+30262097,Dhanmondi,302620,Dhaka South City Corporation,3026,Dhaka,30,Dhaka
+30262024,Gendaria,302620,Dhaka South City Corporation,3026,Dhaka,30,Dhaka
+30262526,Gulshan,302625,Dhaka North City Corperation,3026,Dhaka,30,Dhaka
+30262527,Hatirjheel,302625,Dhaka North City Corperation,3026,Dhaka,30,Dhaka
+30262028,Hazaribag,302620,Dhaka South City Corporation,3026,Dhaka,30,Dhaka
+30262029,Jatrabari,302620,Dhaka South City Corporation,3026,Dhaka,30,Dhaka
+30262032,Kadamtali,302620,Dhaka South City Corporation,3026,Dhaka,30,Dhaka
+30262530,Kafrul,302625,Dhaka North City Corperation,3026,Dhaka,30,Dhaka
+30262033,Kalabagan,302620,Dhaka South City Corporation,3026,Dhaka,30,Dhaka
+30262034,Kamrangir Char,302620,Dhaka South City Corporation,3026,Dhaka,30,Dhaka
+30262036,Khilgaon,302620,Dhaka South City Corporation,3026,Dhaka,30,Dhaka
+30262537,Khilkhet,302625,Dhaka North City Corperation,3026,Dhaka,30,Dhaka
+30262040,Kotwali,302620,Dhaka South City Corporation,3026,Dhaka,30,Dhaka
+30262042,Lalbag,302620,Dhaka South City Corporation,3026,Dhaka,30,Dhaka
+30262548,Mirpur,302625,Dhaka North City Corperation,3026,Dhaka,30,Dhaka
+30262550,Mohammadpur,302625,Dhaka North City Corperation,3026,Dhaka,30,Dhaka
+30262054,Motijheel,302620,Dhaka South City Corporation,3026,Dhaka,30,Dhaka
+30262057,Mugda Para,302620,Dhaka South City Corporation,3026,Dhaka,30,Dhaka
+30262063,New Market,302620,Dhaka South City Corporation,3026,Dhaka,30,Dhaka
+30262564,Pallabi,302625,Dhaka North City Corperation,3026,Dhaka,30,Dhaka
+30262065,Paltan,302620,Dhaka South City Corporation,3026,Dhaka,30,Dhaka
+30262066,Ramna,302620,Dhaka South City Corporation,3026,Dhaka,30,Dhaka
+30262567,Rampura,302625,Dhaka North City Corperation,3026,Dhaka,30,Dhaka
+30262570,Rupnagar,302625,Dhaka North City Corperation,3026,Dhaka,30,Dhaka
+30262068,Sabujbag,302620,Dhaka South City Corporation,3026,Dhaka,30,Dhaka
+30262574,Shah Ali,302625,Dhaka North City Corperation,3026,Dhaka,30,Dhaka
+30262075,Shahbag,302620,Dhaka South City Corporation,3026,Dhaka,30,Dhaka
+30262073,Shahjahanpur,302620,Dhaka South City Corporation,3026,Dhaka,30,Dhaka
+30262580,Sher-e-bangla Nagar,302625,Dhaka North City Corperation,3026,Dhaka,30,Dhaka
+30262076,Shyampur,302620,Dhaka South City Corporation,3026,Dhaka,30,Dhaka
+30262088,Sutrapur,302620,Dhaka South City Corporation,3026,Dhaka,30,Dhaka
+30262590,Tejgaon,302625,Dhaka North City Corperation,3026,Dhaka,30,Dhaka
+30262592,Tejgaon Ind. Area,302625,Dhaka North City Corperation,3026,Dhaka,30,Dhaka
+30262593,Turag,302625,Dhaka North City Corperation,3026,Dhaka,30,Dhaka
+30262596,Uttar Khan,302625,Dhaka North City Corperation,3026,Dhaka,30,Dhaka
+30262594,Uttara Paschim,302625,Dhaka North City Corperation,3026,Dhaka,30,Dhaka
+30262595,Uttara Purba,302625,Dhaka North City Corperation,3026,Dhaka,30,Dhaka
+30262098,Wari,302620,Dhaka South City Corporation,3026,Dhaka,30,Dhaka
+30333315,Basan,303333,Gazipur City Corporation,3033,Gazipur,30,Dhaka
+30333318,Gachha,303333,Gazipur City Corporation,3033,Gazipur,30,Dhaka
+30333330,Gazipur Sadar,303333,Gazipur City Corporation,3033,Gazipur,30,Dhaka
+30333399,Joydebpur,303333,Gazipur City Corporation,3033,Gazipur,30,Dhaka
+30333340,Kashimpur,303333,Gazipur City Corporation,3033,Gazipur,30,Dhaka
+30333345,Konabari,303333,Gazipur City Corporation,3033,Gazipur,30,Dhaka
+30333350,Pubail,303333,Gazipur City Corporation,3033,Gazipur,30,Dhaka
+30333390,Tongi Pashchim,303333,Gazipur City Corporation,3033,Gazipur,30,Dhaka
+30333393,Tongi Purba,303333,Gazipur City Corporation,3033,Gazipur,30,Dhaka
+30674406,Bandar,306744,Narayanganj City Corporation,3067,Narayanganj,30,Dhaka
+30674458,Narayanganj Sadar,306744,Narayanganj City Corporation,3067,Narayanganj,30,Dhaka
+40473321,Daulatpur,404733,Khulna City Corporation,4047,Khulna,40,Khulna
+40473345,Khalishpur,404733,Khulna City Corporation,4047,Khulna,40,Khulna
+40473348,Khan Jahan Ali,404733,Khulna City Corporation,4047,Khulna,40,Khulna
+40473351,Khulna Sadar,404733,Khulna City Corporation,4047,Khulna,40,Khulna
+40473385,Sonadanga,404733,Khulna City Corporation,4047,Khulna,40,Khulna
+45614052,Mymensingh Sadar,456140,Mymensingh City Corporation,4561,Mymensingh,45,Mymensingh
+50816622,Boalia,508166,Rajshahi City Corporation,5081,Rajshahi,50,Rajshahi
+50816624,Chandrima,508166,Rajshahi City Corporation,5081,Rajshahi,50,Rajshahi
+50816638,Kashiadanga,508166,Rajshahi City Corporation,5081,Rajshahi,50,Rajshahi
+50816640,Matihar,508166,Rajshahi City Corporation,5081,Rajshahi,50,Rajshahi
+50816685,Rajpara,508166,Rajshahi City Corporation,5081,Rajshahi,50,Rajshahi
+50816690,Shah Makhdum,508166,Rajshahi City Corporation,5081,Rajshahi,50,Rajshahi
+55857531,Hajirhat,558575,Rangpur City Corporation,5585,Rangpur,55,Rangpur
+55857533,Haragachh,558575,Rangpur City Corporation,5585,Rangpur,55,Rangpur
+55857544,Kotwali,558575,Rangpur City Corporation,5585,Rangpur,55,Rangpur
+55857555,Mahiganj,558575,Rangpur City Corporation,5585,Rangpur,55,Rangpur
+55857569,Parshuram,558575,Rangpur City Corporation,5585,Rangpur,55,Rangpur
+55857549,Rangpur Sadar,558575,Rangpur City Corporation,5585,Rangpur,55,Rangpur
+55857589,Tajhat,558575,Rangpur City Corporation,5585,Rangpur,55,Rangpur
+60915005,Airport,609150,Sylhet City Corporation,6091,Sylhet,60,Sylhet
+60915048,Jalalabad,609150,Sylhet City Corporation,6091,Sylhet,60,Sylhet
+60915055,Kotwali,609150,Sylhet City Corporation,6091,Sylhet,60,Sylhet
+60915057,Moglabazar,609150,Sylhet City Corporation,6091,Sylhet,60,Sylhet
+60915068,Shahparan,609150,Sylhet City Corporation,6091,Sylhet,60,Sylhet
+60915062,Sylhet Sadar,609150,Sylhet City Corporation,6091,Sylhet,60,Sylhet

@@ -1,0 +1,14 @@
+Hello {{ recipient.first_name|default:recipient.email }},
+
+The offboarding case for {{ resignation.employee.display_name }} has completed.
+
+Last working day:   {{ resignation.last_working_date }}
+
+Any standard letters (experience certificate, NOC, release letter) configured
+in the documents app have been auto-issued and entered the normal review /
+approval pipeline.
+
+{{ resignation.employee.display_name }} retains Orbis access until end of day
+on the last working date; account is deactivated automatically the next day.
+
+— Orbis

@@ -1,0 +1,1 @@
+[Orbis] Offboarding complete: {{ resignation.employee.display_name }}

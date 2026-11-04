@@ -1,0 +1,38 @@
+{% if can_view_access_log %}
+<div class="card" id="section-card-access-history">
+    <div class="flex items-start justify-between gap-3 mb-3">
+        <div class="flex items-center gap-2">
+            <i data-lucide="shield-check" class="w-4 h-4 text-brand-accent"></i>
+            <h3 class="text-sm font-semibold uppercase tracking-wider text-text-mute">Access history</h3>
+        </div>
+        <a href="{% url 'audit_access_log' %}?subject={{ employee.pk }}"
+           class="text-xs text-brand hover:underline dark:text-brand-accent inline-flex items-center gap-1">
+            <i data-lucide="external-link" class="w-3.5 h-3.5"></i>Full log
+        </a>
+    </div>
+    <p class="text-sm text-text-soft dark:text-white/60 mb-3">
+        Who last opened this employee's data — the most recent {{ access_history|length }} page loads.
+    </p>
+    {% if access_history %}
+        <table class="min-w-full text-xs">
+            <tbody>
+                {% for row in access_history %}
+                <tr class="border-t border-border/40">
+                    <td class="py-1 pr-3 whitespace-nowrap">{{ row.occurred_at|date:"Y-m-d H:i" }}</td>
+                    <td class="py-1 pr-3">{{ row.actor_label }}</td>
+                    <td class="py-1 pr-3">{{ row.get_data_class_display }}</td>
+                    <td class="py-1 pr-3">
+                        {% if row.action == "DENIED" %}<span class="badge badge-danger">{{ row.get_action_display }}</span>
+                        {% elif row.action == "EXPORT" or row.action == "DOWNLOAD" %}<span class="badge badge-warning">{{ row.get_action_display }}</span>
+                        {% else %}{{ row.get_action_display }}{% endif %}
+                    </td>
+                    <td class="py-1 font-mono text-text-mute">{{ row.route }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p class="text-xs text-text-mute">No recorded access yet.</p>
+    {% endif %}
+</div>
+{% endif %}

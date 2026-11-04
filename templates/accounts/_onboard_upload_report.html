@@ -1,0 +1,203 @@
+{# Result fragment for /users/bulk-create/ — swapped in by HTMX on each submit. #}
+<div class="card mb-4">
+    <h2 class="text-sm font-semibold mb-3">Result</h2>
+
+    {% if inline_error %}
+        <div class="mb-3 px-3 py-2 rounded border border-red-300 bg-red-50 text-red-800
+                    dark:border-red-700/50 dark:bg-red-900/20 dark:text-red-200 text-sm">
+            {{ inline_error }}
+        </div>
+    {% endif %}
+
+    {% if report %}
+        {% if aborted %}
+            <div class="mb-3 px-3 py-2 rounded border border-red-300 bg-red-50 text-red-800
+                        dark:border-red-700/50 dark:bg-red-900/20 dark:text-red-200 text-sm">
+                Upload aborted. Nothing was written. Fix the errors below and re-upload.
+            </div>
+        {% elif preview %}
+            <div class="mb-3 px-3 py-2 rounded border border-blue-300 bg-blue-50 text-blue-800
+                        dark:border-blue-700/50 dark:bg-blue-900/20 dark:text-blue-200 text-sm">
+                Preview only — nothing was written. Click
+                <span class="font-medium">Create employees</span> to commit the same file.
+            </div>
+        {% else %}
+            <div class="mb-3 px-3 py-2 rounded border border-emerald-300 bg-emerald-50 text-emerald-800
+                        dark:border-emerald-700/50 dark:bg-emerald-900/20 dark:text-emerald-200 text-sm">
+                <span class="font-medium">{{ report.created|length }}</span> created
+                {% if report.apply_errors %}· <span class="font-medium">{{ report.apply_errors|length }}</span> failed{% endif %}
+            </div>
+        {% endif %}
+
+        {% if report.warnings %}
+            <div class="mb-3 px-3 py-2 rounded border border-amber-300 bg-amber-50 text-amber-800
+                        dark:border-amber-700/50 dark:bg-amber-900/20 dark:text-amber-200 text-sm">
+                Possible rehire(s) detected — review before confirming. This does not block the upload.
+            </div>
+            <h3 class="text-xs font-semibold uppercase tracking-wide text-amber-700 dark:text-amber-300 mt-4 mb-2">
+                Possible rehires ({{ report.warnings|length }})
+            </h3>
+            <div class="overflow-x-auto">
+                <table class="table-simple text-sm">
+                    <thead>
+                        <tr>
+                            <th class="w-12">Row</th><th>Full Name</th><th>Matched employee</th>
+                            <th>Status</th><th>Prior separation</th><th>Last working date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for w in report.warnings %}
+                            <tr class="{% if w.is_involuntary %}text-red-700 dark:text-red-300{% else %}text-amber-700 dark:text-amber-300{% endif %}">
+                                <td>{{ w.line_no }}</td>
+                                <td>{{ w.raw.Full_Name|default:"—" }}</td>
+                                <td>{{ w.employee_name }}{% if w.employee_id %} ({{ w.employee_id }}){% endif %}</td>
+                                <td>{{ w.employee_is_active|yesno:"Active,Inactive" }}</td>
+                                <td>{{ w.separation_type_display|default:"—" }}</td>
+                                <td>{{ w.last_working_date|default:"—" }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endif %}
+
+        {% if report.parse_errors %}
+            <h3 class="text-xs font-semibold uppercase tracking-wide text-red-700 dark:text-red-300 mt-4 mb-2">
+                Errors ({{ report.parse_errors|length }})
+            </h3>
+            <div class="overflow-x-auto">
+                <table class="table-simple text-sm">
+                    <thead>
+                        <tr><th class="w-12">Row</th><th>Full Name</th><th>Department</th><th>Error</th></tr>
+                    </thead>
+                    <tbody>
+                        {% for err in report.parse_errors %}
+                            <tr class="text-red-700 dark:text-red-300">
+                                <td>{{ err.line_no }}</td>
+                                <td>{{ err.raw.Full_Name|default:"—" }}</td>
+                                <td>{{ err.raw.Department|default:"—" }}</td>
+                                <td>{{ err.message }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endif %}
+
+        {% if report.duplicates %}
+            <h3 class="text-xs font-semibold uppercase tracking-wide text-red-700 dark:text-red-300 mt-4 mb-2">
+                Duplicates within file ({{ report.duplicates|length }})
+            </h3>
+            <div class="overflow-x-auto">
+                <table class="table-simple text-sm">
+                    <thead>
+                        <tr><th class="w-12">Row</th><th>Full Name</th><th>Error</th></tr>
+                    </thead>
+                    <tbody>
+                        {% for err in report.duplicates %}
+                            <tr class="text-red-700 dark:text-red-300">
+                                <td>{{ err.line_no }}</td>
+                                <td>{{ err.raw.Full_Name|default:"—" }}</td>
+                                <td>{{ err.message }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endif %}
+
+        {% if report.apply_errors %}
+            <h3 class="text-xs font-semibold uppercase tracking-wide text-amber-700 dark:text-amber-300 mt-4 mb-2">
+                Failed to apply ({{ report.apply_errors|length }})
+            </h3>
+            <div class="overflow-x-auto">
+                <table class="table-simple text-sm">
+                    <thead>
+                        <tr><th class="w-12">Row</th><th>Full Name</th><th>Error</th></tr>
+                    </thead>
+                    <tbody>
+                        {% for err in report.apply_errors %}
+                            <tr class="text-amber-700 dark:text-amber-300">
+                                <td>{{ err.line_no }}</td>
+                                <td>{{ err.raw.Full_Name|default:"—" }}</td>
+                                <td>{{ err.message }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endif %}
+
+        {% if preview and parsed_preview %}
+            <details class="mt-4" open>
+                <summary class="cursor-pointer text-xs font-semibold uppercase tracking-wide text-text-soft dark:text-white/70">
+                    Rows that would be created ({{ parsed_preview|length }})
+                </summary>
+                <div class="overflow-x-auto mt-2">
+                    <table class="table-simple text-sm">
+                        <thead>
+                            <tr>
+                                <th class="w-12">Row</th><th>Full Name</th><th>Employee ID</th>
+                                <th>Email</th><th>Department</th><th>Gross Monthly</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in parsed_preview %}
+                                <tr>
+                                    <td>{{ row.line_no }}</td>
+                                    <td>{{ row.full_name }}</td>
+                                    <td>{{ row.employee_id }}</td>
+                                    <td>{{ row.email }}</td>
+                                    <td>{{ row.department.name }}</td>
+                                    <td>{{ row.gross_monthly|taka }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </details>
+        {% endif %}
+
+        {% if not preview and not aborted and report.created %}
+            <details class="mt-4" open>
+                <summary class="cursor-pointer text-xs font-semibold uppercase tracking-wide text-emerald-700 dark:text-emerald-300">
+                    Created employees ({{ report.created|length }})
+                </summary>
+                <div class="overflow-x-auto mt-2">
+                    <table class="table-simple text-sm">
+                        <thead>
+                            <tr><th>Full Name</th><th>Employee ID</th><th>Email</th><th>Password</th><th>Department</th></tr>
+                        </thead>
+                        <tbody>
+                            {% for row in report.created %}
+                                <tr class="text-emerald-700 dark:text-emerald-300">
+                                    <td>{{ row.full_name }}</td>
+                                    <td>{{ row.employee_id }}</td>
+                                    <td>{{ row.email }}</td>
+                                    <td class="font-mono">{{ row.generated_password }}</td>
+                                    <td>{{ row.department.name }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </details>
+            <form method="post" action="{% url 'user_bulk_create_results' %}" class="mt-4">
+                {% csrf_token %}
+                {% for row in report.created %}
+                    <input type="hidden" name="pk" value="{{ row.created_employee_pk }}">
+                    <input type="hidden" name="password" value="{{ row.generated_password }}">
+                {% endfor %}
+                <button type="submit" class="btn-primary">
+                    <i data-lucide="download" class="w-4 h-4"></i><span>Download results workbook</span>
+                </button>
+                <span class="text-xs text-text-mute ml-2">
+                    Employee ID + Email + a one-time password filled in — the new joiner can sign
+                    in and fill in their own profile right away, before IT has necessarily set up
+                    Entra. This is the only place the password is shown; it isn't stored anywhere
+                    in plaintext, so re-download now if you need it again.
+                </span>
+            </form>
+        {% endif %}
+    {% endif %}
+</div>

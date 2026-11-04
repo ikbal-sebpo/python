@@ -1,0 +1,45 @@
+{% comment %}
+    Shared audit timeline for one DedicatedNightShiftAssignment. Included by
+    both the drawer fragment and the full-page fallback so the two can't
+    drift. Expects `assignment` + `events`.
+{% endcomment %}
+<ol class="relative space-y-4 pl-6">
+    <span class="absolute left-[7px] top-1.5 bottom-1.5 w-px bg-bg-soft dark:bg-white/10" aria-hidden="true"></span>
+
+    {% for e in events %}
+        <li class="relative">
+            <span class="absolute -left-6 top-1 flex h-3.5 w-3.5 items-center justify-center rounded-full
+                         {% if e.event == 'APPROVED' %}bg-emerald-500{% elif e.event == 'DECLINED' %}bg-red-500{% elif e.event == 'DEMOTED' %}bg-amber-400{% elif e.event == 'CANCELLED' %}bg-gray-400{% else %}bg-brand-accent{% endif %}"
+                  aria-hidden="true"></span>
+
+            <div class="text-sm font-medium text-text-main dark:text-white">
+                {{ e.get_event_display }}
+            </div>
+
+            <div class="text-xs text-text-mute dark:text-white/50">
+                {{ e.occurred_at|date:"Y-m-d H:i" }} ·
+                {% if e.actor %}
+                    {{ e.actor.display_name }}
+                {% else %}
+                    <span class="badge badge-muted text-[10px]">Imported</span>
+                {% endif %}
+            </div>
+
+            {% if e.window_changed %}
+                <div class="mt-1 text-xs tabular-nums text-text-soft dark:text-white/60">
+                    <span class="line-through opacity-60">{{ e.old_start_date|date:"Y-m-d" }} → {{ e.old_end_date|date:"Y-m-d" }}</span>
+                    <span class="mx-1">⇒</span>
+                    <span class="font-medium">{{ e.new_start_date|date:"Y-m-d" }} → {{ e.new_end_date|date:"Y-m-d" }}</span>
+                </div>
+            {% endif %}
+
+            {% if e.note %}
+                <div class="mt-1 text-xs italic text-text-mute dark:text-white/40">{{ e.note }}</div>
+            {% endif %}
+        </li>
+    {% empty %}
+        <li class="text-sm text-text-mute dark:text-white/40 italic">
+            No history recorded for this assignment.
+        </li>
+    {% endfor %}
+</ol>

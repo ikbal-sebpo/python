@@ -1,0 +1,13 @@
+<form method="post" action="{% url 'leave_approve' row.pk %}" class="inline"
+      hx-post="{% url 'leave_approve' row.pk %}"
+      hx-target="#leave-row-{{ row.pk }}"
+      hx-swap="outerHTML">
+    {% csrf_token %}
+    <button type="submit" class="text-xs text-brand hover:underline dark:text-brand-accent inline-flex items-center gap-1">
+        <i data-lucide="check" class="w-3 h-3"></i>Approve
+    </button>
+</form>
+<a href="{% url 'leave_detail' row.pk %}"
+   class="text-xs text-red-600 dark:text-red-400 hover:underline ml-3 inline-flex items-center gap-1">
+    <i data-lucide="x" class="w-3 h-3"></i>Decline
+</a>

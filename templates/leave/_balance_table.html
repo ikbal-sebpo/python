@@ -1,0 +1,93 @@
+{% comment %}
+Per-policy balance table with the per-row transaction-history drawer.
+
+Shared by the full page (leave/balance.html) and the drawer opened from the
+leave list (leave/_balance_drawer.html) — the same markup off the same view,
+so the two can't show different numbers.
+
+Params:
+  rows            from LeaveBalanceView
+  year            the ?year= filter, named in the AL cycle caption
+  wrapper_class   defaults to the full-page ".card p-0 table-scroll"; the
+                  drawer passes "card p-0" instead, since .table-scroll's
+                  flex-1/min-h-0 are meant for a .page-fill parent.
+
+`x-data` lives here rather than on the page root so the History toggle works
+in both hosts.
+{% endcomment %}
+<div class="{{ wrapper_class|default:'card p-0 table-scroll' }}" x-data="{ openPk: null }">
+    <table class="table-sticky min-w-full text-sm">
+        <thead>
+            <tr class="text-text-mute text-xs uppercase tracking-wider border-b border-bg-soft dark:border-white/10">
+                <th class="px-3 py-2 text-left">Leave type</th>
+                <th class="px-3 py-2 text-right">Opening</th>
+                <th class="px-3 py-2 text-right">Accrued</th>
+                <th class="px-3 py-2 text-right">Carried</th>
+                <th class="px-3 py-2 text-right">Used</th>
+                <th class="px-3 py-2 text-right">Encashed</th>
+                <th class="px-3 py-2 text-right">Available</th>
+                <th class="px-3 py-2"></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in rows %}
+                <tr class="border-b border-bg-soft/50 dark:border-white/5 hover:bg-bg-soft/40 dark:hover:bg-white/5{% if row.is_subject %} bg-brand-accent/10 dark:bg-brand-accent/10{% endif %}">
+                    <td class="px-3 py-2">
+                        <div class="font-medium">
+                            {{ row.name }}
+                            {% if row.is_subject %}
+                                <span class="ml-1 badge badge-info text-[10px]">Applied for</span>
+                            {% endif %}
+                        </div>
+                        <div class="text-[11px] text-text-mute">
+                            {% if row.is_paid %}Paid{% else %}Unpaid{% endif %}
+                            {% if row.frozen %}<span class="ml-1 badge badge-muted text-[10px]">Frozen</span>{% endif %}
+                        </div>
+                        {% if row.shows_current_cycle %}
+                            <div class="text-[11px] text-text-mute">
+                                Current cycle: {{ row.cycle_start }} – {{ row.cycle_end }}
+                                (not the {{ year }} filter above)
+                            </div>
+                        {% endif %}
+                    </td>
+                    <td class="px-3 py-2 text-right tabular-nums">{{ row.opening|floatformat:2 }}</td>
+                    <td class="px-3 py-2 text-right tabular-nums">
+                        {{ row.accrued|floatformat:2 }}
+                        {% if row.capped_at and row.accrued >= row.capped_at %}
+                            <span class="ml-1 badge badge-info text-[10px]" title="Accrual is capped at {{ row.capped_at }} days per cycle">Capped at {{ row.capped_at }}</span>
+                        {% endif %}
+                    </td>
+                    <td class="px-3 py-2 text-right tabular-nums">{{ row.carried_forward|floatformat:2 }}</td>
+                    <td class="px-3 py-2 text-right tabular-nums">{{ row.used|floatformat:2 }}</td>
+                    <td class="px-3 py-2 text-right tabular-nums">{{ row.encashed|floatformat:2 }}</td>
+                    <td class="px-3 py-2 text-right tabular-nums font-semibold">{{ row.available|floatformat:2 }}</td>
+                    <td class="px-3 py-2 text-right">
+                        <button type="button"
+                                class="text-xs text-brand hover:underline dark:text-brand-accent"
+                                @click="openPk = (openPk === {{ row.balance_pk }} ? null : {{ row.balance_pk }})">
+                            History
+                        </button>
+                    </td>
+                </tr>
+                <tr x-show="openPk === {{ row.balance_pk }}" x-cloak>
+                    <td colspan="8" class="px-3 py-3 bg-bg-soft/30 dark:bg-white/5">
+                        {% comment %} The endpoint returns a rendered fragment, not JSON — the
+                           audit columns need date formatting, display names and
+                           links back to the source application / roster week.
+                           `intersect once` rather than `load`: inside the drawer
+                           these rows only exist once it's open, and there's no
+                           point fetching every policy's ledger up front. {% endcomment %}
+                        <div hx-get="{% url 'leave_balance_transactions' row.balance_pk %}"
+                             hx-trigger="intersect once"
+                             hx-swap="innerHTML"
+                             class="text-xs">
+                            <div class="text-text-mute italic">Loading…</div>
+                        </div>
+                    </td>
+                </tr>
+            {% empty %}
+                <tr><td colspan="8" class="px-3 py-4 text-text-mute italic text-center">No balance rows yet.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>

@@ -1,0 +1,195 @@
+{% extends "base.html" %}
+{% block title %}Clearance queue · Orbis{% endblock %}
+{% block content %}
+<div class="page-fill">
+  <div class="shrink-0 flex flex-wrap items-end justify-between gap-4">
+    <div>
+      <h1 class="text-2xl font-semibold text-text-main dark:text-white">Clearance queue</h1>
+      <p class="mt-1 text-sm text-text-soft">One row per offboarding case with progress and next action.</p>
+    </div>
+    <div class="card min-w-[180px]">
+      <div class="text-xs uppercase text-text-soft">Waiting on me</div>
+      <div class="text-2xl font-semibold text-text-main dark:text-white">{{ waiting_count }}</div>
+    </div>
+  </div>
+
+  {% if unbacked_separations %}
+  {% comment %} Separations with a last_working_date but no Resignation behind them:
+     no clearance case exists, yet the nightly job still deactivates them on
+     schedule. HR converts each one by hand — separation type and reason
+     can't be inferred from a date. {% endcomment %}
+  <div class="card shrink-0 border-l-4 border-amber-500">
+    <div class="flex flex-wrap items-center justify-between gap-2">
+      <div>
+        <h2 class="text-sm font-semibold text-text-main dark:text-white">
+          Needs offboarding
+          <span class="badge badge-warning ml-1">{{ unbacked_separations|length }}</span>
+        </h2>
+        <p class="mt-1 text-xs text-text-soft">
+          Last working date is set, but no offboarding case exists — these employees lose
+          access on schedule with no clearance, exit interview or letters.
+        </p>
+      </div>
+    </div>
+    <div class="mt-3 table-scroll">
+      <table class="table-simple table-sticky min-w-full">
+        <thead>
+          <tr>
+            <th class="py-2 px-3 text-left">Employee</th>
+            <th class="py-2 px-3 text-left">Department</th>
+            <th class="py-2 px-3 text-left">LWD</th>
+            <th class="py-2 px-3 text-left">Access</th>
+            <th class="py-2 px-3 text-left">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for emp in unbacked_separations %}
+          <tr>
+            <td class="py-2 px-3">
+              <div class="font-medium text-text-main dark:text-white">{{ emp.display_name }}</div>
+              <div class="text-xs text-text-soft">{{ emp.email }}</div>
+            </td>
+            <td class="py-2 px-3 text-text-soft">{{ emp.department|default:"—" }}</td>
+            <td class="py-2 px-3 text-text-soft">{{ emp.last_working_date }}</td>
+            <td class="py-2 px-3">
+              {% if emp.is_active %}
+                <span class="badge badge-success">Active</span>
+              {% else %}
+                <span class="badge badge-warning">Deactivated</span>
+              {% endif %}
+            </td>
+            <td class="py-2 px-3">
+              <a class="btn-secondary text-xs"
+                 href="{% url 'offboarding:hr_create_resignation' %}?employee={{ emp.pk }}">
+                Start offboarding
+              </a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  {% endif %}
+
+  <form method="get" class="card shrink-0 overflow-x-auto">
+    <div class="flex min-w-max items-end gap-3 xl:gap-4">
+      <div class="min-w-[320px] flex-1">
+        <label for="{{ queue_form.q.id_for_label }}" class="mb-1 block text-xs font-medium uppercase tracking-wider text-text-main dark:text-white">
+          Search
+        </label>
+        {{ queue_form.q }}
+      </div>
+      <div class="min-w-[170px]">
+        <label for="{{ queue_form.employee_id.id_for_label }}" class="mb-1 block text-xs font-medium uppercase tracking-wider text-text-main dark:text-white">
+          Employee ID
+        </label>
+        {{ queue_form.employee_id }}
+      </div>
+      <div class="min-w-[200px]">
+        <label for="{{ queue_form.separation_type.id_for_label }}" class="mb-1 block text-xs font-medium uppercase tracking-wider text-text-main dark:text-white">
+          Separation type
+        </label>
+        {{ queue_form.separation_type }}
+      </div>
+      <div class="min-w-[170px]">
+        <label for="{{ queue_form.step_status.id_for_label }}" class="mb-1 block text-xs font-medium uppercase tracking-wider text-text-main dark:text-white">
+          Step status
+        </label>
+        {{ queue_form.step_status }}
+      </div>
+      <div class="min-w-[170px]">
+        <label for="{{ queue_form.case_status.id_for_label }}" class="mb-1 block text-xs font-medium uppercase tracking-wider text-text-main dark:text-white">
+          Case status
+        </label>
+        {{ queue_form.case_status }}
+      </div>
+      <div class="flex min-w-fit items-center gap-2 pt-1">
+        <button class="btn-primary" type="submit">Apply filters</button>
+        <a href="{% url 'offboarding:clearance_queue' %}" class="btn-secondary">Reset</a>
+      </div>
+    </div>
+  </form>
+
+  {% include "partials/_result_count.html" with count_noun="cases" %}
+
+  {% if queue_rows %}
+    <div class="space-y-4 table-scroll">
+      {% for row in queue_rows %}
+        <article class="card space-y-4 {% if row.waiting_on_me %}ring-2 ring-brand-accent/40{% endif %}">
+          <div class="flex flex-wrap items-start justify-between gap-4">
+            <div>
+              <div class="flex flex-wrap items-center gap-2">
+                <h2 class="text-lg font-semibold text-text-main dark:text-white">
+                  {{ row.case.resignation.employee.display_name }}
+                </h2>
+                <span class="badge badge-muted">{{ row.case.resignation.employee.employee_id|default:"No ID" }}</span>
+                {% if row.waiting_on_me %}
+                  <span class="badge badge-success">Waiting on me</span>
+                {% endif %}
+                {% if row.case.resignation.fell_short_of_notice %}
+                  <span class="badge badge-warning">Short {{ row.case.resignation.notice_shortfall_days }}d notice</span>
+                {% endif %}
+              </div>
+              <p class="mt-1 text-sm text-text-soft">
+                {{ row.case.resignation.get_separation_type_display }} ·
+                LWD {{ row.case.resignation.last_working_date }} ·
+                Case {{ row.case.get_status_display }}
+              </p>
+            </div>
+            <a href="{% url 'offboarding:case_detail' row.case.pk %}" class="btn-primary text-xs">Open case</a>
+          </div>
+
+          <div>
+            <div class="mb-1 flex items-center justify-between text-xs uppercase text-text-soft">
+              <span>Progress</span>
+              <span>{{ row.done }} / {{ row.total }}</span>
+            </div>
+            <div class="h-2 overflow-hidden rounded-full bg-bg-soft dark:bg-white/10">
+              <div class="h-full rounded-full bg-brand-accent" style="width: {{ row.progress_percent }}%;"></div>
+            </div>
+          </div>
+
+          <div class="grid gap-4 md:grid-cols-2">
+            <div>
+              <div class="text-xs uppercase text-text-soft">Next step</div>
+              {% if row.current_step %}
+                <div class="mt-1 font-medium text-text-main dark:text-white">
+                  {{ row.current_step.order }}. {{ row.current_step.step_name }}
+                </div>
+                <div class="text-sm text-text-soft">
+                  {{ row.current_step.get_status_display }}
+                  {% if row.current_step.assigned_user %}
+                    · {{ row.current_step.assigned_user.display_name }}
+                  {% elif row.current_step.assigned_group %}
+                    · {{ row.current_step.assigned_group.name }}
+                  {% endif %}
+                </div>
+              {% else %}
+                <div class="mt-1 text-sm text-text-soft">No pending step.</div>
+              {% endif %}
+            </div>
+
+            <div>
+              <div class="text-xs uppercase text-text-soft">Recent steps</div>
+              <div class="mt-2 flex flex-wrap gap-2 text-xs">
+                {% for step in row.steps %}
+                  <span class="badge {% if step.status == 'DONE' %}badge-success{% elif step.status == 'IN_PROGRESS' %}badge-warning{% else %}badge-muted{% endif %}">
+                    {{ step.order }}. {{ step.step_name }}
+                  </span>
+                {% endfor %}
+              </div>
+            </div>
+          </div>
+        </article>
+      {% endfor %}
+    </div>
+
+    {% include "partials/_pagination.html" %}
+  {% else %}
+    <div class="card">
+      <p class="text-sm text-text-soft">Nothing pending.</p>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

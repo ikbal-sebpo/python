@@ -1,0 +1,45 @@
+{% comment %}
+    Single-select employee search widget — type a name or employee ID, pick
+    one from live suggestions. Mirrors templates/policies/_adherent_picker.html's
+    htmx+Alpine idiom, simplified to a single selection. Results come from
+    employees.views.load_employees, rendered by
+    templates/employees/_employee_search_results.html.
+{% endcomment %}
+<div class="relative"
+     x-data="{
+        open: false,
+        selectedId: {% if widget.value %}'{{ widget.value }}'{% else %}null{% endif %},
+        selectedLabel: '{{ widget.selected_label|escapejs }}',
+        select(id, label) { this.selectedId = id; this.selectedLabel = label; this.open = false; },
+        clear() { this.selectedId = null; this.selectedLabel = ''; this.open = false; $refs.searchInput.value = ''; $nextTick(() => $refs.searchInput.focus()); },
+     }"
+     @click.outside="open = false">
+    <input type="hidden" name="{{ widget.name }}" :value="selectedId">
+
+    <div x-show="!selectedId">
+        <div class="relative">
+            <i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-text-mute"></i>
+            <input type="text" id="{{ widget.attrs.id }}" class="form-input pl-9 w-full" autocomplete="off"
+                   name="q"
+                   placeholder="Search name or employee ID"
+                   hx-get="{{ widget.search_url }}"
+                   hx-vals='{"for_employee": "{{ widget.for_employee_pk }}"}'
+                   hx-trigger="keyup changed delay:300ms, focus"
+                   hx-target="#{{ widget.name }}-results"
+                   hx-swap="innerHTML"
+                   hx-include="this"
+                   x-ref="searchInput"
+                   @focus="open = true">
+        </div>
+        <div id="{{ widget.name }}-results" x-show="open" x-cloak
+             class="menu-panel absolute z-10 mt-1 w-full max-h-56 overflow-y-auto divide-y divide-bg-soft dark:divide-white/10 empty:hidden">
+        </div>
+    </div>
+
+    <div x-show="selectedId" x-cloak class="form-input flex items-center justify-between gap-2">
+        <span x-text="selectedLabel"></span>
+        <button type="button" class="text-text-mute hover:text-text-main dark:hover:text-white" @click="clear()" aria-label="Clear">
+            <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+    </div>
+</div>

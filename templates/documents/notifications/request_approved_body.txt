@@ -1,0 +1,10 @@
+Hello {{ recipient.first_name|default:recipient.email }},
+
+Your request for "{{ request_obj.document_type.display_name }}" is approved and the PDF is ready.
+
+Download:  {{ download_url }}
+Verify:    {{ verify_url }}
+
+The verify link can be shared with anyone who wants to confirm the document is authentic.
+
+— Orbis

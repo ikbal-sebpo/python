@@ -1,0 +1,37 @@
+{% comment %}
+    Drawer body for revising a still-PENDING AttendanceCorrection. GET loads
+    this fragment into #drawer-body; POST re-renders it with errors, or (on
+    success) a bare 204 + HX-Trigger: orbis:drawer-close that the enclosing
+    page's Alpine x-data listens for (see attendance/list.html).
+{% endcomment %}
+<div class="drawer-body space-y-4">
+    {% if form.non_field_errors %}
+        <div class="rounded border border-red-200 bg-red-50 text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-300 px-3 py-2 text-sm">
+            {{ form.non_field_errors|striptags }}
+        </div>
+    {% endif %}
+
+    <p class="text-xs text-text-mute dark:text-white/50">
+        {{ correction.employee.display_name }} · {{ correction.date|date:"Y-m-d" }}.
+        Still pending — you can revise it until a manager acts on it.
+    </p>
+
+    <form method="post" id="correction-edit-form" action="{{ action_url }}"
+          hx-post="{{ action_url }}"
+          hx-target="#drawer-body"
+          hx-swap="innerHTML"
+          class="grid grid-cols-1 gap-4">
+        {% csrf_token %}
+        {% include "accounts/_field.html" with field=form.requested_check_in %}
+        {% include "accounts/_field.html" with field=form.requested_check_out %}
+        {% include "accounts/_field.html" with field=form.requested_time_in_office %}
+        {% include "accounts/_field.html" with field=form.reason %}
+    </form>
+</div>
+
+<div class="drawer-footer justify-end">
+    <button type="button" class="btn-secondary" @click="close()">Cancel</button>
+    <button type="submit" form="correction-edit-form" class="btn-primary">
+        <i data-lucide="save" class="w-4 h-4"></i><span>Save</span>
+    </button>
+</div>

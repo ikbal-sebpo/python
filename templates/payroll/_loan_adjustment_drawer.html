@@ -1,0 +1,37 @@
+{% comment %}Append-only balance adjustment: repaid outside payroll, waived, or a correction.{% endcomment %}
+<div class="drawer-body space-y-4">
+    {% if form.non_field_errors %}
+        <div class="rounded border border-red-200 bg-red-50 text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-300 px-3 py-2 text-sm">
+            {{ form.non_field_errors|striptags }}
+        </div>
+    {% endif %}
+    <dl class="grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-sm">
+        <dt class="text-text-mute">Employee</dt>
+        <dd class="font-medium">{{ loan.employee.display_name }}</dd>
+        <dt class="text-text-mute">Principal</dt>
+        <dd class="tabular-nums">{{ loan.principal|taka }}</dd>
+        <dt class="text-text-mute">Recovered so far</dt>
+        <dd class="tabular-nums">{{ balance.recovered|taka }}</dd>
+        <dt class="text-text-mute">Outstanding</dt>
+        <dd class="tabular-nums font-semibold">{{ balance.outstanding|taka }}</dd>
+    </dl>
+    <p class="text-xs text-text-mute">
+        Adjustments are permanent — a mistake is corrected with a second row, never by editing. Payroll instalments are
+        not entered here; they come from the register automatically.
+    </p>
+    <form method="post" id="loan-adjust-form" action="{{ action_url }}"
+          hx-post="{{ action_url }}" hx-target="#drawer-body" hx-swap="innerHTML"
+          class="grid grid-cols-1 gap-4">
+        {% csrf_token %}
+        {% include "accounts/_field.html" with field=form.reason %}
+        {% include "accounts/_field.html" with field=form.delta %}
+        {% include "accounts/_field.html" with field=form.occurred_on %}
+        {% include "accounts/_field.html" with field=form.note %}
+    </form>
+</div>
+<div class="drawer-footer justify-end">
+    <button type="button" class="btn-secondary" @click="close()">Cancel</button>
+    <button type="submit" form="loan-adjust-form" class="btn-primary">
+        <i data-lucide="save" class="w-4 h-4"></i><span>Record adjustment</span>
+    </button>
+</div>

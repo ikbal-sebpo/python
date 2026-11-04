@@ -1,0 +1,7 @@
+{# Top-left total-records label for list pages, e.g. "798 employees". #}
+{# Pass a noun via count_noun="users"; reads paginator.count (full total). #}
+{% if paginator %}
+<div class="shrink-0 text-sm font-medium text-text-main dark:text-white">
+    {{ paginator.count }} {{ count_noun|default:"records" }}
+</div>
+{% endif %}

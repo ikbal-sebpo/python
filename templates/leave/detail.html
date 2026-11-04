@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+{% block title %}{{ page_title }} · Orbis{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl" x-data="{ declining: false }">
+    <div class="card mb-4">
+        <div class="flex items-start justify-between gap-4">
+            <div>
+                <h1 class="text-xl font-semibold text-text-main dark:text-white">
+                    {{ application.leave_type.name }}
+                </h1>
+                <div class="text-sm text-text-soft dark:text-white/60 mt-1">
+                    For <strong>{{ application.employee.display_name }}</strong>
+                    ({{ application.employee.email }})
+                </div>
+            </div>
+            <div>
+                {% if application.status == 'PENDING' %}
+                    <span class="badge badge-info"><i data-lucide="clock" class="w-3 h-3"></i>Pending</span>
+                {% elif application.status == 'APPROVED' %}
+                    <span class="badge badge-success"><i data-lucide="check" class="w-3 h-3"></i>Approved</span>
+                {% elif application.status == 'DECLINED' %}
+                    <span class="badge" style="background:rgba(239,68,68,.15); color:#dc2626;"><i data-lucide="x" class="w-3 h-3"></i>Declined</span>
+                {% else %}
+                    <span class="badge badge-muted"><i data-lucide="slash" class="w-3 h-3"></i>Cancelled</span>
+                {% endif %}
+                {% if application.approved_over_balance %}
+                    <span class="badge badge-warning" title="Exceeded balance by {{ application.balance_shortfall_days }} day(s) at approval time.">⚠ Advance</span>
+                {% endif %}
+            </div>
+        </div>
+
+        <dl class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2 text-sm mt-6">
+            <div><dt class="text-text-mute text-xs">Start</dt><dd>{{ application.start_date|date:"Y-m-d" }}</dd></div>
+            <div><dt class="text-text-mute text-xs">End</dt><dd>{{ application.end_date|date:"Y-m-d" }}</dd></div>
+            <div><dt class="text-text-mute text-xs">Days (calendar)</dt><dd>{{ application.day_count }}</dd></div>
+            <div><dt class="text-text-mute text-xs">Half-day</dt><dd>{% if application.is_half_day %}Yes ({{ application.get_half_day_period_display }}){% else %}No{% endif %}</dd></div>
+            <div><dt class="text-text-mute text-xs">Working days</dt><dd>{{ application.working_days }}</dd></div>
+            <div><dt class="text-text-mute text-xs">Sandwich days</dt><dd>{{ application.sandwich_days }}</dd></div>
+            <div class="sm:col-span-2"><dt class="text-text-mute text-xs">Billed (effective)</dt><dd class="font-semibold">{{ application.effective_days }}</dd></div>
+            <div><dt class="text-text-mute text-xs">Applied by</dt><dd>{{ application.applied_by.display_name|default:"—" }} ({{ application.applied_at|date:"Y-m-d H:i" }})</dd></div>
+            {% if application.processed_by %}
+                <div><dt class="text-text-mute text-xs">Processed by</dt><dd>{{ application.processed_by.display_name }} ({{ application.processed_at|date:"Y-m-d H:i" }})</dd></div>
+            {% endif %}
+            {% if application.process_note %}
+                <div class="sm:col-span-2"><dt class="text-text-mute text-xs">Reason</dt><dd>{{ application.process_note }}</dd></div>
+            {% endif %}
+            {% if application.note %}
+                <div class="sm:col-span-2"><dt class="text-text-mute text-xs">Note</dt><dd class="whitespace-pre-line">{{ application.note }}</dd></div>
+            {% endif %}
+            {% if application.attachment %}
+                <div class="sm:col-span-2"><dt class="text-text-mute text-xs">Attachment</dt>
+                    <dd><a href="{{ application.attachment.url }}" class="text-brand hover:underline dark:text-brand-accent">Download</a></dd></div>
+            {% endif %}
+        </dl>
+    </div>
+
+    {% if can_edit %}
+        <div class="card mb-4 flex flex-wrap items-center justify-between gap-3">
+            <p class="text-sm text-text-soft dark:text-white/60">
+                Still pending — the dates, type, note and attachment can be revised until a manager acts on it.
+            </p>
+            <a href="{% url 'leave_edit' application.pk %}" class="btn-secondary">
+                <i data-lucide="pencil" class="w-4 h-4"></i><span>Edit request</span>
+            </a>
+        </div>
+    {% endif %}
+
+    {% if can_act %}
+        <div class="card mb-4">
+            <h2 class="text-sm font-semibold uppercase tracking-wider text-text-mute mb-3">Process request</h2>
+            <div class="flex flex-wrap gap-2">
+                <form method="post" action="{% url 'leave_approve' application.pk %}" class="inline">
+                    {% csrf_token %}
+                    <button type="submit" class="btn-primary">
+                        <i data-lucide="check" class="w-4 h-4"></i><span>Approve</span>
+                    </button>
+                </form>
+                <button type="button" class="btn-secondary text-red-600 dark:text-red-400"
+                        @click="declining = !declining">
+                    <i data-lucide="x" class="w-4 h-4"></i><span>Decline…</span>
+                </button>
+            </div>
+
+            <form x-show="declining" x-cloak method="post" action="{% url 'leave_decline' application.pk %}"
+                  class="mt-4 space-y-3">
+                {% csrf_token %}
+                <label class="form-label" for="decline-note">Reason (shown to the applicant)</label>
+                <textarea id="decline-note" name="process_note" rows="3" class="form-input" required></textarea>
+                <button type="submit" class="btn-primary bg-red-600 hover:bg-red-700 focus:ring-red-400">
+                    <i data-lucide="x" class="w-4 h-4"></i><span>Confirm decline</span>
+                </button>
+            </form>
+        </div>
+    {% endif %}
+
+    {% if can_cancel %}
+        <div class="card mb-4">
+            <h2 class="text-sm font-semibold uppercase tracking-wider text-text-mute mb-3">Cancel request</h2>
+            <form method="post" action="{% url 'leave_cancel' application.pk %}" class="flex items-center gap-3">
+                {% csrf_token %}
+                <input type="text" name="process_note" placeholder="Reason (optional)" class="form-input flex-1">
+                <button type="submit" class="btn-secondary text-red-600 dark:text-red-400">
+                    <i data-lucide="trash-2" class="w-4 h-4"></i><span>Cancel leave</span>
+                </button>
+            </form>
+            {% if application.status == 'APPROVED' %}
+                <p class="text-xs text-text-mute mt-2">
+                    Cancelling an approved leave will remove the corresponding shifts from the roster.
+                </p>
+            {% endif %}
+        </div>
+    {% endif %}
+
+    <div class="mt-4">
+        <a href="{% url 'leave_list' %}" class="btn-secondary">
+            <i data-lucide="arrow-left" class="w-4 h-4"></i><span>Back to leave list</span>
+        </a>
+    </div>
+</div>
+{% endblock %}

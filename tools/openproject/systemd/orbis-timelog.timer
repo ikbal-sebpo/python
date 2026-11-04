@@ -1,0 +1,11 @@
+[Unit]
+Description=Daily Orbis → OpenProject time log (after Orbis's 10:00 punch sync)
+
+[Timer]
+OnCalendar=*-*-* 11:00
+# Missed while the machine was off or logged out? Run at the next login.
+Persistent=true
+RandomizedDelaySec=300
+
+[Install]
+WantedBy=timers.target

@@ -1,0 +1,15 @@
+{% if rows %}
+    <ul class="space-y-2 text-sm">
+        {% for row in rows %}
+            <li class="flex items-center justify-between gap-3">
+                <div class="min-w-0">
+                    <span class="font-medium">{{ row.vaccine }}</span>
+                    <span class="text-text-soft dark:text-white/60">· {{ row.dose }} · {{ row.taken_date }}</span>
+                </div>
+                {% include "employees/sections/_row_actions.html" %}
+            </li>
+        {% endfor %}
+    </ul>
+{% else %}
+    {% include "employees/sections/_empty.html" %}
+{% endif %}

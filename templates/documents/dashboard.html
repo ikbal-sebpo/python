@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+{% block title %}Documents · Orbis{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+  <div class="flex items-center justify-between gap-4">
+    <h1 class="text-2xl font-semibold text-text-main dark:text-white">Documents</h1>
+    <a href="{% url 'documents:request_start' %}" class="btn-primary">
+      <i data-lucide="plus" class="w-4 h-4"></i><span>Request a document</span>
+    </a>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+    <div class="card">
+      <h2 class="font-semibold text-text-main dark:text-white mb-3">My recent requests</h2>
+      {% if my_recent_requests %}
+        <ul class="divide-y divide-bg-soft dark:divide-white/10 text-sm">
+          {% for r in my_recent_requests %}
+            <li class="py-2.5 flex items-center justify-between gap-3">
+              <div class="min-w-0">
+                <a href="{% url 'documents:request_detail' r.id %}"
+                   class="font-medium text-text-main dark:text-white hover:underline truncate block">
+                  {{ r.document_type.display_name }}
+                </a>
+                <div class="text-xs text-text-soft dark:text-white/60">
+                  {{ r.applied_at|date:"Y-m-d H:i" }}
+                </div>
+              </div>
+              <span class="badge badge-muted text-xs">{{ r.get_status_display }}</span>
+            </li>
+          {% endfor %}
+        </ul>
+        <a href="{% url 'documents:my_documents' %}"
+           class="block text-sm mt-3 text-brand-accent hover:underline">View all →</a>
+      {% else %}
+        <p class="text-sm text-text-soft dark:text-white/60">You haven't requested anything yet.</p>
+      {% endif %}
+    </div>
+
+    <div class="card">
+      <h2 class="font-semibold text-text-main dark:text-white mb-3">Available document types</h2>
+      {% if available_doc_types %}
+        <ul class="space-y-2 text-sm">
+          {% for dt in available_doc_types %}
+            <li>
+              <a href="{% url 'documents:request_form' dt.id %}"
+                 class="flex items-center justify-between gap-3 px-2 py-1.5 rounded hover:bg-bg-soft dark:hover:bg-white/5">
+                <span class="text-text-main dark:text-white">{{ dt.display_name }}</span>
+                <i data-lucide="chevron-right" class="w-4 h-4 text-text-soft"></i>
+              </a>
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p class="text-sm text-text-soft dark:text-white/60">No document types configured. Ask an admin.</p>
+      {% endif %}
+    </div>
+
+    {% if pending_reviews %}
+      <div class="card lg:col-span-1">
+        <h2 class="font-semibold text-text-main dark:text-white mb-3">Pending my review</h2>
+        <ul class="divide-y divide-bg-soft dark:divide-white/10 text-sm">
+          {% for rv in pending_reviews %}
+            <li class="py-2 flex items-center justify-between gap-3">
+              <div class="min-w-0">
+                <a href="{% url 'documents:review_action' rv.pk %}"
+                   class="font-medium text-text-main dark:text-white hover:underline truncate block">
+                  {{ rv.request.employee.display_name }} · {{ rv.request.document_type.display_name }}
+                </a>
+                <div class="text-xs text-text-soft dark:text-white/60">
+                  Step {{ rv.order }} · {{ rv.reviewer_group.name }}
+                </div>
+              </div>
+              <a href="{% url 'documents:review_action' rv.pk %}" class="btn-secondary text-xs">Review</a>
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
+    {% endif %}
+
+    {% if pending_approvals %}
+      <div class="card lg:col-span-1">
+        <h2 class="font-semibold text-text-main dark:text-white mb-3">Pending my approval</h2>
+        <ul class="divide-y divide-bg-soft dark:divide-white/10 text-sm">
+          {% for ap in pending_approvals %}
+            <li class="py-2 flex items-center justify-between gap-3">
+              <div class="min-w-0">
+                <a href="{% url 'documents:approval_action' ap.pk %}"
+                   class="font-medium text-text-main dark:text-white hover:underline truncate block">
+                  {{ ap.request.employee.display_name }} · {{ ap.request.document_type.display_name }}
+                </a>
+                <div class="text-xs text-text-soft dark:text-white/60">
+                  Step {{ ap.order }} · {{ ap.approver_group.name }}
+                </div>
+              </div>
+              <a href="{% url 'documents:approval_action' ap.pk %}" class="btn-secondary text-xs">Approve</a>
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
+    {% endif %}
+
+  </div>
+</div>
+{% endblock %}

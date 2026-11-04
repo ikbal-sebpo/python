@@ -1,0 +1,49 @@
+{% comment %}
+    Drawer body for adding or revising one OvertimeEntry. GET loads this
+    fragment into #drawer-body; an invalid POST re-renders it with errors
+    (status 400), a valid one answers 204 + HX-Redirect back to the list —
+    unlike the attendance correction drawer's bare drawer-close, because the
+    row's own visible values change here.
+{% endcomment %}
+<div class="drawer-body space-y-4">
+    {% if form.non_field_errors %}
+        <div class="rounded border border-red-200 bg-red-50 text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-300 px-3 py-2 text-sm">
+            {{ form.non_field_errors|striptags }}
+        </div>
+    {% endif %}
+
+    <p class="text-xs text-text-mute dark:text-white/50">
+        {% if entry %}
+            {{ entry.employee.display_name }}{% if entry.employee.employee_id %} · {{ entry.employee.employee_id }}{% endif %}
+            — filed {{ entry.added_at|date:"Y-m-d" }}{% if entry.added_by %} by {{ entry.added_by.display_name }}{% endif %}.
+            The employee can't be changed; delete and re-add instead.
+            {% if entry.status == 'REVIEWED' or entry.status == 'APPROVED' %}
+                Changing the date, type, team or hours sends it back to <span class="font-medium">Pending review</span>.
+            {% endif %}
+        {% else %}
+            Entries dated before {{ window.floor|date:"Y-m-d" }} can't be filed — that period's payroll inputs are closed.
+            A new entry starts as <span class="font-medium">Pending review</span>.
+        {% endif %}
+    </p>
+
+    <form method="post" id="overtime-entry-form" action="{{ action_url }}"
+          hx-post="{{ action_url }}"
+          hx-target="#drawer-body"
+          hx-swap="innerHTML"
+          class="grid grid-cols-1 gap-4">
+        {% csrf_token %}
+        {% include "accounts/_field.html" with field=form.employee %}
+        {% include "accounts/_field.html" with field=form.work_date %}
+        {% include "accounts/_field.html" with field=form.worked_in %}
+        {% include "accounts/_field.html" with field=form.overtime_type %}
+        {% include "accounts/_field.html" with field=form.ot_hours %}
+        {% include "accounts/_field.html" with field=form.note %}
+    </form>
+</div>
+
+<div class="drawer-footer justify-end">
+    <button type="button" class="btn-secondary" @click="close()">Cancel</button>
+    <button type="submit" form="overtime-entry-form" class="btn-primary">
+        <i data-lucide="save" class="w-4 h-4"></i><span>{% if entry %}Save{% else %}Add entry{% endif %}</span>
+    </button>
+</div>

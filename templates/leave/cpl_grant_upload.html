@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% block title %}Upload CpL grants · Orbis{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <h1 class="text-xl font-semibold">Upload Compensatory Leave grants</h1>
+    <p class="text-sm text-text-soft dark:text-white/60 mt-1">
+        For departments whose CpL entitlement can't be auto-detected from the roster
+        (e.g. Data Solutions &amp; Due Diligence, which decides CpL vs. overtime per employee
+        outside Orbis), or a one-time historical backfill for any other department. You can
+        only upload for employees within your own managed scope — HR/Admins can upload for
+        anyone.
+    </p>
+</div>
+
+<div class="card mb-4">
+    <h2 class="text-sm font-semibold mb-3">1. Download a template</h2>
+    <div class="flex flex-wrap items-center gap-2">
+        <a href="{% url 'cpl_grant_upload_template' %}" class="btn-secondary">
+            <i data-lucide="file-spreadsheet" class="w-4 h-4"></i><span>Excel template</span>
+        </a>
+        <span class="text-xs text-text-mute ml-2">
+            A blank 4-column workbook — fill in one row per employee/holiday earned.
+        </span>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <h2 class="text-sm font-semibold mb-2">2. File format</h2>
+    <p class="text-sm text-text-soft dark:text-white/70 mb-2">
+        One row per CpL grant, four columns, header on row 1:
+    </p>
+    <table class="table-simple text-sm mb-2">
+        <thead><tr><th>Employee ID</th><th>Working Date</th><th>Status</th><th>Consumed Date</th></tr></thead>
+        <tbody>
+            <tr><td>4850</td><td>2026-08-26</td><td>CONSUMED</td><td>2026-08-28</td></tr>
+            <tr><td>4977</td><td>2026-09-04</td><td>OPEN</td><td></td></tr>
+        </tbody>
+    </table>
+    <ul class="text-sm text-text-soft dark:text-white/70 list-disc pl-5 space-y-1">
+        <li><span class="font-medium">Working Date</span> must be an active government holiday on file in Orbis.</li>
+        <li><span class="font-medium">Status</span> is OPEN (earned, not yet taken) or CONSUMED — blank defaults to OPEN.</li>
+        <li><span class="font-medium">Consumed Date</span> is required when Status is CONSUMED; it can be before or
+            after the Working Date (some departments grant CpL in advance within the same week).</li>
+        <li>Idempotent per (employee, holiday) — re-uploading a row already imported is skipped, not duplicated.</li>
+        <li>There is no approval gate — your upload is final. Corrections after the fact go through a manual
+            adjustment in the <a href="{% url 'cpl_grant_list' %}" class="text-brand hover:underline dark:text-brand-accent">CpL register</a>
+            or Django admin.</li>
+    </ul>
+</div>
+
+<div class="card mb-4">
+    <h2 class="text-sm font-semibold mb-3">3. Upload your filled file</h2>
+    <form id="cpl-grant-upload-form"
+          method="post"
+          enctype="multipart/form-data"
+          hx-post="{% url 'cpl_grant_upload' %}"
+          hx-encoding="multipart/form-data"
+          hx-target="#upload-result"
+          hx-swap="innerHTML"
+          hx-indicator="#upload-spinner"
+          class="flex flex-wrap items-end gap-3">
+        {% csrf_token %}
+        <input type="file" name="file" accept=".xlsx,.csv" required class="form-input w-auto max-w-xs">
+        <button type="submit" name="action" value="preview" class="btn-secondary">
+            <i data-lucide="eye" class="w-4 h-4"></i><span>Preview only</span>
+        </button>
+        <button type="submit" name="action" value="apply" class="btn-primary">
+            <i data-lucide="upload-cloud" class="w-4 h-4"></i><span>Apply upload</span>
+        </button>
+        <span id="upload-spinner" class="htmx-indicator inline-flex items-center gap-1 text-xs text-text-mute">
+            <i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i>Working…
+        </span>
+    </form>
+    <p class="text-xs text-text-mute mt-2">
+        Tip: click <span class="font-medium">Preview only</span> first to see what will change without writing,
+        then click <span class="font-medium">Apply upload</span> — the file stays attached, no need to re-upload.
+    </p>
+</div>
+
+<div id="upload-result">
+    {% if report or inline_error %}
+        {% include "leave/_cpl_grant_upload_report.html" with report=report preview=preview aborted=aborted inline_error=inline_error %}
+    {% endif %}
+</div>
+
+<script>
+    document.body.addEventListener('htmx:afterSwap', function (evt) {
+        if (window.lucide && typeof window.lucide.createIcons === 'function') {
+            window.lucide.createIcons();
+        }
+    });
+</script>
+{% endblock %}

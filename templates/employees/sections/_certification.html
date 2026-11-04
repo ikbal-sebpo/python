@@ -1,0 +1,15 @@
+{% if rows %}
+    <ul class="space-y-3 text-sm">
+        {% for row in rows %}
+            <li class="flex items-start justify-between gap-3">
+                <div class="min-w-0">
+                    <div class="font-medium">{{ row.certificate_name }}</div>
+                    {% if row.certificate_institution or row.certificate_year %}<div class="text-text-soft dark:text-white/60 text-xs">{{ row.certificate_institution|default:"—" }} · {{ row.certificate_year|default:"—" }}</div>{% else %}<div class="text-text-mute text-xs italic">Institution and year not yet on file</div>{% endif %}
+                </div>
+                {% include "employees/sections/_row_actions.html" %}
+            </li>
+        {% endfor %}
+    </ul>
+{% else %}
+    {% include "employees/sections/_empty.html" %}
+{% endif %}

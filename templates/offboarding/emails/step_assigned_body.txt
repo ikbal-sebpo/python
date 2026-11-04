@@ -1,0 +1,15 @@
+Hello {{ recipient.first_name|default:recipient.email }},
+
+An offboarding clearance step needs your attention.
+
+Employee:           {{ resignation.employee.display_name }} ({{ resignation.employee.email }})
+Step:               {{ step.step_name }} (step {{ step.order }})
+Last working day:   {{ resignation.last_working_date }}
+
+{% if step.template.instruction %}Instructions:
+{{ step.template.instruction }}
+{% endif %}
+
+Open the Clearance Queue in Orbis Offboarding to take action.
+
+— Orbis

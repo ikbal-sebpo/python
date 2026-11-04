@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+{% load menu_extras %}
+{% block title %}Pending salary changes · Orbis{% endblock %}
+
+{% block content %}
+<div class="page-fill">
+    <div class="card shrink-0">
+        <form method="get" class="flex flex-wrap items-center gap-2">
+            {% include "partials/_employee_filter_controls.html" %}
+            <button type="submit" class="btn-secondary">Search</button>
+            <a href="{% url 'payroll_salary_list' %}" class="btn-secondary">
+                <i data-lucide="list" class="w-4 h-4"></i><span>All gross salaries</span>
+            </a>
+        </form>
+        <p class="mt-3 text-xs text-text-mute">
+            Salary revisions proposed automatically from an employee's team package — a trainee going
+            live, a transfer. Nobody's pay changes until one is approved here; until then they keep
+            their current figure. After approving, <span class="font-medium">recalculate</span> any
+            payroll run covering the effective date.
+        </p>
+    </div>
+
+    {% include "partials/_result_count.html" with count_noun="proposals" %}
+
+    <div class="card p-0 table-scroll">
+        <table class="table-simple table-sticky min-w-full text-sm">
+            <thead>
+                <tr>
+                    <th class="text-left">Emp ID</th>
+                    <th class="text-left">Name</th>
+                    <th class="text-left">Department</th>
+                    <th class="text-left">Team</th>
+                    <th class="text-left">Effective from</th>
+                    <th class="text-right">Current</th>
+                    <th class="text-right">Proposed</th>
+                    <th class="text-right">Change</th>
+                    <th class="text-left">Reason</th>
+                    <th class="text-right">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for s in structures %}
+                    <tr>
+                        <td class="tabular-nums">{{ s.employee.employee_id|default:"—" }}</td>
+                        <td class="font-medium whitespace-nowrap">{{ s.employee.display_name }}</td>
+                        <td class="whitespace-nowrap">{{ s.employee.department|default:"—" }}</td>
+                        <td class="whitespace-nowrap">{{ s.employee.team|default:"—" }}</td>
+                        <td class="whitespace-nowrap tabular-nums">{{ s.effective_from|date:"Y-m-d" }}</td>
+                        <td class="text-right tabular-nums">
+                            {% if s.current_gross %}{{ s.current_gross|taka  }}{% else %}—{% endif %}
+                        </td>
+                        <td class="text-right tabular-nums font-semibold">{{ s.gross_monthly|taka  }}</td>
+                        <td class="text-right tabular-nums">
+                            {% if s.delta is None %}
+                                <span class="text-text-mute">new</span>
+                            {% elif s.delta > 0 %}
+                                <span class="text-emerald-600 dark:text-emerald-400">+{{ s.delta|taka  }}</span>
+                            {% elif s.delta < 0 %}
+                                <span class="text-red-600 dark:text-red-400">{{ s.delta|taka  }}</span>
+                            {% else %}
+                                <span class="text-text-mute">—</span>
+                            {% endif %}
+                        </td>
+                        <td class="whitespace-nowrap">
+                            {{ s.get_reason_display }}
+                            {% if s.note %}
+                                <span class="block text-xs text-text-mute">{{ s.note }}</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-right whitespace-nowrap">
+                            <form method="post" action="{% url 'payroll_salary_decide' s.pk 'approve' %}" class="inline">
+                                {% csrf_token %}
+                                <button type="submit"
+                                        class="p-1.5 rounded text-text-mute hover:bg-bg-soft hover:text-emerald-600 dark:hover:bg-white/5"
+                                        title="Approve — supersedes their current salary from the effective date">
+                                    <i data-lucide="check" class="w-4 h-4"></i>
+                                </button>
+                            </form>
+                            <form method="post" action="{% url 'payroll_salary_decide' s.pk 'reject' %}" class="inline">
+                                {% csrf_token %}
+                                <button type="submit"
+                                        class="p-1.5 rounded text-text-mute hover:bg-bg-soft hover:text-red-600 dark:hover:bg-white/5"
+                                        title="Reject — their salary is unchanged">
+                                    <i data-lucide="x" class="w-4 h-4"></i>
+                                </button>
+                            </form>
+                            <a href="{% url 'payroll_salary_detail' s.employee.pk %}"
+                               class="p-1.5 rounded inline-block text-text-mute hover:bg-bg-soft hover:text-brand dark:hover:bg-white/5 dark:hover:text-brand-accent"
+                               title="Salary history">
+                                <i data-lucide="history" class="w-4 h-4"></i>
+                            </a>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="10" class="text-center text-text-mute py-8">
+                            No salary changes are waiting for approval.
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% include "partials/_pagination.html" %}
+</div>
+{% endblock %}

@@ -1,0 +1,27 @@
+{% comment %}Cancel a loan that was never disbursed. An active loan is waived (adjustment) instead.{% endcomment %}
+<div class="drawer-body space-y-4">
+    <div class="flex items-start gap-3">
+        <div class="w-10 h-10 rounded bg-red-500/15 text-red-600 dark:text-red-400 flex items-center justify-center shrink-0">
+            <i data-lucide="alert-triangle" class="w-5 h-5"></i>
+        </div>
+        <div>
+            <h3 class="text-base font-semibold text-text-main dark:text-white">Cancel this loan?</h3>
+            <p class="text-sm text-text-soft dark:text-white/60 mt-1">
+                {{ loan.file_reference }} for {{ loan.employee.display_name }} — {{ loan.principal|taka }}.
+                The record stays, marked cancelled, and nothing will ever be deducted for it.
+            </p>
+        </div>
+    </div>
+    <form method="post" id="loan-cancel-form" action="{{ action_url }}"
+          hx-post="{{ action_url }}" hx-target="#drawer-body" hx-swap="innerHTML"
+          class="grid grid-cols-1 gap-4">
+        {% csrf_token %}
+        {% include "accounts/_field.html" with field=form.reason %}
+    </form>
+</div>
+<div class="drawer-footer justify-end">
+    <button type="button" class="btn-secondary" @click="close()">Keep it</button>
+    <button type="submit" form="loan-cancel-form" class="btn-primary bg-red-600 hover:bg-red-700 focus:ring-red-400">
+        <i data-lucide="ban" class="w-4 h-4"></i><span>Cancel loan</span>
+    </button>
+</div>

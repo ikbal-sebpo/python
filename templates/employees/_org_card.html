@@ -1,0 +1,46 @@
+{% comment %}
+One person on the org chart. Expects `node` (employees.org_chart.OrgNode),
+`visible_pks` (profile links only inside the viewer's scope) and, from
+_org_node.html, the Alpine scope `{ open, loaded }` when the card belongs
+to a manager. `compact` is set for the stacked individual-contributor list.
+{% endcomment %}
+{% with u=node.user %}
+<div class="org-card{% if is_root %} org-card--root{% endif %}{% if node.is_me %} org-card--me{% endif %}{% if node.manager_inactive %} org-card--warn{% endif %}{% if node.focused %} org-card--focus{% endif %}"
+     id="org-card-{{ node.pk }}">
+    {% if node.is_me %}<span class="org-pill">You</span>{% elif is_root %}<span class="org-pill">Top</span>{% endif %}
+    <div class="flex items-start gap-2.5">
+        <div class="org-avatar org-avatar--{{ node.hue }}">
+            {% if u.profile_picture %}
+                <img src="{{ u.profile_picture.url }}" alt="" loading="lazy" class="w-full h-full rounded-full object-cover">
+            {% else %}
+                {{ u.first_name|default:u.email|slice:":1"|upper }}{{ u.last_name|slice:":1"|upper }}
+            {% endif %}
+        </div>
+        <div class="min-w-0 flex-1">
+            {% if node.pk in visible_pks %}
+                <a href="{% url 'employee_detail' u.pk %}" class="org-name" title="Open profile">{{ u.display_name }}</a>
+            {% else %}
+                <div class="org-name">{{ u.display_name }}</div>
+            {% endif %}
+            <div class="org-title">{{ u.designation|default:"—" }}</div>
+            <div class="org-dept truncate" title="{{ u.department|default:'' }}{% if u.team %} · {{ u.team }}{% endif %}">
+                {{ u.department|default:"No department" }}{% if u.team %} · {{ u.team }}{% endif %}
+            </div>
+        </div>
+    </div>
+    {% if node.children %}
+        <div class="org-foot">
+            <span class="tabular-nums">{{ node.direct_count }} direct · {{ node.team_size }} total</span>
+            <button type="button" class="org-toggle" :aria-expanded="open.toString()"
+                    aria-controls="org-kids-{{ node.pk }}"
+                    {% if not node.open %}hx-get="{% url 'employee_org_chart_node' node.pk %}" hx-target="#org-kids-{{ node.pk }}" hx-swap="innerHTML" hx-trigger="click once" hx-indicator="#org-card-{{ node.pk }}"{% endif %}
+                    @click="open = !open">
+                <i data-lucide="chevron-right" class="w-3.5 h-3.5 transition-transform" :class="{ 'rotate-90': open }"></i>
+                <span x-text="open ? 'Hide' : 'Show'">{% if node.open %}Hide{% else %}Show{% endif %}</span>
+            </button>
+        </div>
+    {% elif node.manager_inactive %}
+        <div class="org-foot"><span>Manager has left · needs HR</span></div>
+    {% endif %}
+</div>
+{% endwith %}

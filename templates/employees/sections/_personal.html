@@ -1,0 +1,15 @@
+{% if object %}
+    <dl class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2 text-sm">
+        <div><dt class="text-text-mute text-xs">Date of birth</dt><dd>{{ object.date_of_birth|default:"—" }}</dd></div>
+        <div><dt class="text-text-mute text-xs">Gender</dt><dd>{{ object.get_gender_display|default:"—" }}</dd></div>
+        <div><dt class="text-text-mute text-xs">Blood group</dt><dd>{{ object.blood_group|default:"—" }}</dd></div>
+        <div><dt class="text-text-mute text-xs">Religion</dt><dd>{{ object.religion|default:"—" }}</dd></div>
+        <div><dt class="text-text-mute text-xs">Nationality</dt><dd>{{ object.nationality|default:"—" }}</dd></div>
+        <div><dt class="text-text-mute text-xs">Father</dt><dd>{{ object.father_name|default:"—" }}</dd></div>
+        <div><dt class="text-text-mute text-xs">Mother</dt><dd>{{ object.mother_name|default:"—" }}</dd></div>
+        <div><dt class="text-text-mute text-xs">Height / Weight</dt>
+             <dd>{{ object.height_in_inch|default:"—" }}{% if object.height_in_inch %}"{% endif %} / {{ object.weight_in_kg|default:"—" }}{% if object.weight_in_kg %}kg{% endif %}</dd></div>
+    </dl>
+{% else %}
+    {% include "employees/sections/_empty.html" %}
+{% endif %}

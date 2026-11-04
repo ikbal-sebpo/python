@@ -1,0 +1,48 @@
+{% comment %}
+    Drawer body for requesting a Dedicated Night Shift assignment for
+    ?for=<employee_pk> (profile card), or — with no ?for= — for an employee
+    picked in the form itself (the list page's "New request"). GET loads this fragment into #drawer-body; POST
+    re-renders it with errors, or (on success) a bare 204 + HX-Redirect back
+    to the assignment list.
+{% endcomment %}
+<div class="drawer-body space-y-4">
+    {% if target_employee %}
+        <div class="rounded border-l-4 border-brand-accent bg-bg-soft/40 dark:bg-white/5 px-3 py-2 text-sm">
+            For <strong>{{ target_employee.display_name }}</strong>
+            <span class="text-text-mute">({{ target_employee.email }})</span>
+        </div>
+    {% endif %}
+
+    {% if form.non_field_errors %}
+        <div class="rounded border border-red-200 bg-red-50 text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-300 px-3 py-2 text-sm">
+            {{ form.non_field_errors|striptags }}
+        </div>
+    {% endif %}
+
+    <p class="text-xs text-text-mute dark:text-white/50">
+        Only an APM-or-above manager can approve this request. Once approved and
+        active, every night shift this employee works during the window earns
+        the Dedicated Night Shift allowance instead of the regular rate.
+    </p>
+
+    <form method="post" id="dedicated-night-shift-request-form" action="{{ action_url }}"
+          hx-post="{{ action_url }}"
+          hx-target="#drawer-body"
+          hx-swap="innerHTML"
+          class="grid grid-cols-1 gap-4">
+        {% csrf_token %}
+        {% if form.employee %}
+            {% include "accounts/_field.html" with field=form.employee %}
+        {% endif %}
+        {% include "accounts/_field.html" with field=form.start_date %}
+        {% include "accounts/_field.html" with field=form.end_date %}
+        {% include "accounts/_field.html" with field=form.note %}
+    </form>
+</div>
+
+<div class="drawer-footer justify-end">
+    <button type="button" class="btn-secondary" @click="close()">Cancel</button>
+    <button type="submit" form="dedicated-night-shift-request-form" class="btn-primary">
+        <i data-lucide="send" class="w-4 h-4"></i><span>Submit request</span>
+    </button>
+</div>

@@ -1,0 +1,31 @@
+{% comment %}
+    Rendered by PolicyAdherentSearchView (htmx GET), swapped into
+    #adherent-search-results inside policies/_adherent_picker.html. The
+    checkbox's `@change`/`:checked` bindings reference the picker's own Alpine
+    scope (selectedAdherents / toggleAdherent) — Alpine auto-initialises
+    directives on nodes htmx swaps in, since they land inside that scope.
+{% endcomment %}
+{% if not q %}
+    <p class="px-3 py-6 text-sm text-text-soft dark:text-white/50 text-center">
+        Type a name, employee ID, or email to search.
+    </p>
+{% elif results %}
+    {% for u in results %}
+        <label class="flex items-center gap-2 px-3 py-2 cursor-pointer hover:bg-bg-soft dark:hover:bg-white/5">
+            <input type="checkbox" class="form-checkbox shrink-0"
+                   data-id="{{ u.pk }}"
+                   data-name="{{ u.get_full_name|default:u.email }}"
+                   data-email="{{ u.email }}"
+                   @change="toggleAdherent($event.target)"
+                   :checked="!!selectedAdherents['{{ u.pk }}']">
+            <span class="min-w-0 leading-tight">
+                <span class="block text-sm text-text-main dark:text-white truncate">{{ u.get_full_name|default:u.email }}</span>
+                <span class="block text-xs text-text-soft dark:text-white/50 truncate">
+                    {{ u.email }}{% if u.employee_id %} · {{ u.employee_id }}{% endif %}
+                </span>
+            </span>
+        </label>
+    {% endfor %}
+{% else %}
+    <p class="px-3 py-6 text-sm text-text-soft dark:text-white/50 text-center">No matches.</p>
+{% endif %}

@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+{% block title %}Request a shift change · Orbis{% endblock %}
+
+{% block content %}
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 max-w-5xl">
+
+    <div class="lg:col-span-2">
+        {% if applying_for_other %}
+            <div class="card mb-4 border-l-4 border-brand-accent">
+                <div class="text-sm">
+                    Requesting on behalf of
+                    <strong>{{ target_employee.display_name }}</strong>
+                    <span class="text-text-mute">({{ target_employee.email }})</span>
+                </div>
+            </div>
+        {% endif %}
+
+        {% if form.non_field_errors %}
+            <div class="mb-4 rounded border border-red-200 bg-red-50 text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-300 px-3 py-2 text-sm">
+                {{ form.non_field_errors|striptags }}
+            </div>
+        {% endif %}
+
+        <form id="shift-change-form"
+              method="post"
+              class="card space-y-4"
+              data-current-url="{% url 'shift_change_current' %}"
+              {% if form.is_bound %}data-bound="1"{% endif %}
+              {% if applying_for_other %}data-for="{{ target_employee.pk }}"{% endif %}>
+            {% csrf_token %}
+            {% if applying_for_other %}
+                <input type="hidden" name="for" value="{{ target_employee.pk }}">
+            {% endif %}
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="md:col-span-2">
+                    {% include "accounts/_field.html" with field=form.date %}
+                </div>
+                {% include "accounts/_field.html" with field=form.shift_ref %}
+                {% include "accounts/_field.html" with field=form.requested_location %}
+                <div class="md:col-span-2">
+                    {% include "accounts/_field.html" with field=form.reason %}
+                </div>
+            </div>
+
+            <div class="pt-4 border-t border-bg-soft dark:border-white/10 flex items-center gap-3">
+                <button type="submit" class="btn-primary">
+                    <i data-lucide="send" class="w-4 h-4"></i><span>Submit request</span>
+                </button>
+                <a href="{% url 'shift_change_list' %}" class="btn-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+
+    {# --- Current roster value for the picked date --- #}
+    <div class="lg:col-span-1">
+        <div class="card sticky top-4">
+            <h2 class="text-sm font-semibold uppercase tracking-wider text-text-mute mb-3">Currently on the roster</h2>
+            <div id="shift-change-current" class="text-sm space-y-3">
+                <p class="text-text-mute italic">Pick a date to see the shift and location currently rostered.</p>
+            </div>
+            <p class="mt-4 text-xs text-text-mute">
+                Only working shifts and weekly-off days can be requested here. Leave goes through
+                <a href="{% url 'leave_apply' %}" class="text-brand hover:underline dark:text-brand-accent">Apply for leave</a>.
+            </p>
+        </div>
+    </div>
+</div>
+
+<script>
+(function () {
+    const form = document.getElementById("shift-change-form");
+    if (!form) return;
+    const currentUrl = form.dataset.currentUrl;
+    const dateInput = form.querySelector('[name="date"]');
+    const shiftSelect = form.querySelector('[name="shift_ref"]');
+    const locSelect = form.querySelector('[name="requested_location"]');
+    const out = document.getElementById("shift-change-current");
+    // Pre-select the dropdowns to the current roster values only while the
+    // user hasn't touched them. "Touched" comes from change events, not from
+    // the select having a value — a <select> always has *some* value, so
+    // checking that would skip the pre-select every time. A re-render with
+    // errors (bound form) keeps whatever the user submitted.
+    const bound = form.dataset.bound === "1";
+    let userTouchedShift = bound;
+    let userTouchedLoc = bound;
+    shiftSelect.addEventListener("change", () => { userTouchedShift = true; });
+    locSelect.addEventListener("change", () => { userTouchedLoc = true; });
+
+    function esc(s) {
+        return String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+    }
+
+    function refresh() {
+        if (!dateInput.value) {
+            out.innerHTML = '<p class="text-text-mute italic">Pick a date to see the shift and location currently rostered.</p>';
+            return;
+        }
+        const fd = new FormData();
+        fd.append("date", dateInput.value);
+        const forPk = form.dataset.for;
+        if (forPk) fd.append("for", forPk);
+        const csrf = form.querySelector('[name=csrfmiddlewaretoken]').value;
+        fetch(currentUrl, {
+            method: "POST",
+            headers: { "X-CSRFToken": csrf },
+            body: fd,
+        }).then(r => r.json()).then(data => {
+            if (data.error) {
+                out.innerHTML = '<p class="text-red-600 dark:text-red-300 text-sm">' + esc(data.error) + '</p>';
+                return;
+            }
+            if (!userTouchedShift && data.current_shift_ref) {
+                shiftSelect.value = data.current_shift_ref;
+            }
+            if (!userTouchedLoc && data.current_location) {
+                locSelect.value = data.current_location;
+            }
+            const source = data.is_concrete
+                ? ""
+                : '<div class="text-xs text-text-mute">From the weekly pattern — no roster row exists for this date yet.</div>';
+            const warnings = (data.warnings || []).map(w =>
+                `<div class="text-xs px-2 py-1.5 rounded bg-amber-50 text-amber-800 border border-amber-200 dark:bg-amber-500/10 dark:text-amber-200 dark:border-amber-500/30">${esc(w)}</div>`
+            ).join("");
+            out.innerHTML = `
+                <dl class="space-y-2">
+                    <div class="flex justify-between"><dt class="text-text-mute">Date</dt><dd class="tabular-nums">${esc(dateInput.value)}</dd></div>
+                    <div class="flex justify-between"><dt class="text-text-mute">Shift</dt><dd class="font-semibold">${esc(data.current_label)}</dd></div>
+                    <div class="flex justify-between"><dt class="text-text-mute">Location</dt><dd class="font-semibold">${esc(data.current_location || "—")}</dd></div>
+                </dl>
+                ${source}
+                ${warnings}
+            `;
+        }).catch(() => {
+            out.innerHTML = '<p class="text-text-mute italic">Could not load the current roster value.</p>';
+        });
+    }
+
+    dateInput.addEventListener("change", refresh);
+    dateInput.addEventListener("input", refresh);
+    refresh();
+})();
+</script>
+{% endblock %}

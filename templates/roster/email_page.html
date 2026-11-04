@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}Email roster · Orbis{% endblock %}
+{% block content %}
+{# Direct-navigation fallback for the roster email drawer. #}
+<div x-data="{ close() { window.location.href = '{% url 'roster_week' %}?team={{ team.pk }}'; } }"
+     class="card p-0 max-w-5xl flex flex-col">
+    <div class="drawer-header"><h1 class="text-base font-semibold">Email roster — {{ team.name }}</h1></div>
+    <div id="drawer-body" class="contents">{% include "roster/_email_drawer.html" %}</div>
+</div>
+{% endblock %}

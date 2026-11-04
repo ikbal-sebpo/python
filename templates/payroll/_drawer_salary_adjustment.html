@@ -1,0 +1,47 @@
+{% comment %}
+    Drawer body for the run's salary-adjustment instruction
+    (docs/SALARY_ADJUSTMENT_PLAN.md §4): how many months of each employee's
+    owed balance this run settles. A plain POST to the run page's
+    `adjustment` action — the run is recalculated and the page reloads.
+{% endcomment %}
+<div class="drawer-body space-y-5">
+    <p class="text-sm text-text-soft dark:text-white/70">
+        When a salary is revised back to an earlier date (the January increment first paid in August, or a later
+        revision of it), every month since is short by the difference. Orbis derives that balance per employee from
+        the compensation master and what each month actually paid; you decide how many
+        <span class="font-medium">months</span> of it this run settles. A revision tops up the months already settled
+        automatically in the next instalment.
+    </p>
+
+    <dl class="grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
+        <dt class="text-text-mute">Run</dt><dd>{{ run.period }}</dd>
+        <dt class="text-text-mute">Currently</dt>
+        <dd>{% if run.adjustment_instruction_label %}<span class="font-medium">{{ run.adjustment_instruction_label }}</span>{% else %}<span class="text-text-mute">none</span>{% endif %}</dd>
+    </dl>
+
+    <form method="post" action="{{ action_url }}" class="flex flex-col gap-4">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="adjustment">
+        <div>
+            <label for="adjustment-months" class="block text-xs font-semibold uppercase tracking-wider text-text-mute mb-1">Months to settle in this run</label>
+            <select id="adjustment-months" name="months" class="form-input">
+                <option value="" {% if not run.adjustment_months and not run.adjustment_settle_all %}selected{% endif %}>None</option>
+                {% for n in adjustment_month_choices %}
+                    <option value="{{ n }}" {% if run.adjustment_months == n and not run.adjustment_settle_all %}selected{% endif %}>{{ n }} month{{ n|pluralize }}</option>
+                {% endfor %}
+                <option value="all" {% if run.adjustment_settle_all %}selected{% endif %}>All remaining months</option>
+            </select>
+            <p class="text-xs text-text-mute mt-1">
+                Company-wide for this run. An employee with fewer months left gets only what remains; one with nothing owed gets no line.
+            </p>
+        </div>
+        <div class="flex items-center gap-2">
+            <button type="submit" class="btn-primary"><i data-lucide="refresh-cw" class="w-4 h-4"></i><span>Set &amp; recalculate</span></button>
+            <button type="button" class="btn-secondary" @click="close()">Cancel</button>
+        </div>
+        <p class="text-xs text-text-mute">
+            Each paid employee gets one <span class="font-medium">Salary adjustment</span> line whose note says which months it settled and how many remain.
+            Months Orbis has no pay record for are assumed paid at the previous salary and flagged on the Exceptions tab.
+        </p>
+    </form>
+</div>

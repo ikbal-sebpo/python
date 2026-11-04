@@ -1,0 +1,35 @@
+{% load menu_extras %}
+{# Numbered pager + page-size picker for .page-fill list pages. #}
+{# Preserves GET params via qs_replace; needs page_sizes + current_page_size. #}
+{% if is_paginated %}
+<nav class="shrink-0 flex flex-wrap items-center justify-between gap-3 pt-1 text-sm">
+    <div class="text-text-soft dark:text-white/60">
+        Page {{ page_obj.number }} of {{ paginator.num_pages }} · {{ paginator.count }} total
+    </div>
+    <div class="flex items-center gap-3">
+        <ul class="flex items-center gap-1">
+            <li>{% if page_obj.has_previous %}<a class="pager-btn" href="?{% qs_replace page=1 %}" aria-label="First page">&laquo;</a>{% else %}<span class="pager-btn pager-disabled">&laquo;</span>{% endif %}</li>
+            <li>{% if page_obj.has_previous %}<a class="pager-btn" href="?{% qs_replace page=page_obj.previous_page_number %}" aria-label="Previous page">&lsaquo;</a>{% else %}<span class="pager-btn pager-disabled">&lsaquo;</span>{% endif %}</li>
+            {% for num in page_obj|elided_page_range %}
+                {% if num == page_obj.paginator.ELLIPSIS %}
+                    <li><span class="pager-ellipsis">{{ num }}</span></li>
+                {% elif num == page_obj.number %}
+                    <li><span class="pager-btn pager-current" aria-current="page">{{ num }}</span></li>
+                {% else %}
+                    <li><a class="pager-btn" href="?{% qs_replace page=num %}">{{ num }}</a></li>
+                {% endif %}
+            {% endfor %}
+            <li>{% if page_obj.has_next %}<a class="pager-btn" href="?{% qs_replace page=page_obj.next_page_number %}" aria-label="Next page">&rsaquo;</a>{% else %}<span class="pager-btn pager-disabled">&rsaquo;</span>{% endif %}</li>
+            <li>{% if page_obj.has_next %}<a class="pager-btn" href="?{% qs_replace page=paginator.num_pages %}" aria-label="Last page">&raquo;</a>{% else %}<span class="pager-btn pager-disabled">&raquo;</span>{% endif %}</li>
+        </ul>
+        {% if page_sizes %}
+            <select class="form-input !w-auto !py-1 text-sm" aria-label="Rows per page"
+                    onchange="location.href = this.value">
+                {% for size in page_sizes %}
+                    <option value="?{% qs_replace per_page=size page=1 %}" {% if size == current_page_size %}selected{% endif %}>{{ size }} / page</option>
+                {% endfor %}
+            </select>
+        {% endif %}
+    </div>
+</nav>
+{% endif %}

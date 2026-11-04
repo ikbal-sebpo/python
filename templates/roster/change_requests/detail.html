@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+{% block title %}{{ page_title }} · Orbis{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl" x-data="{ declining: false }">
+    <div class="card mb-4">
+        <div class="flex items-start justify-between gap-4">
+            <div>
+                <h1 class="text-xl font-semibold text-text-main dark:text-white">
+                    Shift change · {{ change_request.date|date:"D, Y-m-d" }}
+                </h1>
+                <div class="text-sm text-text-soft dark:text-white/60 mt-1">
+                    For <strong>{{ change_request.employee.display_name }}</strong>
+                    ({{ change_request.employee.email }})
+                </div>
+            </div>
+            <div>
+                {% if change_request.status == 'PENDING' %}
+                    <span class="badge badge-info"><i data-lucide="clock" class="w-3 h-3"></i>Pending</span>
+                {% elif change_request.status == 'APPROVED' %}
+                    <span class="badge badge-success"><i data-lucide="check" class="w-3 h-3"></i>Approved</span>
+                {% elif change_request.status == 'DECLINED' %}
+                    <span class="badge" style="background:rgba(239,68,68,.15); color:#dc2626;"><i data-lucide="x" class="w-3 h-3"></i>Declined</span>
+                {% else %}
+                    <span class="badge badge-muted"><i data-lucide="slash" class="w-3 h-3"></i>Cancelled</span>
+                {% endif %}
+            </div>
+        </div>
+
+        {# Before / after — only the half that actually changes is emphasised. #}
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6">
+            <div class="rounded-md border border-bg-soft dark:border-white/10 p-3">
+                <div class="text-xs uppercase tracking-wider text-text-mute mb-2">
+                    On the roster when filed
+                    {% if not change_request.original_was_concrete and change_request.original_label %}
+                        <span class="normal-case tracking-normal" title="No roster row existed for this date — this is the weekly pattern">(pattern)</span>
+                    {% endif %}
+                </div>
+                <div class="text-base {% if change_request.shift_changed %}line-through text-text-mute{% endif %}">
+                    {{ change_request.original_label|default:"Unscheduled" }}
+                </div>
+                <div class="mt-1 {% if change_request.location_changed %}opacity-50{% endif %}">
+                    {% include "roster/change_requests/_location_badge.html" with code=change_request.original_location %}
+                </div>
+            </div>
+            <div class="rounded-md border border-brand-accent/40 bg-brand-accent/5 p-3">
+                <div class="text-xs uppercase tracking-wider text-text-mute mb-2">Requested</div>
+                <div class="text-base {% if change_request.shift_changed %}font-semibold{% endif %}">
+                    {{ change_request.requested_label }}
+                    {% if not change_request.shift_changed %}<span class="text-xs text-text-mute">(unchanged)</span>{% endif %}
+                </div>
+                <div class="mt-1">
+                    {% include "roster/change_requests/_location_badge.html" with code=change_request.requested_location %}
+                    {% if not change_request.location_changed %}<span class="text-xs text-text-mute">(unchanged)</span>{% endif %}
+                </div>
+            </div>
+        </div>
+
+        <dl class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2 text-sm mt-6">
+            <div class="sm:col-span-2"><dt class="text-text-mute text-xs">Reason</dt><dd class="whitespace-pre-line">{{ change_request.reason }}</dd></div>
+            <div><dt class="text-text-mute text-xs">Requested by</dt><dd>{{ change_request.applied_by.display_name|default:"—" }} ({{ change_request.applied_at|date:"Y-m-d H:i" }})</dd></div>
+            {% if change_request.processed_by %}
+                <div><dt class="text-text-mute text-xs">Processed by</dt><dd>{{ change_request.processed_by.display_name }} ({{ change_request.processed_at|date:"Y-m-d H:i" }})</dd></div>
+            {% endif %}
+            {% if change_request.process_note %}
+                <div class="sm:col-span-2"><dt class="text-text-mute text-xs">Decision note</dt><dd>{{ change_request.process_note }}</dd></div>
+            {% endif %}
+        </dl>
+    </div>
+
+    {% if night_window_note %}
+        <div class="mb-4 px-3 py-2 rounded border border-amber-300 bg-amber-50 text-amber-800
+                    dark:border-amber-700/50 dark:bg-amber-900/20 dark:text-amber-200 text-sm flex items-start gap-2">
+            <i data-lucide="moon" class="w-4 h-4 mt-0.5 shrink-0"></i>
+            <span>{{ night_window_note }}</span>
+        </div>
+    {% endif %}
+
+    {% if can_act %}
+        <div class="card mb-4">
+            <h2 class="text-sm font-semibold uppercase tracking-wider text-text-mute mb-3">Process request</h2>
+            <p class="text-xs text-text-mute mb-3">
+                Approving writes the requested shift and location onto the roster for
+                {{ change_request.date|date:"Y-m-d" }} immediately.
+            </p>
+            <div class="flex flex-wrap gap-2">
+                <form method="post" action="{% url 'shift_change_approve' change_request.pk %}" class="inline">
+                    {% csrf_token %}
+                    <button type="submit" class="btn-primary">
+                        <i data-lucide="check" class="w-4 h-4"></i><span>Approve</span>
+                    </button>
+                </form>
+                <button type="button" class="btn-secondary text-red-600 dark:text-red-400"
+                        @click="declining = !declining">
+                    <i data-lucide="x" class="w-4 h-4"></i><span>Decline…</span>
+                </button>
+            </div>
+
+            <form x-show="declining" x-cloak method="post" action="{% url 'shift_change_decline' change_request.pk %}"
+                  class="mt-4 space-y-3">
+                {% csrf_token %}
+                <label class="form-label" for="decline-note">Reason (shown to the applicant)</label>
+                <textarea id="decline-note" name="process_note" rows="3" class="form-input" required></textarea>
+                <button type="submit" class="btn-primary bg-red-600 hover:bg-red-700 focus:ring-red-400">
+                    <i data-lucide="x" class="w-4 h-4"></i><span>Confirm decline</span>
+                </button>
+            </form>
+        </div>
+    {% endif %}
+
+    {% if can_cancel %}
+        <div class="card mb-4">
+            <h2 class="text-sm font-semibold uppercase tracking-wider text-text-mute mb-3">Cancel request</h2>
+            <form method="post" action="{% url 'shift_change_cancel' change_request.pk %}" class="flex items-center gap-3">
+                {% csrf_token %}
+                <input type="text" name="process_note" placeholder="Reason (optional)" class="form-input flex-1">
+                <button type="submit" class="btn-secondary text-red-600 dark:text-red-400">
+                    <i data-lucide="trash-2" class="w-4 h-4"></i><span>Cancel request</span>
+                </button>
+            </form>
+        </div>
+    {% endif %}
+
+    <div class="mt-4 flex flex-wrap gap-2">
+        <a href="{% url 'shift_change_list' %}" class="btn-secondary">
+            <i data-lucide="arrow-left" class="w-4 h-4"></i><span>Back to shift changes</span>
+        </a>
+        <a href="{% url 'roster_week' %}?employee={{ change_request.employee_id }}&from={{ change_request.date|date:'Y-m-d' }}&to={{ change_request.date|date:'Y-m-d' }}" class="btn-secondary">
+            <i data-lucide="calendar-days" class="w-4 h-4"></i><span>View on roster</span>
+        </a>
+    </div>
+</div>
+{% endblock %}

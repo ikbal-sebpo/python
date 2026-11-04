@@ -1,0 +1,95 @@
+{% comment %}
+Transaction history for one LeaveBalance, rendered into the drawer row on
+leave/balance.html. Server-rendered (not JSON) so the audit columns —
+which need date formatting, per-person display names and links back to the
+originating application or roster week — stay in the template layer.
+{% endcomment %}
+{% if rows %}
+<div class="overflow-x-auto">
+    <table class="min-w-full text-xs">
+        <thead>
+            <tr class="text-text-mute uppercase tracking-wider border-b border-bg-soft dark:border-white/10">
+                <th class="text-left pr-3 pb-1 whitespace-nowrap">Leave date</th>
+                <th class="text-left pr-3 pb-1">Reason</th>
+                <th class="text-right pr-3 pb-1">&Delta;</th>
+                <th class="text-left pr-3 pb-1">Source</th>
+                <th class="text-left pr-3 pb-1">Applied</th>
+                <th class="text-left pr-3 pb-1">Approved</th>
+                <th class="text-left pb-1">Recorded</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in rows %}
+                <tr class="border-b border-bg-soft/40 dark:border-white/5 align-top">
+                    <td class="pr-3 py-1 tabular-nums whitespace-nowrap">
+                        {% if row.leave_start %}
+                            {{ row.leave_start|date:"Y-m-d" }}
+                            {% if row.leave_end and row.leave_end != row.leave_start %}
+                                &ndash; {{ row.leave_end|date:"Y-m-d" }}
+                            {% endif %}
+                        {% else %}
+                            <span class="text-text-mute">&mdash;</span>
+                        {% endif %}
+                    </td>
+                    <td class="pr-3 py-1">
+                        {{ row.txn.get_reason_display }}
+                        {% if row.txn.note %}
+                            <div class="text-[11px] text-text-mute">{{ row.txn.note }}</div>
+                        {% endif %}
+                    </td>
+                    <td class="pr-3 py-1 text-right tabular-nums {% if row.txn.delta < 0 %}text-red-600 dark:text-red-400{% endif %}">
+                        {{ row.txn.delta }}
+                    </td>
+                    <td class="pr-3 py-1 whitespace-nowrap">
+                        {% if row.source_url %}
+                            <a href="{{ row.source_url }}"
+                               class="text-brand hover:underline dark:text-brand-accent">{{ row.source_label }}</a>
+                        {% elif row.source_label %}
+                            <span>{{ row.source_label }}</span>
+                        {% else %}
+                            <span class="text-text-mute">&mdash;</span>
+                        {% endif %}
+                    </td>
+                    <td class="pr-3 py-1">
+                        {% if row.applied_at %}
+                            {{ row.applied_by.display_name|default:"—" }}
+                            <div class="text-[11px] text-text-mute tabular-nums">{{ row.applied_at|date:"Y-m-d H:i" }}</div>
+                        {% else %}
+                            <span class="text-text-mute">&mdash;</span>
+                        {% endif %}
+                    </td>
+                    <td class="pr-3 py-1">
+                        {% if row.approved_at %}
+                            {{ row.approved_by.display_name|default:"—" }}
+                            <div class="text-[11px] text-text-mute tabular-nums">{{ row.approved_at|date:"Y-m-d H:i" }}</div>
+                        {% else %}
+                            <span class="text-text-mute">&mdash;</span>
+                        {% endif %}
+                    </td>
+                    <td class="py-1">
+                        <span class="tabular-nums">{{ row.recorded_at|date:"Y-m-d H:i" }}</span>
+                        <div class="text-[11px] text-text-mute">
+                            {% if row.recorded_by %}by {{ row.recorded_by.display_name }}{% else %}system{% endif %}
+                        </div>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% if has_untracked %}
+    <p class="mt-2 text-[11px] text-text-mute">
+        Rows with no application were set straight on the roster (or imported as
+        pre-Orbis history) &mdash; there is no apply/approve trail to show for those.
+    </p>
+{% endif %}
+{% else %}
+    <em class="text-text-mute">No transactions yet.</em>
+{% endif %}
+{% if accrual_is_live %}
+    <p class="mt-2 text-[11px] text-text-mute">
+        Accrual for this leave type is computed live from days worked in the
+        current cycle, so it has no ledger rows of its own &mdash; only usage,
+        carry-forward and manual adjustments appear above.
+    </p>
+{% endif %}

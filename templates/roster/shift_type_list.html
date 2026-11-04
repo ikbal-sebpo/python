@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% block title %}Shift types · Orbis{% endblock %}
+
+{% block content %}
+<div class="page-fill">
+<div class="card shrink-0 flex flex-wrap items-center gap-3">
+    <form method="get" class="flex items-center gap-2 flex-1 min-w-[240px]">
+        <div class="relative flex-1 max-w-md">
+            <i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-text-mute"></i>
+            <input type="text" name="q" value="{{ request.GET.q }}"
+                   placeholder="Search by name"
+                   class="form-input pl-9">
+        </div>
+        <button type="submit" class="btn-secondary">Search</button>
+    </form>
+    <a href="{% url 'shift_type_create' %}" class="btn-primary">
+        <i data-lucide="plus" class="w-4 h-4"></i><span>New shift type</span>
+    </a>
+</div>
+
+{% include "partials/_result_count.html" with count_noun="shift types" %}
+
+<div class="card p-0 table-scroll">
+    <table class="table-simple table-sticky">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Category</th>
+                <th>Order</th>
+                <th>Start</th>
+                <th>End</th>
+                <th>Active</th>
+                <th class="text-right">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for st in shift_types %}
+                <tr>
+                    <td class="font-medium">{{ st.name }}</td>
+                    <td>{{ st.get_category_display }}</td>
+                    <td>{{ st.sort_order }}</td>
+                    <td>{{ st.shift_start_time|default:"—"|time:"H:i" }}</td>
+                    <td>{{ st.shift_end_time|default:"—"|time:"H:i" }}</td>
+                    <td>
+                        {% if st.is_active %}
+                            <span class="badge badge-success"><i data-lucide="check" class="w-3 h-3"></i>Active</span>
+                        {% else %}
+                            <span class="badge badge-muted"><i data-lucide="x" class="w-3 h-3"></i>Disabled</span>
+                        {% endif %}
+                    </td>
+                    <td class="text-right">
+                        <a href="{% url 'shift_type_update' st.pk %}"
+                           class="inline-flex items-center gap-1 text-xs text-brand hover:underline dark:text-brand-accent">
+                            <i data-lucide="pencil" class="w-3.5 h-3.5"></i>Edit
+                        </a>
+                        <a href="{% url 'shift_type_delete' st.pk %}"
+                           class="inline-flex items-center gap-1 text-xs text-red-600 dark:text-red-400 hover:underline ml-3">
+                            <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>Delete
+                        </a>
+                    </td>
+                </tr>
+            {% empty %}
+                <tr><td colspan="7" class="text-center py-8 text-text-mute">No shift types yet.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% include "partials/_pagination.html" %}
+</div>
+{% endblock %}
