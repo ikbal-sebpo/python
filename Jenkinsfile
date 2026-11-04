@@ -100,10 +100,9 @@ stage('Create Artifact') {
               includes: 'release-staging.tar.gz'
     }
 }
+
 stage('Deploy Staging') {
     steps {
-        unstash 'staging-release'
-
         sshagent(credentials: ['staging-ssh-key']) {
             sh '''
                 set -e
@@ -115,38 +114,31 @@ stage('Deploy Staging') {
                     deploy@192.168.119.128:/tmp/release-staging.tar.gz
 
                 ssh -o StrictHostKeyChecking=accept-new \
-                    deploy@192.168.119.128 << 'ENDSSH'
+                    deploy@192.168.119.128 << 'EOF'
 
                     set -e
 
-                    mkdir -p /var/www/myproject
-
-                    tar -xzf /tmp/release-staging.tar.gz \
+                    tar --no-same-owner \
+                        --no-same-permissions \
+                        --no-overwrite-dir \
+                        -xzf /tmp/release-staging.tar.gz \
                         -C /var/www/myproject
 
                     cd /var/www/myproject
 
-                    if [ ! -d venv ]; then
-                        python3 -m venv venv
-                    fi
+                    . venv/bin/activate
 
-                    ./venv/bin/pip install -r requirements.txt
+                    pip install -r requirements.txt
 
-                    set -a
-                    . /etc/myproject.env
-                    set +a
-
-                    ./venv/bin/python manage.py collectstatic --noinput
+                    python manage.py collectstatic --noinput
 
                     sudo systemctl restart gunicorn
 
                     sudo systemctl is-active --quiet gunicorn
 
-                    rm -f /tmp/release-staging.tar.gz
+                    echo "Staging deployment successful"
 
-                    echo "Staging Deployment Successful"
-
-                ENDSSH
+                    EOF
             '''
         }
     }
