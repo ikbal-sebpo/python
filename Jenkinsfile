@@ -105,8 +105,6 @@ stage('Create Artifact') {
         sh '''
             set -e
 
-            echo "Creating Deployment Artifact"
-
             ARCHIVE_TMP="${WORKSPACE}@tmp/release-staging.tar.gz"
 
             mkdir -p "${WORKSPACE}@tmp"
@@ -123,71 +121,68 @@ stage('Create Artifact') {
 
             mv "$ARCHIVE_TMP" "$WORKSPACE/release-staging.tar.gz"
 
-            echo "Artifact Created Successfully"
             ls -lh release-staging.tar.gz
         '''
 
         archiveArtifacts artifacts: 'release-staging.tar.gz',
                          fingerprint: true
+
+        stash name: 'staging-release',
+              includes: 'release-staging.tar.gz'
     }
 }
 
-        stage('Deploy Staging') {
-            steps {
+stage('Deploy Staging') {
+    steps {
+        unstash 'staging-release'
 
-                unstash 'staging-release'
+        sshagent(credentials: ['staging-ssh-key']) {
+            sh '''
+                set -e
 
-                sshagent(credentials: [env.STAGING_CREDENTIAL]) {
+                echo "Deploying to Staging Server"
 
-                    sh '''
-                        set -e
+                scp -o StrictHostKeyChecking=accept-new \
+                    release-staging.tar.gz \
+                    deploy@192.168.119.128:/tmp/release-staging.tar.gz
 
-                        echo "Deploying to Staging Server"
+                ssh -o StrictHostKeyChecking=accept-new \
+                    deploy@192.168.119.128 << 'ENDSSH'
 
-                        scp -o StrictHostKeyChecking=accept-new \
-                            release-staging.tar.gz \
-                            ${DEPLOY_USER}@${STAGING_HOST}:/tmp/myproject-release.tar.gz
+                    set -e
 
-                        ssh -o StrictHostKeyChecking=accept-new \
-                            ${DEPLOY_USER}@${STAGING_HOST} 'bash -s' <<'REMOTE'
+                    mkdir -p /var/www/myproject
 
-                        set -e
+                    tar -xzf /tmp/release-staging.tar.gz \
+                        -C /var/www/myproject
 
-                        APP_DIR="/var/www/myproject"
+                    cd /var/www/myproject
 
-                        mkdir -p "$APP_DIR"
+                    if [ ! -d venv ]; then
+                        python3 -m venv venv
+                    fi
 
-                        tar -xzf /tmp/myproject-release.tar.gz -C "$APP_DIR"
+                    ./venv/bin/pip install -r requirements.txt
 
-                        rm -f /tmp/myproject-release.tar.gz
+                    set -a
+                    . /etc/myproject.env
+                    set +a
 
-                        cd "$APP_DIR"
+                    ./venv/bin/python manage.py collectstatic --noinput
 
-                        if [ ! -x venv/bin/python ]; then
-                            python3 -m venv venv
-                        fi
+                    sudo systemctl restart gunicorn
 
-                        venv/bin/pip install --upgrade pip
+                    sudo systemctl is-active --quiet gunicorn
 
-                        venv/bin/pip install -r requirements.txt
+                    rm -f /tmp/release-staging.tar.gz
 
-                        set -a
-                        source /etc/myproject.env
-                        set +a
+                    echo "Staging Deployment Successful"
 
-                        venv/bin/python manage.py collectstatic --noinput
-
-                        sudo -n /usr/bin/systemctl restart gunicorn
-
-                        sudo -n /usr/bin/systemctl is-active --quiet gunicorn
-
-                        echo "Staging Deployment Successful"
-
-REMOTE
-                    '''
-                }
-            }
+                ENDSSH
+            '''
         }
+    }
+}
 
         stage('Validate Production Version') {
 
