@@ -100,31 +100,37 @@ pipeline {
             }
         }
 
-        stage('Create Artifact') {
-            steps {
+stage('Create Artifact') {
+    steps {
+        sh '''
+            set -e
 
-                sh '''
-                    set -e
+            echo "Creating Deployment Artifact"
 
-                    tar -czf release-staging.tar.gz \
-                        --exclude=.git \
-                        --exclude=.ci-venv \
-                        --exclude=venv \
-                        --exclude=staticfiles \
-                        --exclude=media \
-                        --exclude=.env \
-                        --exclude=__pycache__ \
-                        .
-                '''
+            ARCHIVE_TMP="${WORKSPACE}@tmp/release-staging.tar.gz"
 
-                archiveArtifacts artifacts: 'release-staging.tar.gz'
+            mkdir -p "${WORKSPACE}@tmp"
 
-                stash(
-                    name: 'staging-release',
-                    includes: 'release-staging.tar.gz'
-                )
-            }
-        }
+            tar -czf "$ARCHIVE_TMP" \
+                --exclude='.git' \
+                --exclude='.ci-venv' \
+                --exclude='venv' \
+                --exclude='staticfiles' \
+                --exclude='media' \
+                --exclude='.env' \
+                --exclude='__pycache__' \
+                -C "$WORKSPACE" .
+
+            mv "$ARCHIVE_TMP" "$WORKSPACE/release-staging.tar.gz"
+
+            echo "Artifact Created Successfully"
+            ls -lh release-staging.tar.gz
+        '''
+
+        archiveArtifacts artifacts: 'release-staging.tar.gz',
+                         fingerprint: true
+    }
+}
 
         stage('Deploy Staging') {
             steps {
