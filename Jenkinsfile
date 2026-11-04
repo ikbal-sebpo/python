@@ -114,36 +114,34 @@ stage('Deploy Staging') {
                     deploy@192.168.119.128:/tmp/release-staging.tar.gz
 
                 ssh -o StrictHostKeyChecking=accept-new \
-                    deploy@192.168.119.128 << 'EOF'
+                    deploy@192.168.119.128 'bash -s' <<'REMOTE_SCRIPT'
+set -e
 
-                    set -e
+cd /var/www/myproject
 
-                    tar --no-same-owner \
-                        --no-same-permissions \
-                        --no-overwrite-dir \
-                        -xzf /tmp/release-staging.tar.gz \
-                        -C /var/www/myproject
+tar --no-same-owner \
+    --no-same-permissions \
+    --no-overwrite-dir \
+    -xzf /tmp/release-staging.tar.gz \
+    -C /var/www/myproject
 
-                    cd /var/www/myproject
+. venv/bin/activate
 
-                    . venv/bin/activate
+pip install -r requirements.txt
 
-                    pip install -r requirements.txt
+python manage.py collectstatic --noinput
 
-                    python manage.py collectstatic --noinput
+sudo -n /usr/bin/systemctl restart gunicorn
 
-                    sudo systemctl restart gunicorn
+sudo -n /usr/bin/systemctl is-active --quiet gunicorn
 
-                    sudo systemctl is-active --quiet gunicorn
+echo "Staging deployment successful"
+REMOTE_SCRIPT
 
-                    echo "Staging deployment successful"
-
-                    EOF
             '''
         }
     }
 }
-
         stage('Validate Production Version') {
 
             when {
