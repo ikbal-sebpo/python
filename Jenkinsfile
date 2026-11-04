@@ -77,20 +77,22 @@ stage('Create Artifact') {
 
             tar -czf "$ARCHIVE_TMP" \
                 --exclude='.git' \
-                --exclude='.ci-venv' \
                 --exclude='venv' \
+                --exclude='.ci-venv' \
                 --exclude='staticfiles' \
                 --exclude='media' \
                 --exclude='.env' \
                 --exclude='__pycache__' \
+                --exclude='*.pyc' \
                 --exclude='db.sqlite3' \
                 --exclude='Jenkinsfile' \
-                --exclude='New Text Document.txt' \
+                --exclude='release-staging.tar.gz' \
+                --exclude='release-production.tar.gz' \
                 -C "$WORKSPACE" .
 
             mv "$ARCHIVE_TMP" "$WORKSPACE/release-staging.tar.gz"
 
-            echo "Artifact created successfully"
+            echo "All project files included in deployment artifact"
         '''
 
         archiveArtifacts artifacts: 'release-staging.tar.gz',
