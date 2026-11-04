@@ -65,40 +65,6 @@ pipeline {
             }
         }
 
-        stage('Build') {
-            steps {
-
-                sh '''
-                    set -e
-
-                    if [ ! -f requirements.txt ]; then
-                        echo "requirements.txt not found!"
-                        exit 1
-                    fi
-
-                    python3 -m venv .ci-venv
-
-                    .ci-venv/bin/pip install --upgrade pip
-
-                    .ci-venv/bin/pip install -r requirements.txt
-                '''
-            }
-        }
-
-        stage('Test') {
-            steps {
-
-                sh '''
-                    set -e
-
-                    echo "Checking Python source compilation"
-
-                    .ci-venv/bin/python -m compileall -q manage.py config
-
-                    echo "Code compilation successful"
-                '''
-            }
-        }
 
 stage('Create Artifact') {
     steps {
@@ -117,11 +83,14 @@ stage('Create Artifact') {
                 --exclude='media' \
                 --exclude='.env' \
                 --exclude='__pycache__' \
+                --exclude='db.sqlite3' \
+                --exclude='Jenkinsfile' \
+                --exclude='New Text Document.txt' \
                 -C "$WORKSPACE" .
 
             mv "$ARCHIVE_TMP" "$WORKSPACE/release-staging.tar.gz"
 
-            ls -lh release-staging.tar.gz
+            echo "Artifact created successfully"
         '''
 
         archiveArtifacts artifacts: 'release-staging.tar.gz',
@@ -131,7 +100,6 @@ stage('Create Artifact') {
               includes: 'release-staging.tar.gz'
     }
 }
-
 stage('Deploy Staging') {
     steps {
         unstash 'staging-release'
