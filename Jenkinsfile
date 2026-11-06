@@ -230,8 +230,8 @@ echo "Collecting static files..."
 echo "Setting Static Files Permissions..."
 
 sudo -n /usr/bin/chmod 755 /var/www
-
 sudo -n /usr/bin/chmod 755 /var/www/myproject
+sudo -n /usr/bin/chmod -R a+rX /var/www/myproject/staticfiles
 
 if [ -d "$APP_DIR/staticfiles" ]; then
     sudo -n /usr/bin/chmod -R a+rX "$APP_DIR/staticfiles"
