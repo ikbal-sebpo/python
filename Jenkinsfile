@@ -1,4 +1,3 @@
-
 pipeline {
 
     agent any
@@ -18,208 +17,235 @@ pipeline {
     }
 
     parameters {
+        booleanParam(
+            name: 'DEPLOY_PRODUCTION',
+            defaultValue: false,
+            description: 'Enable Production deployment'
+        )
 
         string(
             name: 'PRODUCTION_VERSION',
             defaultValue: '',
-            description: 'Git tag to deploy. Example: v1.0.0'
-        )
-
-        booleanParam(
-            name: 'DEPLOY_PRODUCTION',
-            defaultValue: false,
-            description: 'Enable manual Production deployment'
+            description: 'Git tag to deploy. Example: v1, v1.0.0, v2'
         )
     }
 
     environment {
+        // GitHub
+        GIT_REPOSITORY = 'https://github.com/ikbal-sebpo/python.git'
+        GIT_BRANCH = 'main'
 
-        // Server Configuration
+        // Servers
         STAGING_HOST = '192.168.119.128'
         PRODUCTION_HOST = '192.168.119.130'
 
+        // SSH
         DEPLOY_USER = 'deploy'
-
-        APP_DIR = '/var/www/myproject'
-
-        // Jenkins SSH Credentials IDs
         STAGING_CREDENTIAL = 'staging-ssh-key'
         PRODUCTION_CREDENTIAL = 'staging-ssh-key'
 
-        // GitHub Repository
-        GIT_REPOSITORY = 'https://github.com/ikbal-sebpo/python.git'
-        GIT_BRANCH = 'main'
+        // Django application
+        APP_DIR = '/var/www/myproject'
+
+        // Environment files on target servers
+        STAGING_ENV_FILE = '/etc/myproject.env'
+        PRODUCTION_ENV_FILE = '/etc/myproject.env'
+
+        // Artifact names
+        STAGING_ARTIFACT = 'release-staging.tar.gz'
+        PRODUCTION_ARTIFACT = 'release-production.tar.gz'
     }
 
     stages {
 
-        // ==========================================
-        // 1. START PIPELINE
-        // ==========================================
-
         stage('Start') {
             steps {
-
-                echo '===================================='
+                echo '======================================'
                 echo 'Starting Django CI/CD Pipeline'
-                echo '===================================='
-
-                echo 'Staging: Automatic Deployment'
-                echo 'Production: Manual Approval'
+                echo '======================================'
+                echo "Staging Server: ${STAGING_HOST}"
+                echo "Production Server: ${PRODUCTION_HOST}"
+                echo "Application: ${APP_DIR}"
+                echo "Branch: ${GIT_BRANCH}"
+                echo "Production Deployment: ${params.DEPLOY_PRODUCTION}"
             }
         }
 
-
         // ==========================================
-        // 2. CHECKOUT SOURCE CODE
+        // CHECKOUT CODE
         // ==========================================
 
-        stage('Checkout') {
+        stage('Checkout Code') {
             steps {
+                echo 'Checking out GitHub source code...'
 
-                checkout scm
+                checkout([
+                    $class: 'GitSCM',
+                    branches: [[name: "*/${GIT_BRANCH}"]],
+                    userRemoteConfigs: [[
+                        url: "${GIT_REPOSITORY}"
+                    ]]
+                ])
 
                 sh '''
-                    set -e
-
-                    git fetch --force --tags origin
-
-                    echo "Current Branch:"
-                    git branch --show-current
-
-                    echo "Current Commit:"
-                    git rev-parse HEAD
-
-                    echo "Repository:"
-                    git remote get-url origin
+                    echo "Current Git commit:"
+                    git log -1 --oneline
                 '''
             }
         }
 
-
         // ==========================================
-        // 3. CREATE STAGING ARTIFACT
+        // CREATE STAGING ARTIFACT
         // ==========================================
 
         stage('Create Staging Artifact') {
             steps {
+                echo 'Creating Staging release artifact...'
 
                 sh '''
                     set -e
 
-                    echo "Creating Staging Artifact..."
+                    rm -f "$STAGING_ARTIFACT"
 
-                    ARCHIVE_TMP="${WORKSPACE}@tmp/release-staging.tar.gz"
+                    TMP_DIR=$(mktemp -d)
 
-                    mkdir -p "${WORKSPACE}@tmp"
+                    trap 'rm -rf "$TMP_DIR"' EXIT
 
-                    tar -czf "$ARCHIVE_TMP" \
-                        --exclude='.git' \
+                    git archive HEAD | tar -x -C "$TMP_DIR" \
+                        --exclude='.env' \
+                        --exclude='*/.env' \
                         --exclude='venv' \
+                        --exclude='*/venv' \
                         --exclude='.ci-venv' \
                         --exclude='staticfiles' \
+                        --exclude='*/staticfiles' \
                         --exclude='media' \
-                        --exclude='.env' \
-                        --exclude='__pycache__' \
-                        --exclude='*.pyc' \
+                        --exclude='*/media' \
                         --exclude='db.sqlite3' \
-                        --exclude='Jenkinsfile' \
-                        --exclude='release-staging.tar.gz' \
-                        --exclude='release-production.tar.gz' \
-                        -C "$WORKSPACE" .
+                        --exclude='*/db.sqlite3' \
+                        --exclude='__pycache__' \
+                        --exclude='*/__pycache__' \
+                        --exclude='*.pyc' \
+                        --exclude='*.pyo'
 
-                    mv "$ARCHIVE_TMP" "$WORKSPACE/release-staging.tar.gz"
+                    tar -czf "$STAGING_ARTIFACT" -C "$TMP_DIR" .
 
-                    echo "Staging Artifact Created Successfully"
+                    echo "Staging artifact created:"
+                    ls -lh "$STAGING_ARTIFACT"
                 '''
-
-                archiveArtifacts(
-                    artifacts: 'release-staging.tar.gz',
-                    fingerprint: true
-                )
-
-                stash(
-                    name: 'staging-release',
-                    includes: 'release-staging.tar.gz'
-                )
             }
         }
 
-
         // ==========================================
-        // 4. DEPLOY STAGING AUTOMATICALLY
+        // DEPLOY STAGING
         // ==========================================
 
         stage('Deploy Staging') {
             steps {
+                echo 'Deploying application to Staging...'
 
                 sshagent(credentials: [env.STAGING_CREDENTIAL]) {
 
                     sh '''
                         set -e
 
-                        echo "===================================="
-                        echo "Deploying to Staging Server"
-                        echo "Server: ${STAGING_HOST}"
-                        echo "===================================="
+                        echo "Uploading artifact to Staging..."
 
                         scp -o StrictHostKeyChecking=accept-new \
-                            release-staging.tar.gz \
-                            ${DEPLOY_USER}@${STAGING_HOST}:/tmp/release-staging.tar.gz
+                            "$STAGING_ARTIFACT" \
+                            "$DEPLOY_USER@$STAGING_HOST:/tmp/$STAGING_ARTIFACT"
+
+                        echo "Starting Staging deployment..."
 
                         ssh -o StrictHostKeyChecking=accept-new \
-                            ${DEPLOY_USER}@${STAGING_HOST} 'bash -s' <<'REMOTE_SCRIPT'
+                            "$DEPLOY_USER@$STAGING_HOST" \
+                            "APP_DIR='$APP_DIR' ENV_FILE='$STAGING_ENV_FILE' bash -s" <<'REMOTE_SCRIPT'
 
-set -e
+set -Eeuo pipefail
 
-APP_DIR="/var/www/myproject"
+echo "======================================"
+echo "STAGING DEPLOYMENT"
+echo "======================================"
+
+APP_DIR="${APP_DIR:-/var/www/myproject}"
+ENV_FILE="${ENV_FILE:-/etc/myproject.env}"
+RELEASE_FILE="/tmp/release-staging.tar.gz"
+
+echo "Application directory: $APP_DIR"
+
+# Create application directory
+mkdir -p "$APP_DIR"
+
+# Extract application
+echo "Extracting release..."
+
+tar -xzf "$RELEASE_FILE" -C "$APP_DIR"
+
+rm -f "$RELEASE_FILE"
 
 cd "$APP_DIR"
 
-echo "Extracting application files..."
+# Create virtual environment if missing
+if [ ! -d "venv" ]; then
+    echo "Creating Python virtual environment..."
+    python3 -m venv venv
+fi
 
-tar --no-same-owner \
-    --no-same-permissions \
-    --no-overwrite-dir \
-    -xzf /tmp/release-staging.tar.gz \
-    -C "$APP_DIR"
+# Activate virtual environment
+source venv/bin/activate
 
-rm -f /tmp/release-staging.tar.gz
-
-echo "Activating virtual environment..."
-
-test -x venv/bin/python
-
-. venv/bin/activate
-
+# Install dependencies
 echo "Installing Python dependencies..."
 
+python -m pip install --upgrade pip
 pip install -r requirements.txt
 
+# Load environment variables if available
+if [ -f "$ENV_FILE" ]; then
+
+    if [ ! -r "$ENV_FILE" ]; then
+        echo "ERROR: Environment file is not readable: $ENV_FILE"
+        exit 1
+    fi
+
+    echo "Loading Staging environment..."
+
+    set -a
+    source "$ENV_FILE"
+    set +a
+
+else
+    echo "Environment file not found: $ENV_FILE"
+    echo "Continuing with existing application environment configuration..."
+fi
+
+# Django static files
 echo "Collecting static files..."
 
 python manage.py collectstatic --noinput
 
+# Restart Gunicorn
 echo "Restarting Gunicorn..."
 
-sudo -n /usr/bin/systemctl restart gunicorn
+sudo systemctl restart gunicorn
 
-sudo -n /usr/bin/systemctl is-active --quiet gunicorn
+# Verify service
+sudo systemctl is-active --quiet gunicorn
 
-echo "===================================="
+echo "======================================"
 echo "STAGING DEPLOYMENT SUCCESSFUL"
-echo "===================================="
+echo "======================================"
 
 REMOTE_SCRIPT
 
                     '''
+
                 }
             }
         }
 
-
         // ==========================================
-        // 5. VALIDATE PRODUCTION VERSION
+        // VALIDATE PRODUCTION VERSION
         // ==========================================
 
         stage('Validate Production Version') {
@@ -231,83 +257,74 @@ REMOTE_SCRIPT
             }
 
             steps {
-
                 script {
 
-                    def version = params.PRODUCTION_VERSION?.trim()
+                    def version = params.PRODUCTION_VERSION.trim()
 
                     if (!version) {
-                        error(
-                            'PRODUCTION_VERSION is required when Production deployment is enabled.'
-                        )
+                        error('PRODUCTION_VERSION is required for Production deployment.')
                     }
 
-                    // Accept v1, v1.0, v1.0.0 and prerelease tags
                     if (!(version ==~ /^v[0-9]+(\\.[0-9]+){0,2}([.-][A-Za-z0-9.-]+)?$/)) {
-
                         error(
-                            "Invalid Production Version: '${version}'. Example: v1.0.0"
+                            "Invalid version: ${version}. " +
+                            "Examples: v1, v1.0, v1.0.0, v2"
                         )
                     }
 
-                    env.PRODUCTION_VERSION_CLEAN = version
+                    echo "Validating Production version: ${version}"
 
-                    echo "Production Version: ${version}"
+                    sh """
+                        set -e
+
+                        git fetch --force --tags origin
+
+                        git rev-parse --verify \
+                            'refs/tags/${version}^{commit}' >/dev/null
+
+                        echo "Git tag ${version} exists."
+                    """
+
+                    // Create production artifact from the selected tag
+                    sh """
+                        set -e
+
+                        rm -f "$PRODUCTION_ARTIFACT"
+
+                        TMP_DIR=\\$(mktemp -d)
+
+                        trap 'rm -rf "\\$TMP_DIR"' EXIT
+
+                        git archive "refs/tags/${version}" | tar -x -C "\\$TMP_DIR" \
+                            --exclude='.env' \
+                            --exclude='*/.env' \
+                            --exclude='venv' \
+                            --exclude='*/venv' \
+                            --exclude='.ci-venv' \
+                            --exclude='staticfiles' \
+                            --exclude='*/staticfiles' \
+                            --exclude='media' \
+                            --exclude='*/media' \
+                            --exclude='db.sqlite3' \
+                            --exclude='*/db.sqlite3' \
+                            --exclude='__pycache__' \
+                            --exclude='*/__pycache__' \
+                            --exclude='*.pyc' \
+                            --exclude='*.pyo'
+
+                        tar -czf "$PRODUCTION_ARTIFACT" -C "\\$TMP_DIR" .
+
+                        echo "Production artifact created:"
+                        ls -lh "$PRODUCTION_ARTIFACT"
+                    """
+
+                    echo "Production artifact ready for version ${version}"
                 }
-
-                sh '''
-                    set -e
-
-                    echo "===================================="
-                    echo "Validating Production Git Tag"
-                    echo "===================================="
-
-                    git fetch --force --tags origin
-
-                    git rev-parse --verify \
-                        "refs/tags/${PRODUCTION_VERSION_CLEAN}^{commit}"
-
-                    echo "Preparing Production Artifact..."
-
-                    RELEASE_DIR=$(mktemp -d)
-
-                    trap 'rm -rf "$RELEASE_DIR"' EXIT
-
-                    git archive \
-                        "${PRODUCTION_VERSION_CLEAN}" \
-                        | tar -xf - -C "$RELEASE_DIR"
-
-                    tar -czf release-production.tar.gz \
-                        --exclude='.git' \
-                        --exclude='venv' \
-                        --exclude='.ci-venv' \
-                        --exclude='staticfiles' \
-                        --exclude='media' \
-                        --exclude='.env' \
-                        --exclude='__pycache__' \
-                        --exclude='*.pyc' \
-                        --exclude='db.sqlite3' \
-                        --exclude='Jenkinsfile' \
-                        -C "$RELEASE_DIR" .
-
-                    echo "Production Artifact Created Successfully"
-                '''
-
-                archiveArtifacts(
-                    artifacts: 'release-production.tar.gz',
-                    fingerprint: true
-                )
-
-                stash(
-                    name: 'production-release',
-                    includes: 'release-production.tar.gz'
-                )
             }
         }
 
-
         // ==========================================
-        // 6. PRODUCTION APPROVAL
+        // PRODUCTION APPROVAL
         // ==========================================
 
         stage('Production Approval') {
@@ -322,41 +339,25 @@ REMOTE_SCRIPT
 
                 script {
 
-                    echo 'Waiting for Production Approval...'
-
-                    def approvedBy = input(
-
+                    input(
                         message: """
-========================================
+                            Production Deployment Approval
 
-PRODUCTION DEPLOYMENT APPROVAL
+                            Application: Django
+                            Server: ${PRODUCTION_HOST}
+                            Version: ${params.PRODUCTION_VERSION}
 
-Repository: ${env.GIT_REPOSITORY}
-
-Server: ${env.PRODUCTION_HOST}
-
-Version: ${env.PRODUCTION_VERSION_CLEAN}
-
-Application: Django
-
-Approve this Production Deployment?
-
-========================================
-""",
-
-                        ok: 'Approve Production Deployment',
-
-                        submitterParameter: 'APPROVED_BY'
+                            Do you want to deploy this version to Production?
+                        """,
+                        ok: 'Approve Production Deployment'
                     )
 
-                    echo "Production Approved By: ${approvedBy}"
                 }
             }
         }
 
-
         // ==========================================
-        // 7. DEPLOY PRODUCTION
+        // DEPLOY PRODUCTION
         // ==========================================
 
         stage('Deploy Production') {
@@ -369,129 +370,149 @@ Approve this Production Deployment?
 
             steps {
 
-                unstash 'production-release'
+                echo "Deploying version ${params.PRODUCTION_VERSION} to Production..."
 
                 sshagent(credentials: [env.PRODUCTION_CREDENTIAL]) {
 
                     sh '''
                         set -e
 
-                        echo "===================================="
-                        echo "Deploying to Production Server"
-                        echo "Server: ${PRODUCTION_HOST}"
-                        echo "Version: ${PRODUCTION_VERSION_CLEAN}"
-                        echo "===================================="
+                        echo "Uploading Production artifact..."
 
                         scp -o StrictHostKeyChecking=accept-new \
-                            release-production.tar.gz \
-                            ${DEPLOY_USER}@${PRODUCTION_HOST}:/tmp/myproject-release.tar.gz
+                            "$PRODUCTION_ARTIFACT" \
+                            "$DEPLOY_USER@$PRODUCTION_HOST:/tmp/$PRODUCTION_ARTIFACT"
+
+                        echo "Starting Production deployment..."
 
                         ssh -o StrictHostKeyChecking=accept-new \
-                            ${DEPLOY_USER}@${PRODUCTION_HOST} 'bash -s' <<'REMOTE_SCRIPT'
+                            "$DEPLOY_USER@$PRODUCTION_HOST" \
+                            "APP_DIR='$APP_DIR' ENV_FILE='$PRODUCTION_ENV_FILE' bash -s" <<'REMOTE_SCRIPT'
 
-set -e
+set -Eeuo pipefail
 
-APP_DIR="/var/www/myproject"
+echo "======================================"
+echo "PRODUCTION DEPLOYMENT"
+echo "======================================"
+
+APP_DIR="${APP_DIR:-/var/www/myproject}"
+ENV_FILE="${ENV_FILE:-/etc/myproject.env}"
+RELEASE_FILE="/tmp/release-production.tar.gz"
+
+# Create application directory before using it
+sudo mkdir -p "$APP_DIR"
+
+# Ensure deploy user can manage application files
+sudo chown -R "$(whoami):$(id -gn)" "$APP_DIR"
 
 cd "$APP_DIR"
 
-echo "Extracting Production Release..."
+# Extract release
+echo "Extracting Production release..."
 
-tar --no-same-owner \
-    --no-same-permissions \
-    --no-overwrite-dir \
-    -xzf /tmp/myproject-release.tar.gz \
-    -C "$APP_DIR"
+tar -xzf "$RELEASE_FILE" -C "$APP_DIR"
 
-rm -f /tmp/myproject-release.tar.gz
+rm -f "$RELEASE_FILE"
 
-echo "Checking Virtual Environment..."
-
-if [ ! -x venv/bin/python ]; then
-
+# Create virtual environment if missing
+if [ ! -d "venv" ]; then
+    echo "Creating Python virtual environment..."
     python3 -m venv venv
-
 fi
 
-echo "Activating Virtual Environment..."
+# Activate virtual environment
+source venv/bin/activate
 
-. venv/bin/activate
+# Install dependencies
+echo "Installing Python dependencies..."
 
-echo "Installing Python Dependencies..."
-
-pip install --upgrade pip
-
+python -m pip install --upgrade pip
 pip install -r requirements.txt
 
+# Validate environment file
 echo "Loading Production Environment..."
 
-test -f /etc/myproject.env
+if [ ! -f "$ENV_FILE" ]; then
+    echo "ERROR: Environment file not found: $ENV_FILE"
+    exit 1
+fi
 
+if [ ! -r "$ENV_FILE" ]; then
+    echo "ERROR: Environment file is not readable: $ENV_FILE"
+    exit 1
+fi
+
+# Validate shell syntax
+if ! bash -n "$ENV_FILE"; then
+    echo "ERROR: Invalid syntax in $ENV_FILE"
+    exit 1
+fi
+
+# Load environment variables
 set -a
-. /etc/myproject.env
+source "$ENV_FILE"
 set +a
 
-echo "Collecting Static Files..."
+echo "Production environment loaded successfully."
+
+# Django static files
+echo "Collecting static files..."
 
 python manage.py collectstatic --noinput
 
-echo "Restarting Gunicorn..."
+# No database migration
+echo "Database migration skipped as requested."
 
-sudo -n /usr/bin/systemctl restart gunicorn
+# Restart Gunicorn
+echo "Restarting Production Gunicorn..."
 
-sudo -n /usr/bin/systemctl is-active --quiet gunicorn
+sudo systemctl restart gunicorn
 
-echo "===================================="
+# Verify Gunicorn
+if ! sudo systemctl is-active --quiet gunicorn; then
+    echo "ERROR: Gunicorn service is not active."
+    sudo systemctl status gunicorn --no-pager || true
+    exit 1
+fi
+
+echo "======================================"
 echo "PRODUCTION DEPLOYMENT SUCCESSFUL"
-echo "===================================="
+echo "======================================"
 
 REMOTE_SCRIPT
 
                     '''
+
                 }
             }
         }
-
     }
 
-
     // ==========================================
-    // 8. POST BUILD ACTIONS
+    // POST ACTIONS
     // ==========================================
 
     post {
 
         success {
-
-            echo '''
-====================================
-CI/CD PIPELINE SUCCESSFUL
-====================================
-'''
+            echo '======================================'
+            echo 'JENKINS PIPELINE SUCCESSFUL'
+            echo '======================================'
         }
 
         failure {
-
-            echo '''
-====================================
-CI/CD PIPELINE FAILED
-Please check Jenkins Console Output.
-====================================
-'''
+            echo '======================================'
+            echo 'JENKINS PIPELINE FAILED'
+            echo 'Please check the Console Output.'
+            echo '======================================'
         }
 
         aborted {
-
-            echo '''
-====================================
-CI/CD PIPELINE ABORTED
-====================================
-'''
+            echo 'Jenkins pipeline was aborted.'
         }
 
         always {
-
-            echo 'Jenkins Pipeline Execution Finished.'
+            echo 'Pipeline execution completed.'
         }
     }
 }
