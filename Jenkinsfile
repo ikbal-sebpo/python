@@ -39,7 +39,6 @@ pipeline {
         PRODUCTION_HOST = '192.168.119.130'
 
         DEPLOY_USER = 'deploy'
-
         APP_DIR = '/var/www/myproject'
 
         STAGING_CREDENTIAL = 'staging-ssh-key'
@@ -54,14 +53,9 @@ pipeline {
 
     stages {
 
-        // =====================================
-        // 1. START
-        // =====================================
-
         stage('Start') {
             steps {
                 echo 'Starting Django Single Pipeline CI/CD'
-
                 echo "Repository: ${env.GIT_REPOSITORY}"
                 echo "Branch: ${env.GIT_BRANCH}"
                 echo "Staging: ${env.STAGING_HOST}"
@@ -69,10 +63,6 @@ pipeline {
                 echo "Production deployment: ${params.DEPLOY_PRODUCTION}"
             }
         }
-
-        // =====================================
-        // 2. CHECKOUT
-        // =====================================
 
         stage('Checkout Code') {
             steps {
@@ -96,12 +86,7 @@ pipeline {
             }
         }
 
-        // =====================================
-        // 3. CREATE STAGING ARTIFACT
-        // =====================================
-
         stage('Create Staging Artifact') {
-
             when {
                 expression {
                     return !params.DEPLOY_PRODUCTION
@@ -138,7 +123,6 @@ pipeline {
 
                     tar -czf "$STAGING_ARTIFACT" -C "$TMP_DIR" .
 
-                    echo "Staging artifact created:"
                     ls -lh "$STAGING_ARTIFACT"
                 '''
 
@@ -154,12 +138,7 @@ pipeline {
             }
         }
 
-        // =====================================
-        // 4. DEPLOY STAGING
-        // =====================================
-
         stage('Deploy Staging') {
-
             when {
                 expression {
                     return !params.DEPLOY_PRODUCTION
@@ -168,7 +147,6 @@ pipeline {
 
             steps {
                 sshagent(credentials: [env.STAGING_CREDENTIAL]) {
-
                     sh '''
                         set -eu
 
@@ -190,6 +168,11 @@ RELEASE_FILE="/tmp/release-staging.tar.gz"
 
 echo "Deploying Staging..."
 
+if [ ! -d "$APP_DIR" ] || [ ! -w "$APP_DIR" ]; then
+    echo "ERROR: deploy user cannot write to $APP_DIR"
+    exit 1
+fi
+
 cd "$APP_DIR"
 
 tar \
@@ -205,13 +188,11 @@ if [ ! -x venv/bin/python ]; then
     python3 -m venv venv
 fi
 
-source venv/bin/activate
-
-python -m pip install -r requirements.txt
+venv/bin/python -m pip install -r requirements.txt
 
 if [ -f "$ENV_FILE" ]; then
     if [ ! -r "$ENV_FILE" ]; then
-        echo "ERROR: Environment file not readable."
+        echo "ERROR: Staging environment file not readable."
         exit 1
     fi
 
@@ -220,12 +201,11 @@ if [ -f "$ENV_FILE" ]; then
     set +a
 fi
 
-python manage.py collectstatic --noinput
+venv/bin/python manage.py collectstatic --noinput
 
 echo "Database migration skipped."
 
 sudo -n /usr/bin/systemctl restart gunicorn
-
 sudo -n /usr/bin/systemctl is-active --quiet gunicorn
 
 echo "STAGING DEPLOYMENT SUCCESSFUL"
@@ -236,12 +216,7 @@ REMOTE
             }
         }
 
-        // =====================================
-        // 5. VALIDATE PRODUCTION VERSION
-        // =====================================
-
         stage('Validate Production Version') {
-
             when {
                 expression {
                     return params.DEPLOY_PRODUCTION
@@ -256,12 +231,11 @@ REMOTE
                         error('Production version is required. Example: v1.0.0')
                     }
 
-                    if (!(version ==~ /^v[0-9]+(\\.[0-9]+){0,2}([.-][A-Za-z0-9.-]+)?$/)) {
+                    if (!(version ==~ /^v[0-9]+(\.[0-9]+){0,2}([.-][A-Za-z0-9.-]+)?$/)) {
                         error("Invalid version: ${version}")
                     }
 
                     withEnv(["RELEASE_VERSION=${version}"]) {
-
                         sh '''
                             set -eu
 
@@ -301,7 +275,6 @@ REMOTE
                             tar -czf "$PRODUCTION_ARTIFACT" \
                                 -C "$TMP_DIR" .
 
-                            echo "Production artifact created:"
                             ls -lh "$PRODUCTION_ARTIFACT"
                         '''
                     }
@@ -321,12 +294,7 @@ REMOTE
             }
         }
 
-        // =====================================
-        // 6. PRODUCTION APPROVAL
-        // =====================================
-
         stage('Production Approval') {
-
             when {
                 expression {
                     return params.DEPLOY_PRODUCTION
@@ -354,12 +322,7 @@ Approve Production deployment?
             }
         }
 
-        // =====================================
-        // 7. DEPLOY PRODUCTION
-        // =====================================
-
         stage('Deploy Production') {
-
             when {
                 expression {
                     return params.DEPLOY_PRODUCTION
@@ -370,7 +333,6 @@ Approve Production deployment?
                 unstash 'production-release'
 
                 sshagent(credentials: [env.PRODUCTION_CREDENTIAL]) {
-
                     sh '''
                         set -eu
 
@@ -392,10 +354,10 @@ RELEASE_FILE="/tmp/release-production.tar.gz"
 
 echo "Deploying Production..."
 
-sudo mkdir -p "$APP_DIR"
-
-if [ ! -w "$APP_DIR" ]; then
+# No sudo mkdir: directory must already exist and be writable.
+if [ ! -d "$APP_DIR" ] || [ ! -w "$APP_DIR" ]; then
     echo "ERROR: deploy user cannot write to $APP_DIR"
+    echo "Fix directory ownership/permissions on Production server."
     exit 1
 fi
 
@@ -415,7 +377,6 @@ if [ ! -x venv/bin/python ]; then
 fi
 
 venv/bin/python -m pip install --upgrade pip
-
 venv/bin/python -m pip install -r requirements.txt
 
 if [ ! -f "$ENV_FILE" ] || [ ! -r "$ENV_FILE" ]; then
@@ -434,7 +395,6 @@ venv/bin/python manage.py collectstatic --noinput
 echo "Database migration skipped."
 
 sudo -n /usr/bin/systemctl restart gunicorn
-
 sudo -n /usr/bin/systemctl is-active --quiet gunicorn
 
 echo "PRODUCTION DEPLOYMENT SUCCESSFUL"
@@ -446,12 +406,7 @@ REMOTE
         }
     }
 
-    // =====================================
-    // POST ACTIONS
-    // =====================================
-
     post {
-
         success {
             echo 'JENKINS PIPELINE SUCCESSFUL'
         }
