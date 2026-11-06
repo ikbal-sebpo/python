@@ -1,3 +1,4 @@
+
 pipeline {
     agent any
 
@@ -84,6 +85,10 @@ pipeline {
             }
         }
 
+        // ========================================
+        // STAGING ARTIFACT
+        // ========================================
+
         stage('Create Staging Artifact') {
             when {
                 expression {
@@ -106,7 +111,6 @@ pipeline {
 
                     git archive --format=tar HEAD | tar -xf - -C "$TMP_DIR"
 
-                    # Exclude server-specific and generated files.
                     rm -rf \
                         "$TMP_DIR/.env" \
                         "$TMP_DIR/venv" \
@@ -140,6 +144,10 @@ pipeline {
                 )
             }
         }
+
+        // ========================================
+        // STAGING DEPLOYMENT
+        // ========================================
 
         stage('Deploy Staging') {
             when {
@@ -178,13 +186,13 @@ echo "========================================"
 echo "Application directory: $APP_DIR"
 
 if [ ! -d "$APP_DIR" ]; then
-    echo "ERROR: Application directory not found: $APP_DIR"
+    echo "ERROR: Application directory not found."
     exit 1
 fi
 
 cd "$APP_DIR"
 
-# Keep the existing .env file.
+# Preserve existing .env file.
 if [ ! -f "$APP_DIR/.env" ] || [ ! -r "$APP_DIR/.env" ]; then
     echo "ERROR: .env file missing or unreadable."
     exit 1
@@ -192,7 +200,7 @@ fi
 
 echo "Existing .env file found."
 
-# Extract new application code.
+# Extract application code.
 tar -xzf "/tmp/$RELEASE_FILE" -C "$APP_DIR"
 
 rm -f "/tmp/$RELEASE_FILE"
@@ -203,19 +211,41 @@ if [ ! -x "$APP_DIR/venv/bin/python" ]; then
     python3 -m venv "$APP_DIR/venv"
 fi
 
+# Install dependencies.
 echo "Installing Python dependencies..."
 
 "$APP_DIR/venv/bin/python" -m pip install --upgrade pip
 
 "$APP_DIR/venv/bin/pip" install -r "$APP_DIR/requirements.txt"
 
+# Collect static files.
 echo "Collecting static files..."
 
 "$APP_DIR/venv/bin/python" "$APP_DIR/manage.py" collectstatic --noinput
 
+# ========================================
+# STATIC FILE PERMISSIONS
+# ========================================
+
+echo "Setting Static Files Permissions..."
+
+sudo -n /usr/bin/chmod 755 /var/www
+
+sudo -n /usr/bin/chmod 755 /var/www/myproject
+
+if [ -d "$APP_DIR/staticfiles" ]; then
+    sudo -n /usr/bin/chmod -R a+rX "$APP_DIR/staticfiles"
+else
+    echo "ERROR: staticfiles directory not found."
+    exit 1
+fi
+
+echo "Static files permissions updated."
+
 # No database migration.
 echo "Database migration skipped."
 
+# Restart Gunicorn.
 echo "Restarting Gunicorn..."
 
 sudo -n /usr/bin/systemctl restart gunicorn
@@ -239,6 +269,10 @@ REMOTE
                 }
             }
         }
+
+        // ========================================
+        // PRODUCTION VERSION VALIDATION
+        // ========================================
 
         stage('Validate Production Version') {
             when {
@@ -284,6 +318,10 @@ REMOTE
             }
         }
 
+        // ========================================
+        // PRODUCTION ARTIFACT
+        // ========================================
+
         stage('Create Production Artifact') {
             when {
                 expression {
@@ -307,7 +345,6 @@ REMOTE
                     git archive --format=tar "$RELEASE_VERSION" \
                         | tar -xf - -C "$TMP_DIR"
 
-                    # Exclude server-specific and generated files.
                     rm -rf \
                         "$TMP_DIR/.env" \
                         "$TMP_DIR/venv" \
@@ -342,6 +379,10 @@ REMOTE
             }
         }
 
+        // ========================================
+        // PRODUCTION APPROVAL
+        // ========================================
+
         stage('Production Approval') {
             when {
                 expression {
@@ -370,6 +411,10 @@ Do you approve this deployment?
                 }
             }
         }
+
+        // ========================================
+        // PRODUCTION DEPLOYMENT
+        // ========================================
 
         stage('Deploy Production') {
             when {
@@ -408,13 +453,13 @@ echo "========================================"
 echo "Application directory: $APP_DIR"
 
 if [ ! -d "$APP_DIR" ]; then
-    echo "ERROR: Application directory not found: $APP_DIR"
+    echo "ERROR: Application directory not found."
     exit 1
 fi
 
 cd "$APP_DIR"
 
-# Keep the existing .env file.
+# Preserve existing .env file.
 if [ ! -f "$APP_DIR/.env" ] || [ ! -r "$APP_DIR/.env" ]; then
     echo "ERROR: .env file missing or unreadable."
     exit 1
@@ -422,7 +467,7 @@ fi
 
 echo "Existing .env file found."
 
-# Extract new application code.
+# Extract application code.
 tar -xzf "/tmp/$RELEASE_FILE" -C "$APP_DIR"
 
 rm -f "/tmp/$RELEASE_FILE"
@@ -433,19 +478,41 @@ if [ ! -x "$APP_DIR/venv/bin/python" ]; then
     python3 -m venv "$APP_DIR/venv"
 fi
 
+# Install dependencies.
 echo "Installing Python dependencies..."
 
 "$APP_DIR/venv/bin/python" -m pip install --upgrade pip
 
 "$APP_DIR/venv/bin/pip" install -r "$APP_DIR/requirements.txt"
 
+# Collect static files.
 echo "Collecting static files..."
 
 "$APP_DIR/venv/bin/python" "$APP_DIR/manage.py" collectstatic --noinput
 
+# ========================================
+# STATIC FILE PERMISSIONS
+# ========================================
+
+echo "Setting Static Files Permissions..."
+
+sudo -n /usr/bin/chmod 755 /var/www
+
+sudo -n /usr/bin/chmod 755 /var/www/myproject
+
+if [ -d "$APP_DIR/staticfiles" ]; then
+    sudo -n /usr/bin/chmod -R a+rX "$APP_DIR/staticfiles"
+else
+    echo "ERROR: staticfiles directory not found."
+    exit 1
+fi
+
+echo "Static files permissions updated."
+
 # No database migration.
 echo "Database migration skipped."
 
+# Restart Gunicorn.
 echo "Restarting Gunicorn..."
 
 sudo -n /usr/bin/systemctl restart gunicorn
@@ -470,6 +537,10 @@ REMOTE
             }
         }
     }
+
+    // ========================================
+    // POST ACTIONS
+    // ========================================
 
     post {
         success {
