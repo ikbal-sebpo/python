@@ -1,4 +1,3 @@
-
 pipeline {
 
     agent any
@@ -44,9 +43,6 @@ pipeline {
         STAGING_CREDENTIAL = 'staging-ssh-key'
         PRODUCTION_CREDENTIAL = 'staging-ssh-key'
 
-        STAGING_ENV_FILE = '/etc/myproject.env'
-        PRODUCTION_ENV_FILE = '/etc/myproject.env'
-
         STAGING_ARTIFACT = 'release-staging.tar.gz'
         PRODUCTION_ARTIFACT = 'release-production.tar.gz'
     }
@@ -85,6 +81,10 @@ pipeline {
                 '''
             }
         }
+
+        // ==========================================
+        // STAGING ARTIFACT
+        // ==========================================
 
         stage('Create Staging Artifact') {
             when {
@@ -138,6 +138,10 @@ pipeline {
             }
         }
 
+        // ==========================================
+        // DEPLOY STAGING
+        // ==========================================
+
         stage('Deploy Staging') {
             when {
                 expression {
@@ -147,6 +151,7 @@ pipeline {
 
             steps {
                 sshagent(credentials: [env.STAGING_CREDENTIAL]) {
+
                     sh '''
                         set -eu
 
@@ -158,12 +163,11 @@ pipeline {
 
                         ssh -o StrictHostKeyChecking=accept-new \
                             "$DEPLOY_USER@$STAGING_HOST" \
-                            "APP_DIR='$APP_DIR' ENV_FILE='$STAGING_ENV_FILE' bash -s" <<'REMOTE'
+                            "APP_DIR='$APP_DIR' bash -s" <<'REMOTE'
 
 set -Eeuo pipefail
 
 APP_DIR="${APP_DIR:-/var/www/myproject}"
-ENV_FILE="${ENV_FILE:-/etc/myproject.env}"
 RELEASE_FILE="/tmp/release-staging.tar.gz"
 
 echo "Deploying Staging..."
@@ -184,27 +188,30 @@ tar \
 
 rm -f "$RELEASE_FILE"
 
+# Create virtual environment if missing
 if [ ! -x venv/bin/python ]; then
     python3 -m venv venv
 fi
 
+# Install Python dependencies
 venv/bin/python -m pip install -r requirements.txt
 
-if [ -f "$ENV_FILE" ]; then
-    if [ ! -r "$ENV_FILE" ]; then
-        echo "ERROR: Staging environment file not readable."
-        exit 1
-    fi
-
-    set -a
-    source "$ENV_FILE"
-    set +a
+# Load existing project .env
+if [ ! -f "$APP_DIR/.env" ] || [ ! -r "$APP_DIR/.env" ]; then
+    echo "ERROR: Staging .env file missing or unreadable."
+    exit 1
 fi
 
+set -a
+source "$APP_DIR/.env"
+set +a
+
+# Collect static files
 venv/bin/python manage.py collectstatic --noinput
 
 echo "Database migration skipped."
 
+# Restart Gunicorn
 sudo -n /usr/bin/systemctl restart gunicorn
 sudo -n /usr/bin/systemctl is-active --quiet gunicorn
 
@@ -216,6 +223,10 @@ REMOTE
             }
         }
 
+        // ==========================================
+        // PRODUCTION VERSION VALIDATION
+        // ==========================================
+
         stage('Validate Production Version') {
             when {
                 expression {
@@ -225,17 +236,19 @@ REMOTE
 
             steps {
                 script {
+
                     def version = (params.PRODUCTION_VERSION ?: '').trim()
 
                     if (!version) {
                         error('Production version is required. Example: v1.0.0')
                     }
 
-                    if (!(version ==~ /^v[0-9]+(\.[0-9]+){0,2}([.-][A-Za-z0-9.-]+)?$/)) {
+                    if (!(version ==~ /^v[0-9]+(\\.[0-9]+){0,2}([.-][A-Za-z0-9.-]+)?$/)) {
                         error("Invalid version: ${version}")
                     }
 
                     withEnv(["RELEASE_VERSION=${version}"]) {
+
                         sh '''
                             set -eu
 
@@ -294,6 +307,10 @@ REMOTE
             }
         }
 
+        // ==========================================
+        // PRODUCTION APPROVAL
+        // ==========================================
+
         stage('Production Approval') {
             when {
                 expression {
@@ -303,6 +320,7 @@ REMOTE
 
             steps {
                 script {
+
                     def approvedBy = input(
                         message: """
 PRODUCTION DEPLOYMENT APPROVAL
@@ -322,6 +340,10 @@ Approve Production deployment?
             }
         }
 
+        // ==========================================
+        // DEPLOY PRODUCTION
+        // ==========================================
+
         stage('Deploy Production') {
             when {
                 expression {
@@ -330,9 +352,11 @@ Approve Production deployment?
             }
 
             steps {
+
                 unstash 'production-release'
 
                 sshagent(credentials: [env.PRODUCTION_CREDENTIAL]) {
+
                     sh '''
                         set -eu
 
@@ -344,17 +368,15 @@ Approve Production deployment?
 
                         ssh -o StrictHostKeyChecking=accept-new \
                             "$DEPLOY_USER@$PRODUCTION_HOST" \
-                            "APP_DIR='$APP_DIR' ENV_FILE='$PRODUCTION_ENV_FILE' bash -s" <<'REMOTE'
+                            "APP_DIR='$APP_DIR' bash -s" <<'REMOTE'
 
 set -Eeuo pipefail
 
 APP_DIR="${APP_DIR:-/var/www/myproject}"
-ENV_FILE="${ENV_FILE:-/etc/myproject.env}"
 RELEASE_FILE="/tmp/release-production.tar.gz"
 
 echo "Deploying Production..."
 
-# No sudo mkdir: directory must already exist and be writable.
 if [ ! -d "$APP_DIR" ] || [ ! -w "$APP_DIR" ]; then
     echo "ERROR: deploy user cannot write to $APP_DIR"
     echo "Fix directory ownership/permissions on Production server."
@@ -372,28 +394,31 @@ tar \
 
 rm -f "$RELEASE_FILE"
 
+# Create virtual environment if missing
 if [ ! -x venv/bin/python ]; then
     python3 -m venv venv
 fi
 
+# Install Python dependencies
 venv/bin/python -m pip install --upgrade pip
 venv/bin/python -m pip install -r requirements.txt
 
-if [ ! -f "$ENV_FILE" ] || [ ! -r "$ENV_FILE" ]; then
-    echo "ERROR: Production environment file missing or unreadable."
+# Load existing project .env
+if [ ! -f "$APP_DIR/.env" ] || [ ! -r "$APP_DIR/.env" ]; then
+    echo "ERROR: Production .env file missing or unreadable."
     exit 1
 fi
 
-bash -n "$ENV_FILE"
-
 set -a
-source "$ENV_FILE"
+source "$APP_DIR/.env"
 set +a
 
+# Collect static files
 venv/bin/python manage.py collectstatic --noinput
 
 echo "Database migration skipped."
 
+# Restart Gunicorn
 sudo -n /usr/bin/systemctl restart gunicorn
 sudo -n /usr/bin/systemctl is-active --quiet gunicorn
 
@@ -406,7 +431,12 @@ REMOTE
         }
     }
 
+    // ==========================================
+    // POST BUILD ACTIONS
+    // ==========================================
+
     post {
+
         success {
             echo 'JENKINS PIPELINE SUCCESSFUL'
         }
