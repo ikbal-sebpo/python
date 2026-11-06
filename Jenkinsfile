@@ -291,7 +291,7 @@ REMOTE_SCRIPT
 
                         rm -f "$PRODUCTION_ARTIFACT"
 
-                        TMP_DIR=\\$(mktemp -d)
+                        TMP_DIR=\$(mktemp -d)
 
                         trap 'rm -rf "\\$TMP_DIR"' EXIT
 
